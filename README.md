@@ -1,2 +1,2 @@
 # ENEL400
-Repository for initial Git in-lab activity
+Repository for cloud storage and collaboration of the SSKC project.
