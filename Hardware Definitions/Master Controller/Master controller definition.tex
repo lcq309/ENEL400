@@ -97,17 +97,26 @@
      			startstop/.style={rectangle, rounded corners, minimum width=3cm, text width=6em, minimum height=1cm, text centered, draw=black, fill=red!30},
      			process/.style={rectangle, minimum width=3cm, minimum height=1cm, text width=6em, text centered, draw=black, fill=orange!30},
      			decision/.style={diamond, minimum width=3cm, minimum height=1cm, text width=6em, text centered, draw=black, fill=green!30},
-     			arrow/.style={thick,->,>=stealth},}
+     			arrow/.style={thick,->,>=stealth},
+     			}
      		%define nodes
      		\node[startstop](rx){RS485 rx};
      		\node[decision, below of=rx](errcheck){system message?};
      		\node[startstop, right of=errcheck, xshift=1cm](display){send to menu mc};
      		\node[decision, below of=errcheck, yshift=-1cm](collcheck){collision?};
-     		\node[startstop, right of=collcheck, xshift=1cm](reassign){reassign colliding devices 
-            and try again};
-            \node[process, below of=collcheck](channel){find all relevant devices 
+     		\node[startstop, right of=collcheck, xshift=1cm](reassign){reset address of colliding devices 
+            and reassign};
+            \node[process, below of=collcheck, yshift=-0.5cm](channel){find all relevant devices 
             on the same channel};
-            \node[startstop, below of=channel](xBee tx){tx to relevant devices};
+            \node[startstop, below of=channel, yshift=0.5](xBee tx){tx to relevant devices};
+            %define arrows
+            \draw[arrow] (rx) -- (errcheck);
+            \draw[arrow] (errcheck) -- node[anchor=south] {yes} (display);
+            \draw[arrow] (errcheck) -- node[anchor=west] {no} (collcheck);
+            \draw[arrow] (collcheck) -- node[anchor=south] {yes} (reassign);
+            \draw[arrow] (collcheck) -- node[anchor=west] {no} (channel);
+            \draw[arrow] (channel) -- (xBee tx);
+
      	\end{tikzpicture}
      	\caption{RS485 RX flowchart}\label{fig:simpleflowRS485RX}
      \end{figure}
