@@ -12,8 +12,7 @@
     \begin{abstract}
         The purpose of this document is to define the requirements and provide a
          simple work plan for the Master controller main module. This document 
-         will include a simple block diagram and a flowchart for expected 
-         operations
+         will include a simple block diagram, flowcharts for operating modes. And some software design elements.
          \newpage
 	\end{abstract}
     \section{Introduction}
@@ -23,7 +22,7 @@
          power supply for wired devices, and provide a simple menu for viewing 
          devices on the network.
      
-     \section{System definition}
+     \section{System overview}
      The block diagram shown in figure~\ref{fig:simpleblock} is meant to
      encompass the components contained within the enclosure of the Master
      controller main unit. Some simplifications have been made, the A/C
@@ -59,8 +58,7 @@
      and keep track of a device list.
      \newpage
      \section{operations}
-     	see figure~\ref{fig:simpleflowRS485RX} for a simplified flowchart of the operation of the Master
-     	 Controller main unit.
+     	see figure~\ref{fig:simpleflowRS485RX} for a simplified flowchart of the operation of the Master Controller main unit.
      	\subsection{coordinator}
      		The coordinator's primary task is to perform coordination between the wired and wireless
      		 networks, but it will also filter out system messages to send to the menu controller,
@@ -120,4 +118,7 @@
      	\end{tikzpicture}
      	\caption{RS485 RX flowchart}\label{fig:simpleflowRS485RX}
      \end{figure}
+     \section{software design}
+     \section{connected devices}
+     
 \end{document}
