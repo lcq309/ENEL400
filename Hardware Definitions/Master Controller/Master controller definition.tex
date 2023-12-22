@@ -140,6 +140,52 @@
      	\subsubsection{Wired Lights}
      	These are basically the same as the wireless lights, they just have the wireless transceiver replaced with an RS485 one.
      	They take power through a separate power cable, not the network cable.
+     \subsection{Error codes and detection}
+     as part of the requirement for reliability, The master controller will serve as a point to read error and system status messages sent across the network.
+     \subsubsection{Error messaging concept}
+     Channel zero could be reserved for errors, and special system messages,
+     with the Coordinator unit sending these directly to the attached menu micro.
+     Error or system messages should include:
+     \begin{enumerate}
+     	\item The source device of the report message.
+     	\item Error "target", device which has an error.
+     	\item Error severity.
+     	\item The type of error.
+     	\item any additional details.
+     \end{enumerate}
+     \subsubsection{message types}
+     conceptual, add more if beneficial
+     \begin{itemize}
+     	\item Loss of connection / cannot connect
+     	\begin{itemize}
+     		\item Critical Error
+     		\item Sent by a reporting device
+     		\item occurs when a device misses a handshake, or if it never responds to a command
+     		\item includes the reporting device, and the device that is not connectable
+     	\end{itemize}
+     	\item Device internal failure
+     	\begin{itemize}
+     		\item Critical Error
+     		\item Sent by a device with an error
+     		\item internal diagnostic reports a failure to function
+     		\item includes detail of what failed
+     		\item i.e. light 2 green failed to turn on.
+     	\end{itemize}
+     	\item Battery low
+     	\begin{itemize}
+     		\item important
+     		\item Sent by a device that has detected a low battery status
+     		\item could include a time estimate
+     	\end{itemize}
+     	\item new device connected
+     	\begin{itemize}
+     		\item advisory
+     		\item sent by a device that has newly connected to the network
+     		\item includes the device name (if defined), type, and channel.
+     		\item i.e "SECTOR 3 LIGHT has joined the network on channel 4 as a wireless light"
+     	\end{itemize}
+     	
+     \end{itemize}
      \section{initial plan}
      Modular, all separate units vs custom all in one. 
      Modular with separate units was selected to help ensure system is easy to expand.
@@ -161,6 +207,8 @@
      
      \subsection{new network concept}
      The network still works mostly the same, just with the majority of devices being  located within a single primary enclosure.
+     Future expansions could either modify/enlarge the enclosure,
+     or be placed in separate enclosures and connected using a network cable.
      
      \subsection{Primary enclosure design}
      The primary enclosure still contains an A/C power supply. as well as every controller needed for the initial planned network.
