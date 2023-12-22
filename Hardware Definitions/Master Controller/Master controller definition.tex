@@ -118,7 +118,60 @@
      	\end{tikzpicture}
      	\caption{RS485 RX flowchart}\label{fig:simpleflowRS485RX}
      \end{figure}
-     \section{software design}
-     \section{connected devices}
+     \subsection{Wired Network Device Types}
+     	This system is intended to be very flexible, so this list is not restrictive.
+     	\subsubsection{Light controller}
+     	Configured to send controls to a single light channel.
+     	The pit light is the same unit, just with different coloured buttons and slightly modified code.
+     	(include a concept drawing)
+     	\subsubsection{Lap counter and controller}
+     	The lap counter is expected to be either a gas station price sign, or a crosswalk countdown sign.
+     	The lap counter controller is intended for use only on the wired network. (though a wireless version could be easily developed.)
+     	The controller includes:
+     	\begin{itemize}
+     		\item current lap display
+     		\item buttons to increment/decrement
+     		\item button for last lap "LL"
+     		\item button for half way (either wide H, or "HH").
+     		\item button to zero out the display
+     	\end{itemize}
+     	The display also works on the wired network, but could be adapted to be wireless.
+     	The display is powered through a separate power supply from the generator. Not through the network cable.
+     	\subsubsection{Wired Lights}
+     	These are basically the same as the wireless lights, they just have the wireless transceiver replaced with an RS485 one.
+     	They take power through a separate power cable, not the network cable.
+     \section{initial plan}
+     Modular, all separate units vs custom all in one. 
+     Modular with separate units was selected to help ensure system is easy to expand.
+     All, light controllers where initially expected to have 4 buttons (Green, Yellow, Red, Blue).
+     This was later changed to only allow the Master controller to set all lights to red. 
+     Since only the race director has the authority to stop the race.
      
+     (include some diagrams of the modular network concept)
+     
+     \section{after the first meeting}
+     After receiving feedback, The decision was to retain modular units. 
+     But to enclose the majority within a single enclosure (include diagram of single enclosure concept). 
+     The enclosure has space for one additional sector of light controls that will remain unpopulated initially. 
+     The different controls are all still connected through a wired RS485 network. 
+     But due to the close proximity, RJ45 jacks may be foregone within the enclosure. 
+     With the boards just being directly wired to each other.
+     An additional change was made in the form of a move to a single stop button that locks and sets all lights to stop, with individual stop buttons being removed from all devices.
+     In order to retain a redundant safety stop, A special portable stop button may be developed for the Race Director to carry at all times.
+     
+     \subsection{new network concept}
+     The network still works mostly the same, just with the majority of devices being  located within a single primary enclosure.
+     
+     \subsection{Primary enclosure design}
+     The primary enclosure still contains an A/C power supply. as well as every controller needed for the initial planned network.
+     (include diagram)
+     \subsection{other changes}
+     \begin{itemize}
+     	\item The starting line requirements have been updated. 
+     	The starting line should now have 3 lights directly beside each other.
+     	(include a diagram for this)
+     	\item Marshal and light controllers now only need three buttons.
+     	\item In order to meet the no single point of failure requirement for our network.
+     	We should consider a second wireless controller with a stop light. Maybe a special Race Director handheld controller.
+     \end{itemize}
 \end{document}
