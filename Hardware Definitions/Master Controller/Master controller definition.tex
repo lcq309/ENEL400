@@ -222,4 +222,118 @@
      	\item In order to meet the no single point of failure requirement for our network.
      	We should consider a second wireless controller with a stop light. Maybe a special Race Director handheld controller.
      \end{itemize}
+     \section{Central board high level design}
+     \subsection{coordinator}
+     Ideally, the coordinator will be the same micro that we are already using for everything else.
+     But if need be, it can be replaced with something more powerful.
+     The coordinator needs to connect to the wired network, the wireless network, and the menu controller.
+     All three connections could make use of USARTs.
+     \subsection{menu controller}
+     This is intended to handle display of errors and user configurable settings through the menu.
+     The intent is that this will be capable of displaying a simple network map of connected devices.
+     As well as displaying errors and other system messages received from the coordinator.
+     This is likely to be the same type of controller as everything else.
+     The type of display depends on what we decide on. Likely some kind of simple matrix LCD.
+     This controller will also be connected to control panel buttons.
+     
+     \section{Software high level design}
+     \subsection{coordinator}
+     The intent with the coordinator software is sequential:
+     \begin{enumerate}
+     	\item initialize, find and connect to a network. form a network.
+     	\item assignment, find all wired devices, starting with counting up any that are already assigned.
+     	\item after connecting, enter round-robin communication mode on the wired network. and listen to anything from the wireless or the menu.
+     \end{enumerate}
+     \subsubsection{initialization}
+     The initialization routine includes:
+     \begin{itemize}
+     	\item any diagnostic we could think of
+		\item find or create a network, send out a ping to all devices to start building the list
+     	\item wait until it stops receiving devices on the wireless then move to the wired assignment mode
+     \end{itemize}
+     
+     \subsubsection{Wired assignment}
+     wired assignment starts by collecting the 8 bit address of devices that are already assigned.
+     This occurs one at a time, it will ping all 255 addresses and collect the information on any that respond.
+     After finding any already connected devices, it will then send a ping out to any unassigned devices.
+     The idea with the auto-learn routine is that each device has a "random" delay between 0 and 1000ms.
+     when a device reaches its delay time, it sends a ping back to the master.
+     The master collects the information about this device, assigns a semi-permanent ID to it, then sends out another ping.
+     Auto-learning could take up to 255 seconds in the worst case. But it only needs to happen the first time the network is assembled.
+     So this should still be an acceptable delay.
+     While learning, the display should show that it is currently learning and it might take a while.
+     It could also show how many wired devices have been detected, and list off any newly assigned devices.
+     The device only enters assignment mode on startup, if a new device is added afterwards, then the controller will need to be power cycled.
+     (Could also probably be triggered through the menu)
+     
+     \subsubsection{round robin}
+     The master controller pings each device on the wired network in sequence.
+     Each device is expected to respond with a short acknowledgment even if there is nothing to report
+     , and if nothing is received it will show an error.
+     If a device has something to say, it will wait until it is pinged then respond.
+     All devices are listening all the time, if they hear something relevant to them then they will process it and come up with a response.
+     (in order to deal with multiple devices on the same channel on the same wired network. Maybe other wireless devices could determine what number of responses to expect from a master controller.)
+     If a message comes through on the wireless network:
+     \begin{enumerate}
+     	\item check the channel number, if there are no connected devices on the channel then don't bother broadcasting over the wired network.
+     	\item if channel is 0, then send the message to the menu micro.
+     	\item otherwise, broadcast the message over the wired network.
+     	\item return to round robin mode, relevant devices will come up with a response to that message and respond in turn.
+     	The sending device needs to keep track of how many responses it should expect.
+     \end{enumerate}
+     If a message comes through on the wired network:
+     \begin{enumerate}
+     	\item check the channel number, if there are no devices on the wireless network in the same channel then don't do anything with the message.
+     	\item if the channel is 0, send the message to the menu micro, and broadcast if there are any other master devices.
+     \end{enumerate}
+     If a message comes from the menu micro:
+     \begin{enumerate}
+     	\item check the target of the command, if it is meant for a device on the wired network then send it there.
+     	\item otherwise broadcast the command over the network.
+     \end{enumerate}
+     \subsubsection{new wireless device}
+     When a new wireless device joins the network, the coordinator needs to:
+     \begin{enumerate}
+     	\item store the device address, type, and channel
+     	\item determine the device type and respond appropriately.
+     	\begin{itemize}
+     		\item if the device is a controller, then respond with the number of wired targets in the same channel.
+     		\item if the device is another master controller, just respond with the address.
+     		\item if the device is a target, respond with the number of wired controllers in the same channel.
+     	\end{itemize}
+     	\item if there are no wired devices on the same channel, just store the device for system wide messages.
+     	
+     	\item if there are wired devices on the same channel, broadcast the joining message over the wired network so they can add the device to their internal lists.
+     	
+     	\item after, return to round robin
+     \end{enumerate}
+     \subsection{menu micro}
+     The menu micro manages the display, and the controls.
+     \subsubsection{display}
+     The display is meant to show errors and general system status messages.
+     But could also potentially be used to provide a network map,
+      and assign names to devices on the network.
+      As well as accessing any other user configurable commands.
+     
+     \subsubsection{internal memory}
+     The menu micro should also keep track of any devices on the wireless, as well as the wired network.
+     It can store any user assigned name, device type and channel as well as the 64 bit ID or 8 bit ID.
+     Then this list of stored devices can be displayed on request.
+     
+     This information could probably be stored in flash, as it wouldn't change often and would only really be accessed on request from the user in the form of the network map.
+     
+     the device could store the current state of connected devices in RAM, and point to a structure in flash containing the rest of the information.
+     
+     when it is time to generate the network map, it will go through flash and pull each device.
+     It will display the device name, type, current status, and possibly the address as well.
+     
+     
+     \subsubsection{controls}
+     The other responsibility of the menu micro is to respond to any of the user control inputs.
+     
+     \section{alternative coordinator}
+     A lighter weight alternative for the coordinator could be made.
+     The coordinator doesn't have to create a list of wireless devices if the sending device is responsible for
+     knowing where to send things.
+     
 \end{document}
