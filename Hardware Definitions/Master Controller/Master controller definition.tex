@@ -314,6 +314,13 @@
      But could also potentially be used to provide a network map,
       and assign names to devices on the network.
       As well as accessing any other user configurable commands.
+     Because of the complex variety of tasks for this display, a touchscreen should be a good choice.
+     A touchscreen display would be easy to reconfigure for different applications without making any physical changes.
+     And allows for a large amount of information to be displayed and manipulated.
+     A nextion display has a built in microcontroller that handles most of the overhead of running the display and touch input.
+     But we do not have much access for using this micro to process data,
+     so the menu micro will still be responsible for processing data, storing a device list,
+     and sending commands to the display micro.
      
      \subsubsection{internal memory}
      The menu micro should also keep track of any devices on the wireless, as well as the wired network.
@@ -330,10 +337,56 @@
      
      \subsubsection{controls}
      The other responsibility of the menu micro is to respond to any of the user control inputs.
+     These inputs may come from the Nextion touch screen, or potentially from some other optional general purpose inputs.
      
      \section{alternative coordinator}
      A lighter weight alternative for the coordinator could be made.
      The coordinator doesn't have to create a list of wireless devices if the sending device is responsible for
      knowing where to send things.
      
+     \section{hardware design remarks}
+     \begin{itemize}
+     	\item The nextion display requires a 5 volt supply, so a 5 volt regulator will be selected in addition to the 3.3 volts
+     for all the other electronics.
+     
+     \item When looking into the other boards, an issue was noticed with the original RS485 transceiver in that it's load impedance only
+     allowed for a maximum of 32 devices, vs the 256 we had initially intended on.
+     This was rectified by replacing it with a direct upgrade that allows for up to 256 devices and has a higher maximum transmission rate.
+     
+     \item Currently, the primary 12 volt input is making use of a screw terminal. 
+     Replacing this with some kind of keyed connector should be considered to avoid an accidental misconnection.
+     
+     \item in order to prevent potential damage to circuitry from 5v USB power backfeeding.
+     A switch will select between the +5v output from the DC-DC converter, or VBUS from the USB port.
+     USB2.0 should be able to handle the power requirements of the screen and the rest of the device, and 3.0 is of no concern.
+     The switch will also choose between power from the +12v, or power from VBUS for the 3.3 volt converter.
+     In this way, the system can be powered either through 12v input, or USB.
+     
+     \item The nextion display will be mounted separately from the rest of the board, to allow it to be placed optimally.
+     This will use a JST XH 4P connector, as it is easily capable of handling the necessary current (approx. 250mA).
+     And keyed, so there isn't as much risk of damage occurring due to incorrectly made connections.
+     
+     \item The nextion display uses a 5 volt TTL level, but it should be capable of working with down to three volt input according to the datasheet.
+     It should be possible to use a voltage divider to pull the 5V level down to around 3.3V for the menu microcontroller.
+     
+     \item A decision was made to include a few GPIO connections to the menu controller on the board.
+     This is to allow for potential future controls, even if there isn't any direct plan to use them now.
+     They will likely be left without the connectors installed on the board, for potential future use.
+     
+     \item Since the intent is to also provide power over the twisted pair cable, there should probably be some kind of fusing to protect the cables in the event of a fault.
+     The PoE standard specifies a maximum of 300ma per pair, since we intend to use 3 pairs for power we should try to have no more than
+     900ma total for the 3 pairs.
+     
+     \end{itemize}
+     \section{selecting a protection device}
+     We want this device to be reusable, inexpensive, and small.
+     PTC resettable fuses should work well, as they are capable of handling the expected load current.
+     And reset automatically once the fault is cleared (eventually).
+     \subsection{device sizing}
+     with the expected maximum load current of ~900mA, we can select a PTC device with a hold current of 900mA.
+     this gives a trip current of 1.8A, and looking at the curve from the datasheet the device should trip within a few seconds at 5A.
+     \subsection{device placement} 
+     We already have two separate power feeds into the wired network.
+     Each with about 11W capability, for a total of 22W in the wired network.
+     I will use two PTC devices, and place them in between where power comes in, and where it leaves the master controller board.
 \end{document}

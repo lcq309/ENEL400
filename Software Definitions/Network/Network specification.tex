@@ -1,0 +1,124 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+
+\begin{document}
+	
+	\title{RS485 Wired Network Specification}
+	\author{Your Name}
+	\date{\today}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	This document provides a detailed specification for the RS485-based wired network. It outlines the components, protocols, and configurations necessary for the successful implementation and operation of the network.
+	
+	\section{Network Topology}
+	
+	Physical layout and topology:
+	
+	\subsection{Wireless topology}
+	The wireless network will be an xbee mesh using zigbee modules.
+	
+	\subsection{Wired network}
+	The wired network is based on the RS485 physical standard.
+	The wired network will use a bus topology, with all devices connected in series and terminated using 120$\Omega$ resistors.
+	
+	\section{Hardware Components}
+	
+	List and describe the hardware components involved in the network:
+	\subsection{wireless}
+	The wireless network is based on our xbee modules.
+	\subsection{wired}
+	The wired network is based on the RS485 standard, with our own handling for messages.
+	\subsubsection{Network devices}
+	The network consists of one Master device, with up to 255 subordinate devices in a single bus.
+	\subsubsection{RS485 transceiver}
+	The selected transceiver allows for up to 16mbps communication, and up to 255 receiving devices on a network.
+	(include a reference link to the RS485 transceiver)
+	\subsubsection{power supply}
+	The master device is capable of supplying up to 11w on each port.
+	
+	\subsubsection{Cables and connectors}
+	The expected connector is a generic RJ45.
+	With cables ranging from cat5e to cat6.
+	A single twisted pair is for data transmission, the other three are for power.
+	
+	\subsubsection{Termination resistors}
+	The bus should be terminated with a 120$\Omega$ resistance on each end.
+	
+	\section{Communication Protocol}
+	
+	\subsection{Wireless}
+	the wireless network is dependent on the built in protocols of the xbee modules.
+	
+	\subsection{Wired}
+	Detail the communication protocol used on the RS485 network. Include information on:
+	
+	\subsubsection{Baud rate}
+	
+	we are expecting a bit rate of around 115200.
+	
+	\section{Data Frames}
+	
+	Describe the format of data frames used in the RS485 network. Include details such as:
+	
+	\begin{itemize}[label=--]
+		\item Start and stop bits.
+		\item Data length.
+		\item Addressing scheme.
+		\item Payload structure.
+	\end{itemize}
+	
+	\section{Electrical Characteristics}
+	
+	Specify the electrical characteristics of the RS485 network:
+	
+	\begin{itemize}[label=--]
+		\item Voltage levels.
+		\item Maximum cable length.
+		\item Maximum number of nodes.
+		\item Termination resistor values.
+	\end{itemize}
+	
+	\section{Installation Guidelines}
+	
+	Provide guidelines for the installation of the RS485 network:
+	
+	\begin{itemize}[label=--]
+		\item Proper grounding techniques.
+		\item Cable routing and management.
+		\item Considerations for avoiding electromagnetic interference.
+	\end{itemize}
+	
+	\section{Testing and Validation}
+	
+	Outline the procedures for testing and validating the RS485 network:
+	
+	\begin{itemize}[label=--]
+		\item Functional testing of each device.
+		\item Communication reliability testing.
+		\item Troubleshooting steps.
+	\end{itemize}
+	
+	\section{Maintenance and Support}
+	
+	Describe the maintenance procedures and support mechanisms for the RS485 network:
+	
+	\begin{itemize}[label=--]
+		\item Regular checks and inspections.
+		\item Firmware updates for devices.
+		\item Contact information for technical support.
+	\end{itemize}
+	
+	\section{Conclusion}
+	
+	Summarize the key points of the RS485 wired network specification and emphasize any critical considerations for successful implementation.
+	
+\end{document}
