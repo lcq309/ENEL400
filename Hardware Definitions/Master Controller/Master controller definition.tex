@@ -389,4 +389,14 @@
      We already have two separate power feeds into the wired network.
      Each with about 11W capability, for a total of 22W in the wired network.
      I will use two PTC devices, and place them in between where power comes in, and where it leaves the master controller board.
+     \section{further changes}
+     \subsection{coordinator processing}
+     Instead of requiring the coordinator to keep track of all devices, we could instead make the sending device responsible for
+     knowing the destination addresses and instructing the coordinator to transmit over wireless where applicable.
+     This can greatly lighten the processing load on the coordinator as all it really needs to do now is check the channel to see whether it should be sent to the menu or not.
+     And check to see if the message should be transmitted over wireless using a supplied address.
+     \subsection{on/off, all stop, systemwide commands}
+     Instead of having the on/off and other systemwide commands on the main board, they could just make use of another light controller board.
+     This would greatly simplify the code of the menu controller, and allow the system-wide controller to perform more checks on the network.
+     
 \end{document}
