@@ -185,6 +185,22 @@
 		\caption{auto-learn routine on the wired network}
 		\label{fig:autolearnwiredflow}
 	\end{figure}
+	\begin{figure}
+		\begin{tikzpicture}
+			\tikzset{
+				startstop/.style={rectangle, rounded corners, minimum width=3cm, text width=10em, minimum height=1cm, text centered, draw=black, fill=red!30},
+				process/.style={rectangle, minimum width=3cm, minimum height=1cm, text width=8em, text centered, draw=black, fill=orange!30},
+				decision/.style={diamond, minimum width=3cm, minimum height=1cm, text width=8em, text centered, draw=black, fill=green!30},
+				arrow/.style={thick,->,>=stealth},
+			}
+			\node[startstop](start){RS485 RX};
+			\node[decision, below of=start](ch chk){Channel check};
+			\node[startstop, right of=ch chk](menu){Send to menu micro};
+			\node[decision, below of=ch chk](broadcast){wireless check};
+			\node[startstop, right of=broadcast](done){finished with message};
+			
+		\end{tikzpicture}
+	\end{figure}
 	\section{Conclusion}
 	
 	Summarize the key points of the RS485 wired network specification and emphasize any critical considerations for successful implementation.
