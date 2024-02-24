@@ -7,3 +7,12 @@
 *.gz
 Hardware Definitions/Master Controller/Working on Master controller.txt
 Hardware Definitions/Master Controller/Master controller definition.toc
+Software/Startup testing code/MPLABproject/Startup testing 2.X/.generated_files/flags/default/430ad84a2bab6f060165d63c10fd436a30e5a327
+Software/Startup testing code/MPLABproject/Startup testing 2.X/.generated_files/flags/default/74d92322d963479e5b0876e81670a9f4ff312a77
+Software/Startup testing code/MPLABproject/Startup testing 2.X/.generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+*.o
+*.d
+*.elf
+*.map
+*.mk
+*.xml

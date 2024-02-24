@@ -201,6 +201,28 @@
 			
 		\end{tikzpicture}
 	\end{figure}
+	\begin{figure}
+		\begin{tikzpicture}[auto, node distance=5cm,>=latex']
+			\tikzset{
+				startstop/.style={rectangle, rounded corners, minimum width=3cm, text width=10em, minimum height=1cm, text centered, draw=black, fill=red!30},
+				process/.style={rectangle, minimum width=3cm, minimum height=1cm, text width=10em, text centered, draw=black, fill=orange!30},
+				decision/.style={diamond, minimum width=3cm, minimum height=1cm, text width=10em, text centered, draw=black, fill=green!30},
+				arrow/.style={thick,->,>=stealth},
+			}
+			\node[startstop](start){message from device};
+			\node[decision, below of=start](type){check message type};
+			\node[process, below of=type](channel){add channel number};
+			\node[startstop, below of=channel](send){send to devices on list};
+			\node[process, right of=type](error){set channel to 0};
+			\node[startstop, below of=error](errorsend){send error to display devices};
+			%add arrows
+			\draw[->] (start) -- (type);
+			\draw[->] (type) -- node[anchor=east] {Normal} (channel);
+			\draw[->] (type) -- node[anchor=south] {Error} (error);
+			\draw[->] (channel) -- (send);
+			\draw[->] (error) -- (errorsend);
+		\end{tikzpicture}
+	\end{figure}
 	\section{Conclusion}
 	
 	Summarize the key points of the RS485 wired network specification and emphasize any critical considerations for successful implementation.
