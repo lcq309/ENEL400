@@ -40,19 +40,18 @@ int main(int argc, char** argv) {
      * to enable a pin as output, the header path seems to be PORTx.DIRSET
      * I will then use the pin 3 bit mask to set that pin as an output
      */
-    PORTD.DIRSET |= PIN3_bm;
+    PORTD.DIRSET = PIN3_bm;
     /*
      * now PIN3 should be configured as an output, so I will try toggling it
      * once per second
      */
     while(1)
     {
-        PORTD.OUTSET |= PIN3_bm;
+        PORTD.OUTSET = PIN3_bm;
         _delay_ms(1000);
-        PORTD.OUTCLR |= PIN3_bm;
+        PORTD.OUTCLR = PIN3_bm;
         _delay_ms(1000);
     }
-    
     return (EXIT_SUCCESS);
 }
 
