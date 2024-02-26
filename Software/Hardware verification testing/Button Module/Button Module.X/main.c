@@ -5,19 +5,18 @@
  * Created on February 24, 2024
  */
 
-#define I1 PIN1_bm
-#define I2 PIN0_bm
-#define I3 PIN7_bm
-#define B1 PIN6_bm
-#define B2 PIN5_bm
-#define B3 PIN3_bm
-#define B4 PIN2_bm
-#define B5 PIN3_bm
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <avr/io.h>
 
+#define I1 PIN1_bm
+#define I2 PIN0_bm
+#define I3 PIN7_bm
+#define B1 PIN6_bm //PD6
+#define B2 PIN5_bm //PD5
+#define B3 PIN3_bm //PD3
+#define B4 PIN2_bm //PD2
+#define B5 PIN3_bm //PC3
 
 void I1_on(void);
 void I1_off(void);

@@ -5,6 +5,10 @@
  * Created on February 24, 2024
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <avr/io.h>
+
 #define GBut PIN4_bm    //PD4
 #define BBut PIN5_bm    //PD5
 #define YBut PIN6_bm    //PD6
@@ -13,10 +17,6 @@
 #define YInd PIN3_bm    //PC3
 #define BInd PIN1_bm    //PD1
 #define GInd PIN3_bm    //PD3
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <avr/io.h>
 
 /*
  * 
@@ -34,7 +34,7 @@ void GInd_on(void);
 void GInd_off(void);
 
 int main(int argc, char** argv) {
-     // Clock configuration for 24MHz
+    // Clock configuration for 24MHz
     _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL.OSCHFCTRLA | CLKCTRL_FRQSEL_24M_gc);
     // initialize outputs
     PORTC.DIRSET = Stat | YInd;

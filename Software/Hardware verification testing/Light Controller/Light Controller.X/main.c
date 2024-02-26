@@ -4,6 +4,12 @@
  * Purpose: Testing of the light driver module hardware
  * Created on February 24, 2024
  */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <util/delay.h>
+#include <avr/io.h>
+
 #define F_CPU 24000000UL //24MHz clock for delay function
 
 
@@ -12,10 +18,6 @@
 #define BSIG PIN0_bm //PD0
 #define YSIG PIN1_bm //PD1
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <util/delay.h>
-#include <avr/io.h>
 
 void RSIG_on(void);
 void RSIG_off(void);
