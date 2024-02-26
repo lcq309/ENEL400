@@ -103,8 +103,8 @@ void ShiftOut(uint8_t out)
     uint8_t digit = 0;
     for(uint8_t pos = 0; pos < 8; pos++)
     {
-        digit = digit << (7 - pos); //little endian
-        digit = !!(out >> 7); // 1 or 0
+        digit = out << (7 - pos); //little endian
+        digit = !!(digit >> 7); // 1 or 0
         if(digit)
             PORTA.OUTSET = DT2;
         else
