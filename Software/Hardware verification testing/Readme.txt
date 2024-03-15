@@ -75,4 +75,16 @@ February 25, 2024 (Michael King)
 	2. set output pins and output level
 	3. set dimming
 	4. set blinking
+
+- USART Driver
+NOTE: to enable interrupts, global interrupts must be disabled.
+	to initialize USARTx:
+	set baud rate (USARTx.BAUD)
+	set frame format and mode of operation (USARTx.CTRLC)
+	configure TXD as an output
+	Enable the transmitter and receiver (USARTx.CTRLB)
+
+to set baud rate:
+	
+
 	

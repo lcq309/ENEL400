@@ -38,12 +38,12 @@ void I2C_init(void);
  * be created
  * returns a 0 if successful with no issues
  */
-uint8_t I2C_transmsit(uint8_t Address, uint8_t *Message, uint8_t len);
+uint8_t I2C_transmit(uint8_t Address, uint8_t *Message, uint8_t len);
 /*
  * I2C_read(Address, command, *received)
  * reads from an I2C device at address, according to the command, and stores the
  * result in the byte or byte array pointed to by received. Sends NACK depending
- * on len.
+ * on len when appropriate.
  * returns a 0 if successful with no issues
  */
 uint8_t I2C_read(uint8_t Address, uint8_t command, uint8_t *received, uint8_t len);
@@ -71,8 +71,74 @@ void I2C_init(void)
      */
     TWI0.MBAUD = 51;
     //now enable the TWI as a host
-    TWI0.MCTRLA |= TWI_ENABLE_bm;
+    TWI0.MCTRLA |= TWI_ENABLE_bm | TWI_SMEN_bm; //enable host and smart mode
     //set the bus state to idle
     TWI0.MSTATUS |= TWI_BUSSTATE_IDLE_gc;
     //TWI should now be initialized and ready to use
 }
+
+uint8_t I2C_transmit(uint8_t Address, uint8_t *Message, uint8_t len)
+{
+    /* Place address into address register (after adding r/w), 
+     * then message into message and wait
+     * for transmission to finish. Loop through len and Message byte array
+     * until all messages are sent, wait for ACK between messages, then STOP
+     * intended to be use for WRITE operations
+     */
+    /*first, write to address register to start address transmission 
+     * wait for !RXACK(received ACK) and can also check WIF (write interrupt flag)
+     * ,Arbitration lost, and Bus error should also be zero.
+     */
+    TWI0.MADDR = Address & ~0x1; // write has a zero in the first bit
+    while(!(TWI0.MSTATUS & TWI_WIF_bm)); // Write Interrupt Flag set high
+    if(TWI0.MSTATUS & TWI_RXACK_bm)
+    {
+        return(1); //one for a communication error
+    } // Received Acknowledge if no error, if NACK then something is wrong
+    //then send Byte-by-Byte until the length is reached, wait for ACK in between
+    for(int i = 0; i < len; i++)
+    {
+        TWI0.MDATA = Message[i]; //write the message to the data register
+        while(!(TWI0.MSTATUS & TWI_WIF_bm));//wait for Write interrupt to go high
+        if(TWI0.MSTATUS & TWI_RXACK_bm)
+        {
+            return(1); //one for a communication error
+        } // Received Acknowledge if no error, if NACK then something is wrong
+    }
+    //after sending the message, send a STOP over the bus by writing to MCMD field
+    TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
+    return(0); //return 0 for successful transmission
+}
+
+uint8_t I2C_read(uint8_t Address, uint8_t command, uint8_t *received, uint8_t len)
+{
+    /* The read sequence is similar to the write sequence, but after sending the
+     command it will resend the Address with the R/W bit set, and store what it 
+     receives in the array pointed to by *received */
+    uint8_t success = I2C_transmit(Address, command, 1);
+    if(success != 0) //if command transmission is not successful
+    {
+        return(success); //return with the transmit error number
+    }
+    // after sending command, send the address with the write bit set
+    TWI0.MADDR = (Address | 0x1); //R/W set to read
+    while(!(TWI0.MSTATUS & TWI_WIF_bm)); // Write Interrupt Flag set high
+    if(TWI0.MSTATUS & TWI_RXACK_bm) //acknowledge reception and check
+    {
+        return(1);
+    }
+    /*
+     * now begin reading bytes to the buffer pointed to by received
+     * send ACK between bytes and NACK once length is reached.
+     */
+    for(int i = 0; i < len; i++)
+    {
+        while(!(TWI0.MSTATUS & TWI_RIF_bm)); //wait until read is complete
+        received[i] = TWI0.MDATA; //read the data register into the receiver array.
+        //send ACK happens automatically from configuration settings (SMEN)
+    }
+    //after looping complete, send a NACK and a stop state.
+    TWI0.MCTRLB |= TWI_ACKACT_NACK_gc; // send NACK
+    TWI0.MCTRLB |= TWI_MCMD_STOP_gc; // send STOP
+}
+
