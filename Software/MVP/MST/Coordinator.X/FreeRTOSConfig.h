@@ -54,7 +54,7 @@
 24000000, 20000000, 16000000, 12000000, 10000000, 8000000,
 6000000,  5000000,  4000000,  3000000,  2000000,  1000000.
 For other frequency values, update clock_config.h with your own settings */
-#define configCPU_CLOCK_HZ 10000000
+#define configCPU_CLOCK_HZ 24000000
 
 #define configTICK_RATE_HZ 1000
 #define configMAX_PRIORITIES 4
@@ -76,12 +76,12 @@ For other frequency values, update clock_config.h with your own settings */
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION 0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configTOTAL_HEAP_SIZE 0x1000
+#define configTOTAL_HEAP_SIZE 0x3000
 #define configAPPLICATION_ALLOCATED_HEAP 0
 
 /* Hook function related definitions. */
-#define configUSE_IDLE_HOOK 1
-#define configUSE_TICK_HOOK 1
+#define configUSE_IDLE_HOOK 0
+#define configUSE_TICK_HOOK 0
 #define configCHECK_FOR_STACK_OVERFLOW 0
 #define configUSE_MALLOC_FAILED_HOOK 0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK 0
@@ -109,7 +109,7 @@ For other frequency values, update clock_config.h with your own settings */
 #define INCLUDE_vTaskDelayUntil 1
 #define INCLUDE_vTaskDelay 1
 #define INCLUDE_xTaskGetSchedulerState 0
-#define INCLUDE_xTaskGetCurrentTaskHandle 0
+#define INCLUDE_xTaskGetCurrentTaskHandle 1
 #define INCLUDE_uxTaskGetStackHighWaterMark 0
 #define INCLUDE_xTaskGetIdleTaskHandle 0
 #define INCLUDE_eTaskGetState 0

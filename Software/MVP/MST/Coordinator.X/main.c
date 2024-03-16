@@ -9,19 +9,23 @@
  * wired modules as well.
  * Created on March 15, 2024, 8:49 AM
  */
-
+/* Version one: RS485 only
+ * The purpose of this is to provide a testbed for the RS485 network,
+ * it uses just the round robin to drive the wired network, no other tasks are
+ * implemented.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "USART.h"
 #include <avr/io.h>
-#include "FreeRTOS.h" 
+#include <avr/interrupt.h>
+#include "FreeRTOS.h"
 
-/*
- *
+/* Setting up variables for streams and tasks
  */
+
 int main(int argc, char** argv) {
-    //first set the clock
-    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL.OSCHFCTRLA | CLKCTRL_FRQSEL_24M_gc);
+    //clock is set by FreeRTOS
     //enable USART0 (RS485 USART)
     USART0_init();
     
