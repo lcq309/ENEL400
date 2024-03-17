@@ -19,12 +19,14 @@
 #include "USART.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
 
+#define F_CPU 24000000UL // cpu speed for delay utilities
 
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable
 
@@ -46,14 +48,16 @@ static SemaphoreHandle_t xRoundRobin_MUTEX = NULL;
 
 //Semaphores
 
-
 static SemaphoreHandle_t xRS485TX_SEM = NULL;
 
 //stream handles
 static StreamBufferHandle_t xRS485_in_Stream = NULL;
+static StreamBufferHandle_t xRS485_out_Stream = NULL;
 static MessageBufferHandle_t xRS485_out_Buffer = NULL;
 static MessageBufferHandle_t xRoundRobin_Buffer = NULL;
 
+//device table
+static uint8_t GLOBAL_DEVICE_TABLE[256];
 
 int main(int argc, char** argv) {
     //clock is set by FreeRTOS
@@ -65,6 +69,7 @@ int main(int argc, char** argv) {
     //setup buffers and streams
     
     xRS485_in_Stream = xStreamBufferCreate(20, 1); //size of 10 bytes, 1 byte trigger
+    xRS485_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1);
     xRS485_out_Buffer = xMessageBufferCreate(400); //size of 400 bytes
     xRoundRobin_Buffer = xMessageBufferCreate(20); //size of 20 bytes
     
@@ -86,6 +91,47 @@ int main(int argc, char** argv) {
     xTaskCreate(prvRS485OutTask, "RSOUT", 400, NULL, mainRS485OUT_TASK_PRIORITY, NULL);
     //400 bytes of allocated stack for RS485in (needs to hold a full message)
     xTaskCreate(prvRS485InTask, "RSIN", 400, NULL, mainRS485IN_TASK_PRIORITY, NULL);
+    
+    //wait half a second to ensure all wired devices are active
+    _delay_ms(500);
+    //initialize wired network, build device table
+    //ping each device (devices will be in an initialization mode, so only need to send a number with preamble and end)
+    uint8_t initmessage[3];
+    uint8_t table_pos = 0; //position in table
+    for(int i = 0; i < 256; i++)
+        GLOBAL_DEVICE_TABLE[i] = 0; //initialize table to all zeroes
+    initmessage[0] = 0xAA; //wired preamble
+    initmessage[2] = 0x03; //end of message
+    //message is setup now, ping a device, wait 5ms, then check the input buffer.
+    //could be moved into a separate c file or function
+    for(int i = 0; i < 256; i++)
+    {
+        initmessage[1] = i;
+        //first, ping while waiting between bytes for DRE to set
+        PORTD.OUTSET = PIN7_bm; //enable transmitter
+        for(int j = 0; j < 3; j++)
+        {
+            USART0.TXDATAL = initmessage[j];
+            while(USART0.STATUS & USART_DREIF_bm != 0)
+            {} //busy wait
+        }
+        while((USART0.STATUS & USART_TXCIF_bm) == 0)
+        {} //busy wait for transmission to complete
+        PORTD.OUTCLR = PIN7_bm; //disable transmitter
+        USART0.STATUS |= USART_TXCIF_bm; //clear flag
+        //after sending the ping, wait for a response
+        //busy wait should be fine, since the receiver is interrupt driven
+        _delay_ms(5); //5ms should be plenty of time
+        if(xStreamBufferReceiveFromISR(xRS485_in_Stream, initmessage, 3, NULL) != 0); //if something was received
+        {
+            GLOBAL_DEVICE_TABLE[table_pos] = i;
+            table_pos++;
+        }
+        //otherwise, just move on to the next one.
+        
+    }
+    
+    vTaskStartScheduler(); //start scheduler
     return (EXIT_SUCCESS);
 }
 
@@ -93,43 +139,49 @@ static void prvRoundRobinTask(void * parameters)
 {
     //send a ping to each channel on the bus sequentially
     //message length as short as possible 
-    uint8_t message[13];
+    uint8_t message[11];
     uint8_t acknowledge[1];
-    for(uint8_t i = 0; i < 13; i++)
+    for(uint8_t i = 0; i < 11; i++)
         message[i] = 0;
-    message[0] = 0xAA; //wired preamble
-    message[10] = 0xFF; //broadcast channel
-    message[11] = 0x05; //enquire
-    message[12] = 0x03; //end of message
+    message[9] = 0xFF; //broadcast channel
+    message[10] = 0x05; //enquire
     //initialization complete, begin looping code
     for(;;)
     {
-        for(uint8_t count = 1; count < 3; count++) //count is only 3 for testing
+        for(uint8_t count = 1; count < 256; count++)
         {
             /* process:
+             * check if device table is NULL(set count to 1 if so)
              * secure both MUTEXes
              * set RS485 transceiver to transmit mode
-             * ping the device by looping through the message byte by byte until complete
-             * return the transceiver to receive mode
+             * pass message to output buffer
+             * enable DRE interrupt
+             * write preamble to USART output register
+             * wait for txcomplete semaphore
              * release the USART MUTEX
              * wait for response
              * check response, release robin MUTEX
              * go to next number when available again
              */
+            //device table checks
+            if (GLOBAL_DEVICE_TABLE[count] == 0)
+                count = 1;
             //first, try to secure the RS485 line
             xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
             //then, secure output
             xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
             //set message to the current counter address
-            message[9] = count;
+            message[8] = GLOBAL_DEVICE_TABLE[count];
             //set RS485 transceiver to transmit mode
             PORTD.OUTSET = PIN7_bm;
-            //loop through message (block and wait for semaphore)
-            for(uint8_t i = 0; i < 13; i++)
-            {
-                USART0.TXDATAL = message[i]; //begin transmission
-                xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY); //wait until TX complete
-            }
+            //pass message to the output buffer
+            xStreamBufferSend(xRS485_out_Stream, message, 11, portMAX_DELAY);
+            //enable DRE interrupt
+            USART0.CTRLA |= USART_DREIE_bm;
+            //start transmission by sending preamble
+            USART0.TXDATAL = 0xAA;
+            //wait for TXcomplete semaphore
+            xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
             //return transceiver to receive mode
             PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
@@ -153,9 +205,10 @@ static void prvRS485OutTask(void * parameters)
      * 1. wait until a message arrives in the buffer
      * 2. acquire USART MUTEX and round robin MUTEX
      * 3. transceiver to send mode
-     * 4. send message by looping through byte by byte
-     * 5. transceiver to receive mode
-     * 6. release USART MUTEX and round robin MUTEX
+     * 4. send message to interrupt send buffer
+     * 5. wait for txcomplete semaphore
+     * 6. transceiver to receive mode
+     * 7. release USART MUTEX and round robin MUTEX
      */
     uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
     uint8_t length = 0; //message length
@@ -167,16 +220,17 @@ static void prvRS485OutTask(void * parameters)
         //acquire MUTEX after pulling message into internal buffer
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
-        //transceiver to send mode
+        //set RS485 transceiver to transmit mode
         PORTD.OUTSET = PIN7_bm;
-        //send message by looping
-        for(int i = 0; i < length; i++)
-        {
-            USART0.TXDATAL = output_buffer[i]; //begin transmission
-            USART0.CTRLA |= USART_DREIE_bm; //enable interrupt
-            xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY); //wait until TX complete
-        }
-        //return to receive mode
+        //pass message to the output buffer
+        xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
+        //enable DRE interrupt
+        USART0.CTRLA |= USART_DREIE_bm;
+        //start transmission by sending wired preamble
+        USART0.TXDATAL = 0xAA;
+        //wait for TXcomplete semaphore
+        xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
+        //return transceiver to receive mode
         PORTD.OUTCLR = PIN7_bm;
         //release MUTEXes
         xSemaphoreGive(xRoundRobin_MUTEX);
@@ -204,7 +258,7 @@ static void prvRS485InTask(void * parameters)
         length = 0;
         //wait for something to come in
         xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
-        if(byte_buffer != 0xAA) //if not start delimiter, break somehow
+        if(byte_buffer[0] != 0xAA) //if not start delimiter, break somehow
         {} // just discard it
         else
         {
@@ -268,13 +322,25 @@ ISR(USART0_RXC_vect)
     //move the data receive register into the stream for the input task, this clears the interrupt automatically
     xMessageBufferSendFromISR(xRS485_in_Stream, USART0.RXDATAL, 1, NULL);
 }
-
 ISR(USART0_DRE_vect)
 {
     /* Data Register empty Interrupt
-     * 1. set the semaphore
-     * 2. disable interrupt
+     * 1. pull from output stream buffer and put in TX register until clear
+     * 2. send end delimiter
+     * 3. disable interrupt after loading end delimiter
+     */
+    if(xStreamBufferReceiveFromISR(xRS485_out_Stream, USART0.TXDATAL, 1, NULL) == 0) //if end of message
+    {
+        USART0.TXDATAL = 0x03; //add end delimiter on end of message
+        USART0.CTRLA &= ~USART_DREIE_bm; //disable interrupt
+    }
+}
+ISR(USART0_TXC_vect)
+{
+    /* Transmission complete interrupts
+     * 1. set semaphore
+     * 2. clear interrupt flag
      */
     xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
-    USART0.CTRLA &= ~USART_DREIE_bm; //disable interrupt, may be a better way to accomplish this?
+    USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
 }
