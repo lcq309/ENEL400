@@ -157,7 +157,7 @@ static void prvRS485OutTask(void * parameters)
      * 5. transceiver to receive mode
      * 6. release USART MUTEX and round robin MUTEX
      */
-    uint8_t[MAX_MESSAGE_SIZE] output_buffer; //output buffer
+    uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
     uint8_t length = 0; //message length
     //initialization complete, begin looping portion
     for(;;)
@@ -182,5 +182,81 @@ static void prvRS485OutTask(void * parameters)
         xSemaphoreGive(xRoundRobin_MUTEX);
         xSemaphoreGive(xUSART0_MUTEX);
         //end of loop, start over by waiting for a new message in the buffer
+    }
+}
+static void prvRS485InTask(void * parameters)
+{
+    /* receive procedure:
+     * 1. wait for something to appear on the input stream buffer (start delimiter 0xAA)
+     * 2. take the USART MUTEX
+     * 3. add the message to an input buffer sequentially
+     * 4. wait between bytes
+     * 5. stop looping when end delimiter received
+     * 6. release MUTEX
+     * 7. decide where to route message based on context
+     */
+    uint8_t message_buffer[MAX_MESSAGE_SIZE];
+    uint8_t byte_buffer[1];
+    uint8_t length = 0; //message length increments with each bit
+    //initialization complete
+    for(;;)
+    {
+        length = 0;
+        //wait for something to come in
+        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+        if(byte_buffer != 0xAA) //if not start delimiter, break somehow
+        {} // just discard it
+        else
+        {
+            //take MUTEX
+            xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+            //loop and assemble message until end delimiter received
+            for(int i = 0; i < MAX_MESSAGE_SIZE; i++)
+            {
+                xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                //check if delimiter
+                if(byte_buffer[0] == 0x03)
+                {
+                    //don't increment length, end loop
+                    i = MAX_MESSAGE_SIZE;
+                }
+                else
+                {
+                    message_buffer[i] = byte_buffer[0]; // add to message buffer
+                    length++; //increment length
+                }
+            }
+            //assembled message is within the buffer, end delimiter received
+            //release MUTEX and perform routing
+            xSemaphoreGive(xUSART0_MUTEX);
+            /* routing options:
+             * always send device ID to round robin task
+             * menu - if channel is 0
+             * wireless - if wireless address is populated
+             * discard if the above two conditions are not true
+             */
+            //device ID should always be byte 8 (counting from 0)
+            byte_buffer[0] = message_buffer[8];
+            //send ID to round robin task
+            xMessageBufferSend(xRoundRobin_Buffer, byte_buffer, 1, portMAX_DELAY);
+            //check channel, should always be byte 9 (counting from 0)
+            if(message_buffer[9] == 0) //if channel 0
+            {
+                //send to menu
+                //NOT YET IMPLEMENTED
+            }
+            //check if there is anything in the wireless address section
+            for(int i = 0; i < 8; i++)
+            {
+                if(message_buffer[i] != 0) //if a byte does not = 0
+                {
+                    //stop looping check, send message to wireless section
+                    i = 8; //stop loop
+                    //NOT YET IMPLEMENTED
+                }
+            }
+            //if buffer needs to be cleared out, do it here
+        }
+            
     }
 }
