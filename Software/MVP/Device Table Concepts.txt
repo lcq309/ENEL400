@@ -1,0 +1,23 @@
+Global Device Table concept:
+
+The global device table could be an array of structs including:
+position in array is used internally to refer to a device, so when a new device is added to the table by the RS485_IN task it will pass the table entry number to device specific to ask it to check.
+If the table requires MUTEX protection, then there may need to be a task holding an input buffer so that the RS485_IN task doesn't get stuck waiting for table access.
+
+Structure can be defined as:
+8 bytes Wireless Address
+1 byte Wired Address
+1 byte Channel
+1 byte Device Type
+1 byte flags - first bit indicates relevance, other 7 can be used by device specific for whatever
+
+if we make the table sized to fit 255 devices, a total of 3060 bytes of RAM will be dedicated to the table, may need to adjust the config of FreeRTOS to ensure it will fit.
+
+The coordinator uses a much simpler device table, as it is only used to target pings from the round robin task.
+
+device types listing:
+0 - reserved
+1 - generic light controller
+2 - generic light
+3 - reserved as end delimiter
+5 - reserved for wired pings only

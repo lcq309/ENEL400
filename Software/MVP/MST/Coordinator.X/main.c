@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
         //otherwise, just move on to the next one.
         
     }
-    
+    USART0.CTRLA |= USART_TXCIE_bm; //enable TXC interrupt
     vTaskStartScheduler(); //start scheduler
     return (EXIT_SUCCESS);
 }
