@@ -173,8 +173,8 @@ static void prvRS485OutTask(void * parameters)
         for(int i = 0; i < length; i++)
         {
             USART0.TXDATAL = output_buffer[i]; //begin transmission
+            USART0.CTRLA |= USART_DREIE_bm; //enable interrupt
             xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY); //wait until TX complete
-            
         }
         //return to receive mode
         PORTD.OUTCLR = PIN7_bm;
@@ -259,4 +259,22 @@ static void prvRS485InTask(void * parameters)
         }
             
     }
+}
+
+//now setup interrupts for the RS485 section
+
+ISR(USART0_RXC_vect)
+{
+    //move the data receive register into the stream for the input task, this clears the interrupt automatically
+    xMessageBufferSendFromISR(xRS485_in_Stream, USART0.RXDATAL, 1, NULL);
+}
+
+ISR(USART0_DRE_vect)
+{
+    /* Data Register empty Interrupt
+     * 1. set the semaphore
+     * 2. disable interrupt
+     */
+    xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
+    USART0.CTRLA &= ~USART_DREIE_bm; //disable interrupt, may be a better way to accomplish this?
 }

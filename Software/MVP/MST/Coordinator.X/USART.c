@@ -20,8 +20,8 @@ void USART0_init(void)
     //note that parity mode may need to be changed for certain vendor devices
     //Set tx pin as an output
     PORTA.DIRSET = PIN0_bm; //port A pin 0 is txd for USART 0
-    // set interrupts RXCIE, TXCIE enabled
-    USART0.CTRLA = USART_RXCIE_bm | USART_TXCIE_bm;
+    // set interrupt RXCIE, DREIF is enabled in code before moving to the register
+    USART0.CTRLA = USART_RXCIE_bm;
     //enable the receiver and transmitter
     USART0.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
     //re-enable global interrupts
