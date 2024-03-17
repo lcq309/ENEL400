@@ -176,10 +176,10 @@ static void prvRoundRobinTask(void * parameters)
             PORTD.OUTSET = PIN7_bm;
             //pass message to the output buffer
             xStreamBufferSend(xRS485_out_Stream, message, 11, portMAX_DELAY);
-            //enable DRE interrupt
-            USART0.CTRLA |= USART_DREIE_bm;
             //start transmission by sending preamble
             USART0.TXDATAL = 0xAA;
+            //enable DRE interrupt
+            USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete semaphore
             xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
             //return transceiver to receive mode
@@ -224,10 +224,10 @@ static void prvRS485OutTask(void * parameters)
         PORTD.OUTSET = PIN7_bm;
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
-        //enable DRE interrupt
-        USART0.CTRLA |= USART_DREIE_bm;
         //start transmission by sending wired preamble
         USART0.TXDATAL = 0xAA;
+        //enable DRE interrupt
+        USART0.CTRLA |= USART_DREIE_bm;
         //wait for TXcomplete semaphore
         xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
         //return transceiver to receive mode
