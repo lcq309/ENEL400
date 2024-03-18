@@ -28,6 +28,7 @@
 static uint8_t GLOBAL_DeviceID = 0; //device ID is set during initial startup
 static uint8_t GLOBAL_Channel = 0; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 1; //this will be device type 1, generic controller
+static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
 
 struct Device { //defined in the Device Table Concepts.txt file
     uint8_t XBeeADD[8];
@@ -54,7 +55,6 @@ static struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device tab
 static void prvWiredInitTask ( void *parameters );
 static void prvRS485OutTask ( void *parameters );
 static void prvRS485InTask ( void *parameters );
-static void prvTableWriteTask ( void *parameters );
 static void prvPbInTask ( void *parameters );
 static void prvIndOutTask ( void *parameters );
 static void prvWBMTask ( void *parameters );
@@ -74,7 +74,6 @@ static SemaphoreHandle_t xDeviceBuffer_MUTEX = NULL;
 static StreamBufferHandle_t xRS485_in_Stream = NULL;
 static StreamBufferHandle_t xRS485_out_Stream = NULL;
 static MessageBufferHandle_t xRS485_out_Buffer = NULL;
-static MessageBufferHandle_t xTableWrite_Buffer = NULL;
 static MessageBufferHandle_t xDevice_Buffer = NULL;
 
 //queue handles
@@ -94,10 +93,9 @@ int main(int argc, char** argv) {
     PORTD.OUTCLR = PIN7_bm;
     //setup buffers and streams
     
-    xRS485_in_Stream = xStreamBufferCreate(20,1); //20 bytes, triggers when a byte is added
+    xRS485_in_Stream = xStreamBufferCreate(50,1); //50 bytes, triggers when a byte is added
     xRS485_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1); //output buffer
     xRS485_out_Buffer = xMessageBufferCreate(400);
-    xTableWrite_Buffer = xMessageBufferCreate(50);
     xDevice_Buffer = xMessageBufferCreate(200);
     
     //setup Queues
@@ -119,7 +117,6 @@ int main(int argc, char** argv) {
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvRS485OutTask, "RSOUT", 500, NULL, mainRS485OUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvRS485InTask, "RSIN", 400, NULL, mainRS485IN_TASK_PRIORITY, NULL);
-    xTaskCreate(prvTableWriteTask, "TABLE", 300, NULL, mainTABLEWRITE_TASK_PRIORITY, NULL);
     xTaskCreate(prvPbInTask, "PBIN", 250, NULL, mainPBIN_TASK_PRIORITY, NULL);
     xTaskCreate(prvIndOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvWBMTask, "WBM", 600, NULL, mainWBM_TASK_PRIORITY, NULL);
@@ -223,7 +220,7 @@ static void prvRS485OutTask(void * parameters)
     for(;;){
     uint8_t buffer[MAX_MESSAGE_SIZE];
     // wait for notification
-    xTaskNotifyWaitIndexed(1, NULL, NULL, NULL, portMAX_DELAY);
+    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //check for waiting output message
@@ -266,7 +263,7 @@ static void prvRS485OutTask(void * parameters)
             //enable DRE interrupt
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
-            xTaskNotifyWaitIndexed(1, NULL, NULL, NULL, portMAX_DELAY);
+            ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
             //return to receive mode
             PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
@@ -289,7 +286,7 @@ static void prvRS485OutTask(void * parameters)
             //grab table mutex
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //search table for devices marked relevant
-            for(uint8_t count = 0; count < DEVICE_TABLE_SIZE; count++)
+            for(uint8_t count = 0; count < GLOBAL_TableLength; count++)
             {
                 if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
                 {
@@ -312,13 +309,13 @@ static void prvRS485OutTask(void * parameters)
                     //enable DRE interrupt
                     USART0.CTRLA |= USART_DREIE_bm;
                     //wait for TXcomplete notification
-                    xTaskNotifyWaitIndexed(1, NULL, NULL, NULL, portMAX_DELAY);
+                    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
                     //return to receive mode
                     PORTD.OUTCLR = PIN7_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
                     //now complete message sending process, wait for the next opportunity
-                    xTaskNotifyWaitIndexed(1, NULL, NULL, NULL, portMAX_DELAY);
+                    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
                     //grab USART MUTEX
                     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
                 }
@@ -345,7 +342,7 @@ static void prvRS485OutTask(void * parameters)
             //enable DRE interrupt
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
-            xTaskNotifyWaitIndexed(1, NULL, NULL, NULL, portMAX_DELAY);
+            ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
             //return to receive mode
             PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
@@ -355,6 +352,146 @@ static void prvRS485OutTask(void * parameters)
     }
 }
 
+static void prvRS485InTask(void * parameters)
+{
+    /* RS485 In Handler
+     * 1. wait for something to come in on stream buffer
+     * 2. assemble message in internal buffer, byte-by-byte
+     * 3. check (in working on WBM code document)
+     */
+    uint8_t buffer[MAX_MESSAGE_SIZE];
+    uint8_t byte_buffer[1];
+    uint8_t length = 0;
+    for(;;)
+    {
+    length = 0;
+    //wait for something to come in
+    xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+    if(byte_buffer[0] == 0xAA) //if not start delimiter, break somehow
+    {
+        //take MUTEX
+        xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+        //loop and assemble until end delimiter received
+        for(int i = 0; i < MAX_MESSAGE_SIZE; i++)
+        {
+            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            //check if delimiter
+            if(byte_buffer[0] == 0x03)
+            {
+                //don't increment length, end loop
+                i = MAX_MESSAGE_SIZE;
+            }
+            else
+            {
+                buffer[i] = byte_buffer[0]; // add to message buffer
+                length++; //increment length
+            }
+        }
+        //assembled message is within the buffer, end delimiter received
+        //release MUTEX and perform checks
+        xSemaphoreGive(xUSART0_MUTEX);
+        /* Check options:
+         * first check for ping
+         * then check for channel match and relevance
+         */
+        if(buffer[10] == 0x05) //if ping
+        {
+            if(buffer[8] == GLOBAL_DeviceID) //if right device
+            {
+                //send notification to the output task
+                xTaskNotifyGiveIndexed(prvRS485OutTask, 1);
+            }
+        }
+        else if(buffer[9] == GLOBAL_Channel) //if channel matches
+        {
+            /* channel check
+             * 1. acquire table MUTEX
+             * 2. check if wireless address 1st byte matches
+             * 3. check if wired address matches
+             * 4. check relevance bit
+             * 5. perform actions based on that
+             * 6. if no match found, create a new table entry at next empty spot
+             */
+            //acquire table MUTEX
+            xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
+            //loop through table entries
+            uint8_t matched = 0;
+            for(int pos = 0; pos < GLOBAL_TableLength; pos++)
+            {
+                if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[0] == buffer[0]) //if first byte in wireless address matches
+                    if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
+                        if(GLOBAL_DEVICE_TABLE[pos].Flags & 1 == 1) //if relevant
+                        {
+                            //grab device buffer MUTEX
+                            xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+                            //send to device buffer
+                            xMessageBufferSend(xDevice_Buffer, buffer, length, portMAX_DELAY);
+                            //release device MUTEX
+                            xSemaphoreGive(xDeviceBuffer_MUTEX);
+                            //set matched byte
+                            matched = 1;
+                            //release table MUTEX
+                            xSemaphoreGive(xTABLE_MUTEX);
+                            //now done with message processing
+                        }
+            }
+            if(matched == 0)
+            {
+                /* if no match
+                 * 1. add to end of table
+                 * 2. increment table length
+                 * 3. send check message with table index to device specific
+                 * 4. release table mutex
+                 * 5. wait 2 ms to allow device specific to make a decision
+                 * 6. reacquire table mutex
+                 * 7. check table relevance bit and either pass or discard
+                 */
+                //add to current end of table (add a check against max length at some point)
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[1];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[2];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[3];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[4] = buffer[4];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[5] = buffer[5];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[6] = buffer[6];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[7] = buffer[7];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].WiredADD = buffer[8];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Channel = buffer[9];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Type = buffer[10];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Flags = 0;
+                //increment table length
+                GLOBAL_TableLength++;
+                //grab device buffer MUTEX
+                xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+                //check message will be defined as {0x05, index}
+                uint8_t check[2] = {0x05, GLOBAL_TableLength - 1};
+                //send check message to device buffer
+                xMessageBufferSend(xDevice_Buffer, check, 2, portMAX_DELAY);
+                //release device MUTEX
+                xSemaphoreGive(xDeviceBuffer_MUTEX);
+                //wait 2ms to allow device specific some time to process
+                vTaskDelay(2 / portTICK_PERIOD_MS);
+                //reacquire table mutex
+                xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
+                //check relevance bit
+                if(GLOBAL_DEVICE_TABLE[GLOBAL_TableLength-1].Flags & 1)
+                {   
+                    //pass on message
+                    //grab device buffer MUTEX
+                    xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+                    //send to device buffer
+                    xMessageBufferSend(xDevice_Buffer, buffer, length, portMAX_DELAY);
+                    //release device MUTEX
+                    xSemaphoreGive(xDeviceBuffer_MUTEX);
+                }
+                //return MUTEX
+                xSemaphoreGive(xTABLE_MUTEX);
+            }
+        }
+    }
+    
+    }
+}
 ISR(USART0_RXC_vect)
 {
     
