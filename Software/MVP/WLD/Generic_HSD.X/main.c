@@ -1,11 +1,11 @@
 /* 
- * File:   main.c - WBM Generic
+ * File:   main.c - WLD Generic HSD
  * Author: Michael King
  * MVP version
  *
- * The purpose of this is to create a minimum viable running code for the Wired 
- * Button Modules, this code is for the general case.
- * Created on March 17, 2024
+ * The purpose of this is to create a minimum viable running code for the Wired
+ * Light Drivers, this code is for the general case.
+ * Created on March 20, 2024
  */
 /* Version one: Basics only
  * The purpose of this is to provide a testbed for the RS485 network, and networking
@@ -21,6 +21,7 @@
 #include "semphr.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
+#include "ShiftReg.h"
 
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable, includes formatting
 #define DEVICE_TABLE_SIZE 250
@@ -125,6 +126,13 @@ int main(int argc, char** argv) {
     xTaskCreate(prvWBMTask, "WBM", 600, NULL, mainWBM_TASK_PRIORITY, NULL);
     
     //setup device ID and channel here, read shift registers and move into global variables
+    
+    InitShiftIn(); //initialize shift register pins
+    LTCHIn(); //latch input register
+    ShiftIn(GLOBAL_Channel); //grab channel
+    ShiftIn(GLOBAL_DeviceID); //grab DeviceID
+    //should now be done with shift registers
+    
     //initialize device table to all 0s? Not needed
     vTaskStartScheduler(); //start scheduler
     return (EXIT_SUCCESS);
@@ -611,6 +619,9 @@ static void prvIndOutTask(void * parameters)
 
 static void prvWBMTask(void * parameters)
 {
+    /* Wired Button Module - Generic
+     * 
+     */
     for(;;)
     {
     }
