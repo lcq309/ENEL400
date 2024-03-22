@@ -28,7 +28,7 @@
 
 static uint8_t GLOBAL_DeviceID = 0; //device ID is set during initial startup
 static uint8_t GLOBAL_Channel = 0; //channel number is set during initial startup
-static uint8_t GLOBAL_DeviceType = 1; //this will be device type 1, generic controller
+static uint8_t GLOBAL_DeviceType = 0x31; //this will be device type 0x31, generic controller
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
 
 struct Device { //defined in the Device Table Concepts.txt file
@@ -618,7 +618,7 @@ static void prvIndOutTask(void * parameters)
                 PORTC.OUTCLR = PIN1_bm;
                 break;
             case 0x1: //light on
-                PORTC.OUTCLR = PIN1_bm;
+                PORTC.OUTSET = PIN1_bm;
                 break;
             case 0x2: //blink
                 PORTC.OUTTGL = PIN1_bm;
@@ -630,7 +630,7 @@ static void prvIndOutTask(void * parameters)
                 PORTC.OUTCLR = PIN0_bm;
                 break;
             case 0x1: //light on
-                PORTC.OUTCLR = PIN0_bm;
+                PORTC.OUTSET = PIN0_bm;
                 break;
             case 0x2: //blink
                 PORTC.OUTTGL = PIN0_bm;
@@ -642,7 +642,7 @@ static void prvIndOutTask(void * parameters)
                 PORTA.OUTCLR = PIN7_bm;
                 break;
             case 0x1: //light on
-                PORTA.OUTCLR = PIN7_bm;
+                PORTA.OUTSET = PIN7_bm;
                 break;
             case 0x2: //blink
                 PORTA.OUTTGL = PIN7_bm;
