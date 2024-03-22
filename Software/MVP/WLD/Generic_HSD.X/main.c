@@ -155,7 +155,7 @@ static void prvWiredInitTask(void * parameters)
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //2. Start Flashing Indicators
     uint8_t lightsFlash[2] = {'Y', 0x2};
-    xQueueSendToFront(xPB_Queue, lightsFlash, portMAX_DELAY);
+    xQueueSendToFront(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
     /*
@@ -194,7 +194,7 @@ static void prvWiredInitTask(void * parameters)
     PORTD.OUTCLR = PIN7_bm;
     //stop flashing lights
     lightsFlash[0] = 0; //command 0, off
-    xQueueSendToFront(xPB_Queue, lightsFlash, portMAX_DELAY);
+    xQueueSendToFront(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
     //send network join message to RS485 output buffer
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xMessageBufferSend(xRS485_out_Buffer, &StartMessage, 11, portMAX_DELAY);

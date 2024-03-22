@@ -2,40 +2,39 @@
 <configurationDescriptor version="65">
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="f1" displayName="FreeRTOS" projectFiles="true">
-      <logicalFolder name="AVR_AVRDx" displayName="AVR_AVRDx" projectFiles="true">
-        <itemPath>F:/FreeRTOS/Source/portable/GCC/AVR_AVRDx/port.c</itemPath>
-        <itemPath>F:/FreeRTOS/Source/portable/GCC/AVR_AVRDx/porthardware.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/portable/GCC/AVR_AVRDx/portmacro.h</itemPath>
+      <logicalFolder name="f1" displayName="AVR_AVRDx" projectFiles="true">
+        <itemPath>../../../../../../FreeRTOS/Source/portable/GCC/AVR_AVRDx/port.c</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/portable/GCC/AVR_AVRDx/porthardware.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/portable/GCC/AVR_AVRDx/portmacro.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="include" displayName="include" projectFiles="true">
-        <itemPath>F:/FreeRTOS/Source/include/atomic.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/croutine.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/deprecated_definitions.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/event_groups.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/FreeRTOS.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/list.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/message_buffer.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/mpu_prototypes.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/mpu_wrappers.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/portable.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/projdefs.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/queue.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/semphr.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/StackMacros.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/stack_macros.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/stream_buffer.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/task.h</itemPath>
-        <itemPath>F:/FreeRTOS/Source/include/timers.h</itemPath>
+      <logicalFolder name="f2" displayName="Include" projectFiles="true">
+        <itemPath>../../../../../../FreeRTOS/Source/include/FreeRTOS.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/StackMacros.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/atomic.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/croutine.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/deprecated_definitions.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/event_groups.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/list.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/message_buffer.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/mpu_prototypes.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/mpu_wrappers.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/portable.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/projdefs.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/queue.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/semphr.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/stack_macros.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/stdint.readme</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/stream_buffer.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/task.h</itemPath>
+        <itemPath>../../../../../../FreeRTOS/Source/include/timers.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="MemMang" displayName="MemMang" projectFiles="true">
-        <itemPath>F:/FreeRTOS/Source/portable/MemMang/heap_1.c</itemPath>
-      </logicalFolder>
-      <itemPath>F:/FreeRTOS/Source/event_groups.c</itemPath>
-      <itemPath>F:/FreeRTOS/Source/list.c</itemPath>
-      <itemPath>F:/FreeRTOS/Source/queue.c</itemPath>
-      <itemPath>F:/FreeRTOS/Source/stream_buffer.c</itemPath>
-      <itemPath>F:/FreeRTOS/Source/tasks.c</itemPath>
-      <itemPath>F:/FreeRTOS/Source/timers.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/event_groups.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/list.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/queue.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/stream_buffer.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/tasks.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/timers.c</itemPath>
+      <itemPath>../../../../../../FreeRTOS/Source/portable/MemMang/heap_1.c</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -118,7 +117,7 @@
         <property key="define-macros" value=""/>
         <property key="disable-optimizations" value="false"/>
         <property key="extra-include-directories"
-                  value="F:\GitHub\ENEL400\Software\MVP\WLD\Generic_HSD.X;F:\FreeRTOS\Source;F:\FreeRTOS\Source\include;F:\FreeRTOS\Source\portable\GCC\AVR_AVRDx"/>
+                  value="..\..\..\..\..\..\FreeRTOS\Source;..\..\..\..\..\..\FreeRTOS\Source\include;..\..\..\..\..\..\FreeRTOS\Source\portable\GCC\AVR_AVRDx;F:\GitHub\ENEL400\Software\MVP\WLD\Generic_HSD.X"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
