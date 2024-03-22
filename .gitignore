@@ -5,7 +5,6 @@
 *.log
 *.pdf
 *.gz
-Hardware Definitions/Master Controller/Working on Master controller.txt
 Hardware Definitions/Master Controller/Master controller definition.toc
 Software/Startup testing code/MPLABproject/Startup testing 2.X/.generated_files/flags/default/430ad84a2bab6f060165d63c10fd436a30e5a327
 Software/Startup testing code/MPLABproject/Startup testing 2.X/.generated_files/flags/default/74d92322d963479e5b0876e81670a9f4ff312a77
@@ -492,7 +491,6 @@ Software/MVP/MST/Coordinator.X/.generated_files/flags/default/ff4006925a208b1269
 Software/MVP/MST/Coordinator.X/.generated_files/flags/default/ff7e40bf2e01bcef14b8ed56ac2d8b535d764855
 Software/MVP/MST/Coordinator.X/.generated_files/flags/default/ffce4c00b038dabc44c636aab5312a52d2fd9f3f
 Software/MVP/MST/Coordinator.X/.generated_files/flags/default/ffef9ebb9842dad34ce31bea9df47441693a3612
-*.hex
 Software/Hardware verification testing/Light Controller/Light Controller.X/queuelogs/debugtool
 Software/MVP/MST/Coordinator.X/.generated_files/flags/default/168ef86185dba70d8dd8c45519525756cb99cfcf
 Software/MVP/MST/Coordinator.X/.generated_files/flags/default/20cdb4f6f50f7ce299e4fecbc3e34703a0fa3716

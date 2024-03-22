@@ -1,0 +1,13 @@
+Intertask messages to DS take the form of two bytes for now, following this format:
+Byte 0 = command/identifier, Byte 1 = data/state
+
+commands and data:
+
+0x05, <index> = check device table, used when a new device is added to the table to get the DS task to process it and mark as relevant or not.
+
+Other commands may be device dependent, for a controller such as this
+0x04, <button> = button pressed, sent from the button task when a button has been pressed.
+
+outbound commands from task:
+to indicator out:
+<indicator>,<state> = indicators 1 to 3 and 0xff for all. 0 for off, 1 for solid on, 2 for blink.
