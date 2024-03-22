@@ -154,7 +154,7 @@ static void prvWiredInitTask(void * parameters)
     //1. Take RS485 MUTEX
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //2. Start Flashing Indicators
-    uint8_t lightsFlash[2] = {0xFF, 0x2};
+    uint8_t lightsFlash[2] = {'Y', 0x2};
     xQueueSendToFront(xPB_Queue, lightsFlash, portMAX_DELAY);
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
@@ -193,7 +193,7 @@ static void prvWiredInitTask(void * parameters)
     USART0.STATUS |= USART_TXCIF_bm;
     PORTD.OUTCLR = PIN7_bm;
     //stop flashing lights
-    lightsFlash[1] = 0; //command 0, off
+    lightsFlash[0] = 0; //command 0, off
     xQueueSendToFront(xPB_Queue, lightsFlash, portMAX_DELAY);
     //send network join message to RS485 output buffer
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
@@ -403,7 +403,7 @@ static void prvRS485InTask(void * parameters)
             if(buffer[8] == GLOBAL_DeviceID) //if right device
             {
                 //send notification to the output task
-                xTaskNotifyGiveIndexed(prvRS485OutTask, 1);
+                xTaskNotifyGiveIndexed(RS485OutHandle, 1);
             }
         }
         else if(buffer[9] == GLOBAL_Channel) //if channel matches

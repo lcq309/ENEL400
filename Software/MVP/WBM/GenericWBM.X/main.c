@@ -408,7 +408,7 @@ static void prvRS485InTask(void * parameters)
             if(buffer[8] == GLOBAL_DeviceID) //if right device
             {
                 //send notification to the output task
-                xTaskNotifyGiveIndexed(prvRS485OutTask, 1);
+                xTaskNotifyGiveIndexed(RS485OutHandle, 1);
             }
         }
         else if(buffer[9] == GLOBAL_Channel) //if channel matches
