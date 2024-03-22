@@ -1,11 +1,11 @@
 /* 
- * File:   main.c - WLD Generic HSD
+ * File:   main.c - WBM Generic
  * Author: Michael King
  * MVP version
  *
- * The purpose of this is to create a minimum viable running code for the Wired
- * Light Drivers, this code is for the general case.
- * Created on March 20, 2024
+ * The purpose of this is to create a minimum viable running code for the Wired 
+ * Button Modules, this code is for the general case.
+ * Created on March 17, 2024
  */
 /* Version one: Basics only
  * The purpose of this is to provide a testbed for the RS485 network, and networking
@@ -427,10 +427,21 @@ static void prvRS485InTask(void * parameters)
             uint8_t matched = 0;
             for(int pos = 0; pos < GLOBAL_TableLength; pos++)
             {
-                if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[0] == buffer[0]) //if first byte in wireless address matches
+                if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[0] == buffer[0]) //if first byte in wireless address matches, should be changed to check all
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
                         if(GLOBAL_DEVICE_TABLE[pos].Flags & 1 == 1) //if relevant
                         {
+                            //assemble a new buffer containing only the message portion with the index entry as the first byte.
+                            //message starts at byte 11
+                            buffer[0] = pos;
+                            buffer[1] = 0x00; //NULL padding to increase message length
+                            //copy bytes back to start of buffer
+                            for(int i = 11; i < length; i++)
+                            {
+                                buffer[i - 9] = buffer[i];
+                            }
+                            //reduce length by 9
+                            length = length - 9;
                             //grab device buffer MUTEX
                             xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
                             //send to device buffer
@@ -485,6 +496,17 @@ static void prvRS485InTask(void * parameters)
                 //check relevance bit
                 if(GLOBAL_DEVICE_TABLE[GLOBAL_TableLength-1].Flags & 1)
                 {   
+                    //assemble a new buffer containing only the message portion with the index entry as the first byte.
+                    //message starts at byte 11
+                    buffer[0] = GLOBAL_TableLength-1;
+                    buffer[1] = 0x00; //NULL padding to increase message length
+                    //copy bytes back to start of buffer
+                    for(int i = 11; i < length; i++)
+                    {
+                        buffer[i - 9] = buffer[i];
+                    }
+                    //reduce length by 9
+                    length = length - 9;
                     //pass on message
                     //grab device buffer MUTEX
                     xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
@@ -496,6 +518,14 @@ static void prvRS485InTask(void * parameters)
                 //return MUTEX
                 xSemaphoreGive(xTABLE_MUTEX);
             }
+        }
+        else if(buffer[9] == 0xff) //special channel check for broadcast devices
+        {
+            /* always pass message, but also include in device table and ensure
+             * that the device specific knows that it is there so it can store in
+             * it's special table
+             */
+            
         }
     }
     
@@ -528,10 +558,15 @@ static void prvPbInTask(void * parameters)
     {
         //wait for something to come in from the queue
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
+        //add a messaging byte to the front, 0x04 in this case
+        //device specific needs to check for a two-byte message and react according to the first byte of the message
+        uint8_t output[2];
+        output[0] = 0x04;
+        output[1] = input[0];
         //grab device buffer MUTEX
         xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
         //send to device buffer
-        xMessageBufferSend(xDevice_Buffer, input, 1, portMAX_DELAY);
+        xMessageBufferSend(xDevice_Buffer, output, 2, portMAX_DELAY);
         //release device MUTEX
         xSemaphoreGive(xDeviceBuffer_MUTEX);
     }
@@ -619,11 +654,193 @@ static void prvIndOutTask(void * parameters)
 
 static void prvWBMTask(void * parameters)
 {
-    /* Wired Button Module - Generic
-     * 
+    /* Wired Button Module:
+     * 1. check for input (blocks up to 50 ticks?)
+     * 2. perform input checking
+     * 3. if no actable input, and task is ready, go back to waiting for input
+     * 4. if no actable input, and task is waiting for colour change, check on resend timer state
+     *    -if it is time to resend, then check table for unconfirmed lights and send a message to them
+     *    -if not time to resend, go back to waiting
+     * 5. if actable input, perform action
+     *  - colour change, start blinking both lights and send messages out
+     *  - incoming light confirmation signal, compare colour and either lockout or confirm
      */
+    //uint8_t task_state = 0; //0 = uninitialized
+    //uint8_t lockout = 0; //0 = not locked
+    uint8_t colour_track = 0;// 0 = off, used to track colour requested
+    uint8_t colour_light = 0;// 0 = off, used to track light colour
+    uint8_t inlen = 0; //input length tracking
+    uint8_t indbuffer[2]; //buffer for commands to indicators
+    uint8_t buffer[MAX_MESSAGE_SIZE]; //message buffer
+    uint8_t lights[20]; //one controller can track up to 20 lights?
+    uint8_t lightnum = 0; //keep track of how many lights are controlled
+    uint8_t lightrem = 0; //track how many lights need to be confirmed
+    //uint8_t controllers[20]; //when implemented
+    //uint8_t broadcast[20]; //20 broadcast channel devices
+    //uint8_t menus[20]; //up to 20 menus
     for(;;)
     {
+        //1. wait up to 50 ticks for input, need to grab MUTEX?
+        //grab device buffer MUTEX
+        xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+        //keep track of length as well
+        inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 50);
+        //release device buffer MUTEX
+        xSemaphoreGive(xDeviceBuffer_MUTEX);
+        //2. check input
+        switch (inlen)
+        {
+            case 0: //no message
+                break;
+            case 2: //intertask message
+                switch(buffer[0])
+                {
+                    case 0x05: //check device table
+                        //device table processing here, check device type and mark relevance for lights only for now
+                        //add other device types to relevant tables for quicker access in the future
+                        //acquire table MUTEX
+                        xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
+                        //check on requested table entry's device type
+                        switch(GLOBAL_DEVICE_TABLE[buffer[1]].Type)
+                        {
+                            case 0x32: //generic light
+                                //mark as relevant
+                                GLOBAL_DEVICE_TABLE[buffer[1]].Flags = 0x1;
+                                //add index to light table
+                                lights[lightnum] = buffer[1];
+                                //increment lightnum count
+                                lightnum++;
+                            break;
+                        }
+                        //release table MUTEX
+                        xSemaphoreGive(xTABLE_MUTEX);
+                        break;
+                    case 0x04:    //button press
+                        switch(buffer[1])
+                        {
+                            case 0x0: //button 1 (call this blue for now)
+                                colour_track = 'B'; // blue lights
+                                break;
+                            case 0x1: //button 2 (call this green for now)
+                                colour_track = 'G';
+                                break;
+                            case 0x2: //button 3 (call this yellow for now)
+                                colour_track = 'Y';
+                                break;
+                        }
+                        break;
+                }
+            case 3: //length of 3 indicates from light or other device (just lights for now)
+                //check index entry of light, mark confirmation bit if colour matches
+                //check colour and compare against colour track variable
+                if(buffer[2] == colour_track)
+                {
+                    //mark confirmation bit, byte 0 should be index.
+                    //acquire table MUTEX
+                    xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
+                    //bit 1 will be used as a confirmation for now
+                    GLOBAL_DEVICE_TABLE[buffer[0]].Flags |= 0x2;
+                    //release table MUTEX
+                    xSemaphoreGive(xTABLE_MUTEX);
+                    //subtract one from remaining lights to confirm
+                    lightrem--;
+                }
+                else //error or state change? not implemented yet
+                {}
+                break;
+        }
+        /* Testing section
+         * very basic test, just put out a message of the currently requested colour, flash the current indicator and the new one
+         * reset the confirmation bit of the current light, then once the colour is confirmed, turn on the new indicator and turn off the flashing one
+         * acts if colour_track is different from colour_light
+         * 1. flash indicators
+         * 2. reset confirmation bit of lights
+         * 3. light_rem = light_num
+         * 4. send the colour to the output task
+         * 5. release table mutex
+         */
+        
+        /* colour confirmation section
+         * once lightrem = 0, set light_colour to colour_track
+         * turn off all indicators and turn on the correct one
+         */
+        if (lightrem == 0)
+        {
+            colour_light = colour_track;
+            indbuffer[0] = 0xff;
+            indbuffer[1] = 0;
+            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+            indbuffer[1] = 1;
+            switch(colour_light)
+            {
+                case 'B':
+                    indbuffer[0] = 1; //indicator 1
+                    break;
+                case 'G':
+                    indbuffer[0] = 2; //indicator 2
+                    break;
+                case 'Y':
+                    indbuffer[0] = 3; //indicator 3
+                    break;
+                default:
+                    indbuffer[0] = 0; //no indicator
+            }
+            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+        }
+        /* change colour check section:
+         * check if there is a colour change
+         * if there is a colour change, flash both lights, transmit colour change message
+         */
+        if(colour_light != colour_track)
+        {
+            //change light colours
+            indbuffer[1] = 2; //flashing
+            switch(colour_light)
+            {
+                case 'B':
+                    indbuffer[0] = 1; //indicator 1
+                    break;
+                case 'G':
+                    indbuffer[0] = 2; //indicator 2
+                    break;
+                case 'Y':
+                    indbuffer[0] = 3; //indicator 3
+                    break;
+                default:
+                    indbuffer[0] = 0; //no indicator
+            }
+            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+            switch(colour_track)
+            {
+                case 'B':
+                    indbuffer[0] = 1; //indicator 1
+                    break;
+                case 'G':
+                    indbuffer[0] = 2; //indicator 2
+                    break;
+                case 'Y':
+                    indbuffer[0] = 3; //indicator 3
+                    break;
+                default:
+                    indbuffer[0] = 0; //no indicator
+            }
+            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+            //lights should now be flashing
+            //send colour change message to the RS485_output
+            //send to relevant devices for now
+            //last two bytes of message need to be 0x0401
+            buffer[0] = colour_track;
+            buffer[1] = 0x04;
+            buffer[2] = 0x01;
+            xMessageBufferSend(xRS485_out_Buffer, buffer, 3, portMAX_DELAY);
+        }
+        /* message processing section complete:
+         * confirmation check section
+         * not yet implemented, since this is the most basic case for testing use
+         * just send a message for the correct light colour if it has changed
+         * (i.e, not confirmed)
+         */
+        
     }
 }
 

@@ -1,0 +1,61 @@
+Device starts in an initialization state, where it flashes lights while waiting for the Coordinator to contact it. It replies with the same message it was sent.
+
+After initializing (done in an init task?). It will launch into its normal running loop.
+
+There is a global table of device structs available in memory, it may need to be MUTEX access protected.
+
+RS485_IN:
+	Takes in data from the USART on RS485, and turns the stream of bytes into a full message before checking to see if it is relevant or not using the device table.
+	This is non-trivial, if the device is on the same channel and not on the table then it will be added and a request will be sent to the device specific task to mark if it is relevant
+	if the device is on the table and not marked, the message will be discarded.
+	if the device is on the table and marked as relevant, the message will be passed on to device specific tasks.
+
+RS485_OUT:
+	Takes a message from the device specific task and sends it to relevant devices from the table, devices on the same wired network will have a wireless address of all 0's.
+	The task knows where to route messages by checking the table, it will send the same message to all marked devices (will only send on broadcast if all devices are on the same 
+	wired network)
+	In case a message is intended only for a special target (I.E. response to broadcast) the first byte from the device specific task indicates the intended channel (0 (menu), 255 	(special devices), <x> (assigned channel))
+	
+	This works by passing the fully assembled message to an output buffer that goes back and forth with an intterupt. it will spend most of it's time waiting on a direct notification	from RS485_IN when the ping is received. After the ping is received (direct notification from RS485_IN), the task will check if there is anything in the message buffer, and if not it 	will just send an empty message. A device only gets one message per ping cycle (may be changed later if this is too slow). So after sending the message it will go back to waiting.
+
+WIRED_INIT:
+	Handles initialization, and any sort of device diagnostic checks we can think of, will only run once at the start of the program.
+	Takes the RS485 MUTEX on startup, and releases it once the initialization is complete. Instructs all lights to flash until initialization complete, then sends the network join 	message out after sending the initialization reply message and going to sleep until reset. It will make use of the normal RS485_IN_STREAM, then once it is done running it will stop 	forever. it also enables the TXC interrupt before going to sleep. 
+
+Wired_Button_module:
+	Device specific task that handles inputs from the button task, and drives outputs on the indicator task. It generates the core of the message, checks the device table when 	instructed by RS485_IN. 
+	to indicate if a device is relevant (maybe a seperate table of relevant device types?)
+	Device type will be taken as the first byte within the message portion of the wired message (might change the protocol to reflect this), with 0x05 being reserved for ping messages 	system wide. Device ID field should usually not matter on the wired network, all devices will listen and respond to appropriate messages. The device ID is only used to filter for 	pings and to differentiate devices.
+
+PB_in:
+	Manages the inputs, passing a simple message on to the device specific task anytime a button is pressed. May use a queue to hold the 1 byte messages from the button interrupts.	Could probably have some additional processing to prevent spamming the Marshal with button presses. (I.E. discard same input if it occurs multiple times within a second).
+
+Indicator_out:
+	Manages the indicators, capable of pulsing or solid output depending on command parameters. May use a queue to hold 2 byte commands (0xINDICATOR, 0xCOMMAND).
+
+
+Global Device Table concept:
+
+The global device table could be an array of structs including:
+position in array is used internally to refer to a device, so when a new device is added to the table by the RS485_IN task it will pass the table entry number to device specific to ask it to check.
+If the table requires MUTEX protection, then there may need to be a task holding an input buffer so that the RS485_IN task doesn't get stuck waiting for table access.
+
+I will give the table MUTEX protection to avoid any potential issues, there will be a counter contained within RS485_OUT to keep track of its place so it can release table access while waiting between output messages. The Device Specific will just block and wait when it needs to interact with the flags instead of going through the write task, the write task is just a buffer so that RS485_IN doesn't get stuck waiting for the MUTEX to become available
+
+Structure can be defined as:
+8 bytes Wireless Address
+1 byte Wired Address
+1 byte Channel
+1 byte Device Type
+1 byte flags - first bit indicates relevance, other 7 can be used by device specific for whatever
+
+if we make the table sized to fit 255 devices, a total of 3060 bytes of RAM will be dedicated to the table, may need to adjust the config of FreeRTOS to ensure it will fit.
+
+The device specific in this case will make use of the flags while it is tracking replies from lights. If a light turns into a higher priority colour when waiting for replies, it will stop
+attempting to change colours until the lights are all the same colour. It will lock out any inputs of a lower priority until all lights have changed colour.
+I.E trying to turn the lights green, when yellow has been pressed on another controller, must wait until all lights turn yellow before it will accept a green button press.
+
+It may also be helpful to communicate with other controllers, but this will be considered an optional feature as it should work fine without it.
+
+
+I have decided to remove the Table_Write task, the input buffer on the RS485 in task should be able to handle any delay in grabbing the MUTEX and it will reduce overall RAM usage.

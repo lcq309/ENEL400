@@ -1,0 +1,124 @@
+WBM indicator commands:
+2 bytes
+1st byte is the target (1,2,3,255 in this case)
+2nd byte is command (0 = off, 1 = on, 2 = flash)
+
+I am realizing I should double check to be sure that I loaded the preamble before enabling the DRE interrupt in the coordinator code, or it might get locked in an interrupt loop.
+
+network join message needs to include:
+wireless address (0x000000000000FFFF broadcast for xbees, will be updated to the sender address at receiving device) 8 bytes
+channel (part of header) 1 byte
+device type (first byte in message or part of updated header) 1 byte
+device ID (0x00 for wireless-only devices, wired address not used to filter messages outside of pings) 1 byte
+
+This should ensure the device is added to the relevant device tables. Devices should reply to this type of message (device specific will instruct a reply if appropriate)
+
+In order to use task notifications, we need to have at least two notifications so that the stream buffers can use index 0. (will need to add configTASK_NOTIFICATION_ARRAY_ENTRIES 2 to the coordinator as well).
+
+task specific can point out a specific channel, entry, or device type in the device table with the last 2 bytes of the message (easier to discard this way), or it can send 0x0501 to tell the output task to send to all devices marked relevant. (5th field, relevance)
+0x00XX (index, entry) - no loop needed for this one
+0x01XX (wireless address, not really useable) - not implemented
+0x02XX (wired address, match) - not implemented, mostly pointless
+0x03XX (channel, match) - may not be implemented
+0x04XX (device type, match) mostly useless, not implemented
+0x05XX (flags, match) - expected use case, will be implemented
+
+I will focus first on implementing the index and the channel matches.
+we can send one message, then must pass back until next notification, there needs to be a way to cancel sending if new information is received.
+
+single index messages are easy, just send that and finish.
+relevant devices will be more difficult, needs to loop through table until all devices hit, (does it need to cancel if new message received?)
+
+to get to second last byte, size - 2, last byte should be size - 1.
+
+485 IN check ROUTINES:
+first check if this is a ping, then check device ID if so, send notification to RS485 out task in that case
+
+if not a ping, check the channel
+- if channel matches, grab the table MUTEX and check if the device already exists on the list. If not, then add it and signal the device specific task to check on it.
+	- signal to check by sending a short message and then wait for the device specific task to check before discarding or passing the message
+- if the device already exists but is not marked as relevant, then just discard the message
+- if the device already exists and is marked as relevant, pass the message onto the device specific task
+
+Indicator task needs to be non-blocking, so it can run the blinking and drive multiple lights at once.
+The task will pause for 250ms each time it cycles through, which can be implemented using the QueueReceive.
+Lights that are blinking just toggle, so blinking may become unsynchronized unless all lights are turned off before starting to Blink
+
+Device specific:
+- Three buttons, three indicators
+	- respond to button input, change indicator colour only when all lights are matching (maybe flash while they are changing or something?)
+	- respond to lights changing colour 
+- cede control to a higher priority colour
+Green -> Blue -> Yellow -> Red
+- wait until all lights match colour before issuing a change (discard changes when not appropriate to act on at that time)
+	-could probably use an interlocking variable to track if a change has finished or been interrupted
+
+Can't be blocking, needs to cycle and keep checking (how can we time this?)
+Maybe I can use a software timer to keep time (check all relevant devices and see if they have responded by the time the timer goes off, if not then re-send to unconfirmed devices)
+one byte to track status of change? State change handled by controllers (one light turns yellow uncommanded, wait until all other lights turn yellow before unlocking the lower level colours) 
+One Byte to track lockouts: (0x0 = no lockout, 0x1 yellow lockout)
+lockout of Red is handled by lights, they will reject other colours until after (can only be released by the stop buttons).
+
+
+Running through:
+colour tracker tracks currently requested colour, if a higher safety priority comes in then stop trying to change the lights and set the lockout.
+When a colour change is requested, a software timer is started after the final message is sent out. every 500ms(?) it will start a check of each relevant device 
+
+Controllers may also coordinate when they send commands: I.E. a controller lets the other controllers know what colour it is requesting, otherwise this just comes through the lights.
+For now.
+
+Advantages to controller coordination:
+possible to detect unintended light change and correct
+controllers can work together (if a controller fails before all lights change, the other controllers can finish the colour change)
+
+Disadvantages:
+More messages required to coordinate between controllers, more network traffic
+More complexity within the code, needs to handle multiple messages
+Potential for network confusion, possibly slower response times
+
+Advantages to light coordination:
+Should be simpler running code (potentially easier to debug)
+Controllers only need to keep track of lights, and not other controllers on the same channel
+
+Disadvantages:
+May be harder to detect running issues in system (unintended colour changes impossible to detect or correct?)
+Loss of control if a coordinator doesn't unlock the lights
+
+I will start with the light coordination scheme, it will be faster to develop code for testing and shouldn't be too difficult to change later on.
+
+Messaging sequence controller coordination:
+1. button is pressed, this is fed into the device specific task
+2. Task compares the requested colour level against the current lockout level and discards if it isn't appropriate to act at this time
+3. if it is appropriate to act, then send a message to other controllers on the same channel
+4. send colour change message to other lights on the same channel
+5. receiving controllers will also track and assist colour change, with a delay to allow the requesting controller time to act
+6. once all lights have changed to the correct colour, release the lockout
+
+with this system, there are a few states a controller can be in:
+0. startup
+1. ready (not currently processing a change)
+2. change leader (change requested from this switch)
+3. assist (change requested at other controller, assisting)
+
+Lights will also lockout based on colour, with the lockout being released by a controller once all lights complete the change
+
+Device specific uses multiple tables to track device types:
+A light controller might have a table of index entries for lights, other controllers, special devices, and possibly menus as well.
+
+colour codes in device specific will be taken as:
+0x0 for off
+0x47 'G' for green
+0x42 'B' for blue
+0x59 'Y' for yellow
+0x52 'R' for red
+
+message passed between devices could look like this:
+preamble->header->1 byte command (colour)->end delimiter
+the NULL padding is needed to ensure it isn't mistaken for an inter-task message, but it will be added when the message arrives at the destination device
+lockout not yet implemented pending testing of existing code, just send a command when a colour change is requested
+
+
+Message processing sequence:
+1. message comes in
+	- direct command = execute command or check
+	- message from other device is contextual, just set a bit and go to next part of looping processing code

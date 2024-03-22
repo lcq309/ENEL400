@@ -17,7 +17,10 @@ The coordinator uses a much simpler device table, as it is only used to target p
 
 device types listing:
 0 - reserved
-1 - generic light controller
-2 - generic light
 3 - reserved as end delimiter
+4 - reserved for wired multimessaging
 5 - reserved for wired pings only
+0x30 - generic menu
+0x31 - generic light controller
+0x32 - generic light
+0x33 - special light controller
