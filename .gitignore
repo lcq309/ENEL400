@@ -12,8 +12,6 @@ Software/Startup testing code/MPLABproject/Startup testing 2.X/.generated_files/
 *.o
 *.d
 *.elf
-*.map
-*.xml
 Software/Hardware verification testing/Button Module/Button Module.X/.generated_files/flags/default/5ed0c1510611cf9d0dee0196ec48aad8de9a8a60
 Software/Hardware verification testing/Button Module/Button Module.X/.generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 Software/Hardware verification testing/Button Module/Button Module.X/.generated_files/flags/default/fd1b4f4a3ede282101283d07c3dbcb8d2d8f5b71
