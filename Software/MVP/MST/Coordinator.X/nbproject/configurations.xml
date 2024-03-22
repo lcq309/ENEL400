@@ -51,8 +51,8 @@
                    projectFiles="true">
       <itemPath>USART.c</itemPath>
       <itemPath>main.c</itemPath>
-      <itemPath>FreeRTOSConfig.h</itemPath>
       <itemPath>clk_config.h</itemPath>
+      <itemPath>../../WLD/Generic_HSD.X/FreeRTOSConfig/FreeRTOSConfig.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -63,6 +63,7 @@
   <sourceRootList>
     <Elem>.</Elem>
     <Elem>F:/FreeRTOS/Source</Elem>
+    <Elem>../../WLD/Generic_HSD.X/FreeRTOSConfig</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -116,7 +117,7 @@
         <property key="define-macros" value=""/>
         <property key="disable-optimizations" value="false"/>
         <property key="extra-include-directories"
-                  value="F:\FreeRTOS\Source;F:\FreeRTOS\Source\include;F:\FreeRTOS\Source\portable\GCC\AVR_AVRDx;F:\GitHub\ENEL400\Software\MVP\MST\Coordinator.X"/>
+                  value="..\..\..\..\..\..\FreeRTOS\Source\portable\GCC\AVR_AVRDx;..\..\..\..\..\..\FreeRTOS\Source\include;FreeRTOSConfig;..\..\..\..\..\..\FreeRTOS\Source"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
