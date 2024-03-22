@@ -1,0 +1,8 @@
+to determine if a light should be flashing or not
+a 2 byte command is sent to the light output
+first byte is colour
+RGBY0 where 0 is off
+second byte is a command byte
+0 = off
+1 = solid
+2 = blink

@@ -117,8 +117,4 @@ preamble->header->1 byte command (colour)->end delimiter
 the NULL padding is needed to ensure it isn't mistaken for an inter-task message, but it will be added when the message arrives at the destination device
 lockout not yet implemented pending testing of existing code, just send a command when a colour change is requested
 
-
-Message processing sequence:
-1. message comes in
-	- direct command = execute command or check
-	- message from other device is contextual, just set a bit and go to next part of looping processing code
+This has started to slip over my head, I will spend some time on Friday creating the flow charts
