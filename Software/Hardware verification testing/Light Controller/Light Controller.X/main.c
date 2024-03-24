@@ -5,13 +5,12 @@
  * Created on February 24, 2024
  */
 
+#define F_CPU 24000000 //24MHz clock for delay function
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <util/delay.h>
 #include <avr/io.h>
-
-#define F_CPU 24000000UL //24MHz clock for delay function
-
 
 #define RSIG PIN2_bm //PC2
 #define GSIG PIN3_bm //PC3

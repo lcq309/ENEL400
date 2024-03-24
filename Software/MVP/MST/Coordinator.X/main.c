@@ -14,6 +14,9 @@
  * it uses just the round robin to drive the wired network, no other tasks are
  * implemented.
  */
+
+#define F_CPU 24000000UL // cpu speed for delay utilities
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "USART.h"
@@ -25,8 +28,6 @@
 #include "semphr.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
-
-#define F_CPU 24000000UL // cpu speed for delay utilities
 
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable
 

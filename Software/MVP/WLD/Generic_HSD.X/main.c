@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
     
     //setup Queues
     
-    xLIGHT_Queue = xQueueCreate(3, 1 * sizeof(uint8_t)); // up to 3 Light Commands held
+    xLIGHT_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // up to 3 Light Commands held
     
     //setup mutex(es)
     
@@ -154,8 +154,8 @@ static void prvWiredInitTask(void * parameters)
     //1. Take RS485 MUTEX
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //2. Start Flashing Indicators
-    uint8_t lightsFlash[2] = {'Y', 0x2};
-    xQueueSendToFront(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
+    uint8_t lightsFlash[2] = {'Y', 0x02};
+    xQueueSendToBack(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
     /*
@@ -540,7 +540,7 @@ static void prvLightOutTask(void * parameters)
      */
     uint8_t output = 0; //initialize as none
     uint8_t blink = 0; //output flash or solid 
-    uint8_t received[1]; // receiver buffer
+    uint8_t received[2]; // receiver buffer
     for(;;)
     {
         //first, check if commands have come in

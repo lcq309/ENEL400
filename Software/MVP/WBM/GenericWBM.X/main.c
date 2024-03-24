@@ -71,7 +71,7 @@ static SemaphoreHandle_t xDeviceBuffer_MUTEX = NULL;
 
 //Semaphores
 
-//no semaphores for this device, uses only direct notification
+static SemaphoreHandle_t xInit = NULL;
 
 //stream handles
 
@@ -114,7 +114,8 @@ int main(int argc, char** argv) {
     xDeviceBuffer_MUTEX = xSemaphoreCreateMutex();
     
     //setup semaphore
-    //no semaphore for this one
+    
+    xInit = xSemaphoreCreateBinary();
     
     //setup tasks
     
@@ -160,7 +161,8 @@ static void prvWiredInitTask(void * parameters)
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //2. Start Flashing Indicators
     uint8_t lightsFlash[2] = {0xFF, 0x2};
-    xQueueSendToFront(xPB_Queue ,lightsFlash, portMAX_DELAY);
+    xQueueSendToBack(xIND_Queue, lightsFlash, portMAX_DELAY);
+    xSemaphoreTake(xInit, 0);
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
     /*
@@ -199,7 +201,7 @@ static void prvWiredInitTask(void * parameters)
     PORTD.OUTCLR = PIN7_bm;
     //stop flashing lights
     lightsFlash[1] = 0; //command 0, off
-    xQueueSendToFront(xPB_Queue ,lightsFlash, portMAX_DELAY);
+    xQueueSendToFront(xIND_Queue ,lightsFlash, portMAX_DELAY);
     //send network join message to RS485 output buffer
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xMessageBufferSend(xRS485_out_Buffer, StartMessage, 11, portMAX_DELAY);
@@ -207,6 +209,7 @@ static void prvWiredInitTask(void * parameters)
     USART0.CTRLA |= USART_TXCIE_bm;
     //release MUTEX
     xSemaphoreGive(xUSART0_MUTEX);
+    xSemaphoreGive(xInit);
     //go to sleep until restart
     vTaskSuspend(NULL);
     }
@@ -678,6 +681,8 @@ static void prvWBMTask(void * parameters)
     //uint8_t controllers[20]; //when implemented
     //uint8_t broadcast[20]; //20 broadcast channel devices
     //uint8_t menus[20]; //up to 20 menus
+    
+    xSemaphoreTake(xInit, portMAX_DELAY); //take when initialized
     for(;;)
     {
         //1. wait up to 50 ticks for input, need to grab MUTEX?
