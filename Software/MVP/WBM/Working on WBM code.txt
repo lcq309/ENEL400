@@ -117,4 +117,8 @@ preamble->header->1 byte command (colour)->end delimiter
 the NULL padding is needed to ensure it isn't mistaken for an inter-task message, but it will be added when the message arrives at the destination device
 lockout not yet implemented pending testing of existing code, just send a command when a colour change is requested
 
-This has started to slip over my head, I will spend some time on Friday creating the flow charts
+This has started to slip over my head, I will spend some time on Friday creating the flow charts.
+
+
+
+I need to create an event group to prevent certain tasks from starting before the device is initialized. For tasks that shouldn't run before a device is initialized, wait for the first bit of the event group to go high (init task does this before suspending)

@@ -19,6 +19,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "event_groups.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
 #include "ShiftReg.h"
@@ -70,8 +71,11 @@ static SemaphoreHandle_t xTABLE_MUTEX = NULL;
 static SemaphoreHandle_t xDeviceBuffer_MUTEX = NULL;
 
 //Semaphores
+//no semaphore, it has been replaced by an event group
 
-static SemaphoreHandle_t xInit = NULL;
+//event groups
+
+static EventGroupHandle_t xInit = NULL;
 
 //stream handles
 
@@ -115,7 +119,11 @@ int main(int argc, char** argv) {
     
     //setup semaphore
     
-    xInit = xSemaphoreCreateBinary();
+    //no semaphore here
+    
+    //setup event group
+    
+    xInit = xEventGroupCreate();
     
     //setup tasks
     
@@ -139,8 +147,6 @@ int main(int argc, char** argv) {
     return (EXIT_SUCCESS);
 }
 
-//now setup interrupts for the RS485 section
-
 static void prvWiredInitTask(void * parameters)
 {
     /* Wired Init Task
@@ -156,6 +162,7 @@ static void prvWiredInitTask(void * parameters)
      * 10. release RS485 MUTEX
      * 11. sleep until reset
      */
+    //wait for the device to finish initializing.
     for(;;){
     //1. Take RS485 MUTEX
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
@@ -213,7 +220,7 @@ static void prvWiredInitTask(void * parameters)
     USART0.CTRLA |= USART_TXCIE_bm;
     //release MUTEX
     xSemaphoreGive(xUSART0_MUTEX);
-    xSemaphoreGive(xInit);
+    xEventGroupSetBits(xInit, 0x1); //set initialization flags
     //go to sleep until restart
     vTaskSuspend(NULL);
     }
@@ -403,10 +410,11 @@ static void prvRS485InTask(void * parameters)
     uint8_t buffer[MAX_MESSAGE_SIZE];
     uint8_t byte_buffer[1];
     uint8_t length = 0;
+    xEventGroupWaitBits(xInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
     for(;;)
     {
     length = 0;
-    //wait for something to come in
+    //wait for something to come i
     xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
     if(byte_buffer[0] == 0xAA) //if not start delimiter, break somehow
     {
@@ -711,7 +719,7 @@ static void prvWBMTask(void * parameters)
     //uint8_t broadcast[20]; //20 broadcast channel devices
     //uint8_t menus[20]; //up to 20 menus
     
-    xSemaphoreTake(xInit, portMAX_DELAY); //take when initialized
+    xEventGroupWaitBits(xInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
     for(;;)
     {
         //1. wait up to 50 ticks for input, need to grab MUTEX?
@@ -927,7 +935,9 @@ ISR(USART0_RXC_vect)
     /* Receive complete interrupt
      * move received byte into byte buffer for RS485 in task
      */
-    xMessageBufferSendFromISR(xRS485_in_Stream, USART0.RXDATAL, 1, NULL);
+    uint8_t buf[1];
+    buf[0] = USART0.RXDATAL;
+    xMessageBufferSendFromISR(xRS485_in_Stream, buf, 1, NULL);
 }
 ISR(USART0_DRE_vect)
 {

@@ -1,3 +1,4 @@
+Message Processing______________________________________________________________________________
 Intertask messages to DS take the form of two bytes for now, following this format:
 Byte 0 = command/identifier, Byte 1 = data/state
 
@@ -11,3 +12,24 @@ Other commands may be device dependent, for a controller such as this
 outbound commands from task:
 to indicator out:
 <indicator>,<state> = indicators 1 to 3 and 0xff for all. 0 for off, 1 for solid on, 2 for blink.
+
+
+Interdevice messages have a third byte in them to differentiate from intertask, the third byte might be padding, or additional information.
+
+0x05 typically indicates that something is from the comms-in task within a device. but outside of a device it is reserved for pings only
+
+inbound messages:
+0x05, <index>, <data> = <data> from the device at <index>. used for routine confirmation and communication messages between controllers and lights
+
+outbound messages:
+messages to the comms out task are a bit different, the command is attached to the end of the message so it can easily be stripped away when the message is forwarded.
+an inter-device message from a controller DS task to a light through the comms out task may look like:
+<colour>, <command>, <detail>. where the commands are specified in the documents for the comms out tasks
+
+Colour lockouts are set when a safety colour is requested, the lockout is only released once all lights confirm the colour change.
+A controller will not try to override a lockout colour until all lights have confirmed the colour.
+A controller will send a message to other controllers on the same channel, which will set lockouts when appropriate.
+(indicators will flash to indicate a change of colour, cannot change to green if yellow is still flashing)
+
+Colour track is used to control output messaging. Lights will also lockout internally and must be released by a confirmation message from a controller.
+Controllers will work together, which may cause some network spam in this simplified case, but 
