@@ -26,8 +26,8 @@
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable, includes formatting
 #define DEVICE_TABLE_SIZE 250
 
-static uint8_t GLOBAL_DeviceID = 0x1; //device ID is set during initial startup
-static uint8_t GLOBAL_Channel = 0x1; //channel number is set during initial startup
+static uint8_t GLOBAL_DeviceID = 0x01; //device ID is set during initial startup
+static uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x31; //this will be device type 0x31, generic controller
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
 
@@ -163,10 +163,12 @@ static void prvWiredInitTask(void * parameters)
     uint8_t lightsFlash[2] = {0xFF, 0x2};
     xQueueSendToBack(xIND_Queue, lightsFlash, portMAX_DELAY);
     xSemaphoreTake(xInit, 0);
-    //testing, feed the correct init message to the device.
+    /*//testing, feed the correct init message to the device.
     lightsFlash[0] = 0xaa;
-    lightsFlash[1] = 0x01;
+    lightsFlash[1] = GLOBAL_DeviceID;
+    vTaskDelay(500); //wait about half a second.
     xStreamBufferSend(xRS485_in_Stream, lightsFlash, 2, portMAX_DELAY);
+    */
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
     /*
@@ -195,7 +197,7 @@ static void prvWiredInitTask(void * parameters)
     //start transmit mode
     PORTD.OUTSET = PIN7_bm;
     //send preamble to output buffer
-    USART0.TXDATAL = 0xAA;
+    USART0.TXDATAL = 0xaa;
     //enable DRE interrupt
     USART0.CTRLA |= USART_DREIE_bm;
     //after it returns from the interrupt, wait for transmission to complete
@@ -207,9 +209,6 @@ static void prvWiredInitTask(void * parameters)
     lightsFlash[0] = 0xff;
     lightsFlash[1] = 0; //command 0, off
     xQueueSendToFront(xIND_Queue ,lightsFlash, portMAX_DELAY);
-    //send network join message to RS485 output buffer
-    uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
-    xMessageBufferSend(xRS485_out_Buffer, StartMessage, 11, portMAX_DELAY);
     //enable TXCIE
     USART0.CTRLA |= USART_TXCIE_bm;
     //release MUTEX
@@ -234,6 +233,31 @@ static void prvRS485OutTask(void * parameters)
      * 9. set to receive mode
      * 10. release MUTEX
      */
+    /*first wakeup, wait for notification and send the join message*/
+    //send network join message to RS485 output buffer
+    
+    // wait for notification
+    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+    //acquire mutex
+    xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+    uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
+    xMessageBufferSend(xRS485_out_Buffer, StartMessage, 11, portMAX_DELAY);
+    //enable transmitter
+    PORTD.OUTSET = PIN7_bm; //set transmit mode
+    //send preamble
+    USART0.TXDATAL = 0xaa;
+    //enable DRE interrupt
+    USART0.CTRLA |= USART_DREIE_bm;
+    //wait for TXcomplete notification
+    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+    //return to receive mode
+    PORTD.OUTCLR = PIN7_bm;
+    //release USART MUTEX
+    xSemaphoreGive(xUSART0_MUTEX);
+    
+    //now that this is done, we should be able to loop normally
+    
+
     for(;;){
     uint8_t buffer[MAX_MESSAGE_SIZE];
     // wait for notification
@@ -264,7 +288,7 @@ static void prvRS485OutTask(void * parameters)
             //pull information from table, load the output buffer with 8 byte address
             xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD, 8, portMAX_DELAY);
             //next load the 1 byte wired address
-            xStreamBufferSend(xRS485_out_Stream, (void *)GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD, 1, portMAX_DELAY);
+            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD, 1, portMAX_DELAY);
             //next load the channel
             xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel, 1, portMAX_DELAY);
             //next load the device type
@@ -912,11 +936,14 @@ ISR(USART0_DRE_vect)
      * 2. send end delimiter
      * 3. disable interrupt after loading end delimiter
      */
-    if(xStreamBufferReceiveFromISR(xRS485_out_Stream, (uint8_t)USART0.TXDATAL, 1, NULL) == 0) //if end of message
+    uint8_t buf[1];
+    if(xStreamBufferReceiveFromISR(xRS485_out_Stream, buf, 1, NULL) == 0) //if end of message
     {
         USART0.TXDATAL = 0x03; //add end delimiter on end of message
         USART0.CTRLA &= ~USART_DREIE_bm; //disable interrupt
     }
+    else
+        USART0.TXDATAL = buf[0];
 }
 ISR(USART0_TXC_vect)
 {
