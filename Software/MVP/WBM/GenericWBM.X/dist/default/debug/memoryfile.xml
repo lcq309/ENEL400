@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/GenericWBM.X.production.elf">                 
+  <executable name="dist/default/debug/GenericWBM.X.debug.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>17071</used>                     
-      <free>114001</free>                     
+      <used>17051</used>                     
+      <free>114021</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 

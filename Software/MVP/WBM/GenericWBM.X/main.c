@@ -26,8 +26,8 @@
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable, includes formatting
 #define DEVICE_TABLE_SIZE 250
 
-static uint8_t GLOBAL_DeviceID = 0; //device ID is set during initial startup
-static uint8_t GLOBAL_Channel = 0; //channel number is set during initial startup
+static uint8_t GLOBAL_DeviceID = 0x1; //device ID is set during initial startup
+static uint8_t GLOBAL_Channel = 0x1; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x31; //this will be device type 0x31, generic controller
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
 
@@ -127,13 +127,13 @@ int main(int argc, char** argv) {
     xTaskCreate(prvWBMTask, "WBM", 600, NULL, mainWBM_TASK_PRIORITY, NULL);
     
     //setup device ID and channel here, read shift registers and move into global variables
-    
+    /*
     InitShiftIn(); //initialize shift register pins
     LTCHIn(); //latch input register
     ShiftIn(GLOBAL_Channel); //grab channel
     ShiftIn(GLOBAL_DeviceID); //grab DeviceID
     //should now be done with shift registers
-    
+    */
     //initialize device table to all 0s? Not needed
     vTaskStartScheduler(); //start scheduler
     return (EXIT_SUCCESS);
@@ -163,6 +163,10 @@ static void prvWiredInitTask(void * parameters)
     uint8_t lightsFlash[2] = {0xFF, 0x2};
     xQueueSendToBack(xIND_Queue, lightsFlash, portMAX_DELAY);
     xSemaphoreTake(xInit, 0);
+    //testing, feed the correct init message to the device.
+    lightsFlash[0] = 0xaa;
+    lightsFlash[1] = 0x01;
+    xStreamBufferSend(xRS485_in_Stream, lightsFlash, 2, portMAX_DELAY);
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
     /*
@@ -174,7 +178,7 @@ static void prvWiredInitTask(void * parameters)
     {
         //wait for buffer
         xStreamBufferReceive(xRS485_in_Stream, ByteBuffer, 1, portMAX_DELAY);
-        if(ByteBuffer[0] != 0xAA) //start delimiter, next byte should be device ID during init
+        if(ByteBuffer[0] == 0xAA) //start delimiter, next byte should be device ID during init
         {
             xStreamBufferReceive(xRS485_in_Stream, ByteBuffer, 1, portMAX_DELAY);
             if(ByteBuffer[0] == GLOBAL_DeviceID)// if this is the right device
@@ -200,6 +204,7 @@ static void prvWiredInitTask(void * parameters)
     USART0.STATUS |= USART_TXCIF_bm;
     PORTD.OUTCLR = PIN7_bm;
     //stop flashing lights
+    lightsFlash[0] = 0xff;
     lightsFlash[1] = 0; //command 0, off
     xQueueSendToFront(xIND_Queue ,lightsFlash, portMAX_DELAY);
     //send network join message to RS485 output buffer
@@ -676,7 +681,7 @@ static void prvWBMTask(void * parameters)
     uint8_t indbuffer[2]; //buffer for commands to indicators
     uint8_t buffer[MAX_MESSAGE_SIZE]; //message buffer
     uint8_t lights[20]; //one controller can track up to 20 lights?
-    uint8_t lightnum = 0; //keep track of how many lights are controlled
+    uint8_t lightnum = 1; //keep track of how many lights are controlled
     uint8_t lightrem = 0; //track how many lights need to be confirmed
     //uint8_t controllers[20]; //when implemented
     //uint8_t broadcast[20]; //20 broadcast channel devices
@@ -689,7 +694,7 @@ static void prvWBMTask(void * parameters)
         //grab device buffer MUTEX
         xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
         //keep track of length as well
-        inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 50);
+        inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 250);
         //release device buffer MUTEX
         xSemaphoreGive(xDeviceBuffer_MUTEX);
         //2. check input
@@ -723,14 +728,20 @@ static void prvWBMTask(void * parameters)
                     case 0x04:    //button press
                         switch(buffer[1])
                         {
-                            case 0x0: //button 1 (call this blue for now)
+                            case 0x1: //button 1 (call this blue for now)
                                 colour_track = 'B'; // blue lights
+                                if(colour_track != colour_light)
+                                lightrem = lightnum;
                                 break;
-                            case 0x1: //button 2 (call this green for now)
+                            case 0x2: //button 2 (call this green for now)
                                 colour_track = 'G';
+                                if(colour_track != colour_light)
+                                lightrem = lightnum;
                                 break;
-                            case 0x2: //button 3 (call this yellow for now)
+                            case 0x3: //button 3 (call this yellow for now)
                                 colour_track = 'Y';
+                                if(colour_track != colour_light)
+                                lightrem = lightnum;
                                 break;
                         }
                         break;
@@ -765,33 +776,7 @@ static void prvWBMTask(void * parameters)
          * 5. release table mutex
          */
         
-        /* colour confirmation section
-         * once lightrem = 0, set light_colour to colour_track
-         * turn off all indicators and turn on the correct one
-         */
-        if (lightrem == 0)
-        {
-            colour_light = colour_track;
-            indbuffer[0] = 0xff;
-            indbuffer[1] = 0;
-            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
-            indbuffer[1] = 1;
-            switch(colour_light)
-            {
-                case 'B':
-                    indbuffer[0] = 1; //indicator 1
-                    break;
-                case 'G':
-                    indbuffer[0] = 2; //indicator 2
-                    break;
-                case 'Y':
-                    indbuffer[0] = 3; //indicator 3
-                    break;
-                default:
-                    indbuffer[0] = 0; //no indicator
-            }
-            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
-        }
+        
         /* change colour check section:
          * check if there is a colour change
          * if there is a colour change, flash both lights, transmit colour change message
@@ -839,6 +824,33 @@ static void prvWBMTask(void * parameters)
             buffer[2] = 0x01;
             xMessageBufferSend(xRS485_out_Buffer, buffer, 3, portMAX_DELAY);
         }
+        /* colour confirmation section
+         * once lightrem = 0, set light_colour to colour_track
+         * turn off all indicators and turn on the correct one
+         */
+        if (lightrem == 0)
+        {
+            colour_light = colour_track;
+            indbuffer[0] = 0xff;
+            indbuffer[1] = 0;
+            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+            indbuffer[1] = 1;
+            switch(colour_light)
+            {
+                case 'B':
+                    indbuffer[0] = 1; //indicator 1
+                    break;
+                case 'G':
+                    indbuffer[0] = 2; //indicator 2
+                    break;
+                case 'Y':
+                    indbuffer[0] = 3; //indicator 3
+                    break;
+                default:
+                    indbuffer[0] = 0; //no indicator
+            }
+            xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+        }
         /* message processing section complete:
          * confirmation check section
          * not yet implemented, since this is the most basic case for testing use
@@ -857,32 +869,33 @@ ISR(PORTD_PORT_vect)
      * 3. send the button number to the button task
      */
     //1. check which pin the interrupt is on
-    
+    uint8_t pb[1] = {0};
     switch(PORTD.INTFLAGS)
     {
         case PIN6_bm: //button 1
-            
-            xQueueSendToFrontFromISR(xPB_Queue, (void*)0x01, NULL);
             PORTD.INTFLAGS = PIN6_bm; //reset interrupt
+            pb[0] = 0x01;
             break;
         case PIN5_bm: //button 2
-            xQueueSendToFrontFromISR(xPB_Queue, (void*)0x02, NULL);
             PORTD.INTFLAGS = PIN5_bm; //reset interrupt
+            pb[0] = 0x02;
             break;
         case PIN3_bm: //button 3
-            xQueueSendToFrontFromISR(xPB_Queue, (void*)0x03, NULL);
             PORTD.INTFLAGS = PIN3_bm; //reset interrupt
+            pb[0] = 0x03;
             break;
         case PIN2_bm: //button 4
-            xQueueSendToFrontFromISR(xPB_Queue, (void*)0x04, NULL);
             PORTD.INTFLAGS = PIN2_bm; //reset interrupt
+            pb[0] = 0x04;
     }
+    xQueueSendToFrontFromISR(xPB_Queue, pb, NULL);
 }
 
 ISR(PORTC_PORT_vect)
 {
-    xQueueSendToFrontFromISR(xPB_Queue, 0x0, NULL);
+    uint8_t pb[1] = {0x05};
     PORTC.INTFLAGS = PIN3_bm;
+    xQueueSendToFrontFromISR(xPB_Queue, pb, NULL);
 }
 
 ISR(USART0_RXC_vect)

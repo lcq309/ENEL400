@@ -25,6 +25,6 @@ void USART0_init(void)
     //enable the receiver and transmitter
     USART0.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
     //re-enable global interrupts
-    SREG |= ~CPU_I_bm;
+    SREG |= CPU_I_bm;
     //USART0 now initialized for 8bit, even parity, interrupt driven mode
 }
