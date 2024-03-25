@@ -6,7 +6,7 @@
  * Will enable the targeted USART with interrupts enabled, as well as global
  * interrupts.
  * Assumes that the CPU is running at 24MHZ
- * Created on March 15, 2024, 8:58 AM
+ * Created on March 15, 2024
  */
 
 #ifndef USART_H
@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#define USARTBAUD 115200 //define initial baudrate, for easy changes later
+#define USARTBAUD 9600 //define initial baudrate, for easy changes later
 #define CPU_F 24000000 //24MHz
 #ifdef	__cplusplus
 extern "C" {
