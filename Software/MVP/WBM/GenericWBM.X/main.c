@@ -378,7 +378,8 @@ static void prvRS485OutTask(void * parameters)
                 }
             }
         }
-        else // ping response, generic response is anything (or nothing in this case)
+    }
+    else // ping response, generic response is anything (or nothing in this case)
         {
             /* 1. assemble message in buffer as above
              * 2. perform sending process as above
@@ -400,7 +401,6 @@ static void prvRS485OutTask(void * parameters)
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
         }
-    }
     }
 }
 
