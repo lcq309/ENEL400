@@ -3,12 +3,16 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>Lap Counter Driver</name>
-            <creation-uuid>0547c0db-1714-4b08-a778-be737a323bb4</creation-uuid>
+            <name>Marshal</name>
+            <creation-uuid>bde156e4-495d-49cc-9dfe-8fbbd550b52e</creation-uuid>
             <make-project-type>0</make-project-type>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
-            <sourceRootList/>
+            <sourceRootList>
+                <sourceRootElem>.</sourceRootElem>
+                <sourceRootElem>F:/FreeRTOS/Source</sourceRootElem>
+                <sourceRootElem>../../WLD/Generic_HSD.X/FreeRTOSConfig</sourceRootElem>
+            </sourceRootList>
             <confList>
                 <confElem>
                     <name>default</name>

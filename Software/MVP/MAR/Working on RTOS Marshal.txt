@@ -1,0 +1,32 @@
+Working on RTOS Marshal:
+
+Note on Buffers:
+Stream and Message buffers are not thread safe, they need to be mutexed if being written to by multiple tasks.
+
+Wireless section:
+this is much the same as the wireless section on other devices. Note the new notation for direct task notification by ISR.
+
+	WIRELESS_IN:
+		WIRELESS_IN assembles a complete message from a stream of bytes (WIRELESS_IN_STREAM) and cleans any irrevelant formatting before passing 		the message to Marshal or status for processing (part of the message header could include a message type that determines this routing).
+
+	WIRELESS_OUT:
+		WIRELESS_OUT attaches the device address (unless the XBee handles this automatically), handles xbee configuration, and sends the message 		passed to it in the mutex-protected (MUTEX_TX) Variable-length buffer WIRELESS_OUT_BUFFER. 
+
+Status Section:
+	STATUS:
+		The status task is meant to be used for keeping track of battery level with the ADC, controlling the status light, and responding to status 		requests from a menu controller. The status task may also be what loads and and updates the user readable device name in storage, if the 		feature is implemented. (user readable name is only sent by request from a menu, as that is the only place they can be viewed) This task is 		responsible for sending errors relating to the specific device (low battery, ???)
+
+Device Specific Section:
+	Marshal:
+		Marshal receives commands and other messages through the MUTEX_MAR protected message buffer Marshal_Buffer.
+		Marshal is responsible for operating the controller, translating button presses from the PB_in task into network messages, and sending the 		messages to their destination. It is also responsible for tracking the responses and sending an error (and flashing the associated 			indicator) in case a response is not heard in time (or an error is received from the light).
+		Marshal is also responsible for forming the list of relevant devices, and sending the wakeup message as part of it's initialization.
+		Marshal is responsible for sending the command to the indicator out task when all lights have confirmed their status.
+
+I/O section:
+	PB_in:
+		PB_in is responsible for coordinating the interrupts from button presses, and sending that information on to the Marshal. PB_in uses a 			message buffer as it has only a single interrupt writing to it, and a message buffer is lighter than a queue
+
+	Indicator_out:
+		Indicator out receives commands through the variable length buffer Indicator_out_Buffer
+		Indicator_out is responsible for lighting indicators for specific lights based on commands from the marshal task, and flashing those lights 		when appropriate
