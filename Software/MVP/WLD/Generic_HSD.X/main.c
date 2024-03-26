@@ -27,6 +27,9 @@
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable, includes formatting
 #define DEVICE_TABLE_SIZE 250
 
+// messaging constants
+static const uint8_t end_delimiter[3] = {0x03,0x03,0x03};
+
 static uint8_t GLOBAL_DeviceID = 0x02; //device ID is set during initial startup
 static uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x32; //this will be device type 0x32, generic light
@@ -251,6 +254,8 @@ static void prvRS485OutTask(void * parameters)
     vTaskDelay(1); //delay for communications?
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xStreamBufferSend(xRS485_out_Stream, StartMessage, 11, portMAX_DELAY);
+    //tack on end delimiter
+    xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
     //enable transmitter
     PORTD.OUTSET = PIN7_bm; //set transmit mode
     //send preamble
@@ -320,6 +325,8 @@ static void prvRS485OutTask(void * parameters)
             //next load the message (subtract last 2 bytes for intertask commands)
             xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
             //full message should be loaded into the output buffer now, prepare to start sending
+            //tack on end delimiter
+            xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
             PORTD.OUTSET = PIN7_bm; //set transmit mode
             //send preamble to start transmisson
             USART0.TXDATAL = 0xAA;
@@ -372,6 +379,8 @@ static void prvRS485OutTask(void * parameters)
                     //next load the message (subtract last 2 bytes for commands)
                     xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
                     //full message should be loaded into the output buffer now, prepare to start sending
+                    //tack on end delimiter
+                    xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
                     PORTD.OUTSET = PIN7_bm; //set transmit mode
                     //send preamble to start transmission
                     USART0.TXDATAL = 0xAA;
@@ -401,6 +410,8 @@ static void prvRS485OutTask(void * parameters)
             //next load the device type
             xStreamBufferSend(xRS485_out_Stream, pingres, 11, portMAX_DELAY);
             //full message should be loaded into the output buffer now, prepare to start sending
+            //tack on end delimiter
+            xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
             PORTD.OUTSET = PIN7_bm; //set transmit mode
             //send preamble to start transmission
             USART0.TXDATAL = 0xAA;
@@ -799,15 +810,13 @@ ISR(USART0_DRE_vect)
 {
     /* Data Register empty Interrupt
      * 1. pull from output stream buffer and put in TX register until clear
-     * 2. send end delimiter
-     * 3. disable interrupt after loading end delimiter
+     * 2. disable interrupt
      */
-    if(xStreamBufferReceiveFromISR(xRS485_out_Stream, (uint8_t)USART0.TXDATAL, 1, NULL) == 0) //if end of message
-        //may need to be changed to pull from shift register before sending, will require testing
-    {
-        USART0.TXDATAL = 0x03; //add end delimiter on end of message
+    uint8_t buf[1];
+    if(xStreamBufferReceiveFromISR(xRS485_out_Stream, buf, 1, NULL) == 0) //if end of message
         USART0.CTRLA &= ~USART_DREIE_bm; //disable interrupt
-    }
+    else
+        USART0.TXDATAL = buf[0];
 }
 ISR(USART0_TXC_vect)
 {

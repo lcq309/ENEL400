@@ -31,6 +31,9 @@
 
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable
 
+// messaging constants
+static const uint8_t end_delimiter[3] = {0x03,0x03,0x03};
+
 // Priority Definitions:
 
 #define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -176,6 +179,8 @@ static void prvRoundRobinTask(void * parameters)
             message[8] = GLOBAL_DEVICE_TABLE[count];
             //pass message to the output buffer
             xStreamBufferSend(xRS485_out_Stream, message, 11, portMAX_DELAY);
+            //tack on end delimiter
+            xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
             //set RS485 transceiver to transmit mode
             PORTD.OUTSET = PIN7_bm;
             //start transmission by sending preamble
@@ -193,7 +198,7 @@ static void prvRoundRobinTask(void * parameters)
             xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, portMAX_DELAY);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
-            {xSemaphoreGive(xRoundRobin_MUTEX)} //do nothing yet
+            {} //break here for debug purposes
             else
             xSemaphoreGive(xRoundRobin_MUTEX); //release round robin
             //end of loop, start again after incrementing
@@ -223,10 +228,12 @@ static void prvRS485OutTask(void * parameters)
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
         vTaskDelay(1); //delay for communications?
-        //set RS485 transceiver to transmit mode
-        PORTD.OUTSET = PIN7_bm;
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
+        //tack on end delimiter
+        xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
+        //set RS485 transceiver to transmit mode
+        PORTD.OUTSET = PIN7_bm;
         //start transmission by sending wired preamble
         USART0.TXDATAL = 0xAA;
         //enable DRE interrupt
@@ -367,7 +374,6 @@ ISR(USART0_DRE_vect)
     uint8_t buf[1];
     if(xStreamBufferReceiveFromISR(xRS485_out_Stream, buf, 1, NULL) == 0) //if end of message
     {
-        USART0.TXDATAL = 0x03; //add end delimiter on end of message
         USART0.CTRLA &= ~USART_DREIE_bm; //disable interrupt
     }
     else
