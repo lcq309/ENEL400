@@ -272,7 +272,8 @@ static void prvRS485OutTask(void * parameters)
     pingres[i] = 0;
     pingres[8] = GLOBAL_DeviceID;
     pingres[9] = GLOBAL_Channel;
-    pingres[10] = 0x0;
+    pingres[10] = GLOBAL_DeviceType;
+    uint8_t headerbuf[11];
     uint8_t buffer[MAX_MESSAGE_SIZE];
     for(;;){
     // wait for notification
@@ -281,7 +282,7 @@ static void prvRS485OutTask(void * parameters)
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //check for waiting output message
-    uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 10);
+    uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
     {
      /* send a message
@@ -301,17 +302,23 @@ static void prvRS485OutTask(void * parameters)
         {
             //take table MUTEX
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
-            //pull information from table, load the output buffer with 8 byte address
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD, 8, portMAX_DELAY);
-            //next load the 1 byte wired address
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD, 1, portMAX_DELAY);
-            //next load the channel
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel, 1, portMAX_DELAY);
-            //next load the device type
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].Type, 1, portMAX_DELAY);
+            //load header with info
+            headerbuf[0] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[0];
+            headerbuf[1] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[1];
+            headerbuf[2] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[2];
+            headerbuf[3] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[3];
+            headerbuf[4] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[4];
+            headerbuf[5] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[5];
+            headerbuf[6] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[6];
+            headerbuf[7] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[7];
+            headerbuf[8] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD;
+            headerbuf[9] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel;
+            headerbuf[10] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Type;
             //don't need the table anymore, drop the MUTEX
             xSemaphoreGive(xTABLE_MUTEX);
-            //next load the message (subtract last 2 bytes for commands)
+            //next load the device type
+            xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
+            //next load the message (subtract last 2 bytes for intertask commands)
             xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
             //full message should be loaded into the output buffer now, prepare to start sending
             PORTD.OUTSET = PIN7_bm; //set transmit mode
@@ -340,23 +347,29 @@ static void prvRS485OutTask(void * parameters)
              * 8. wait until next notification
              * 9. loop until entire table is cleared
              */
-            //grab table mutex
-            xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //search table for devices marked relevant
             for(uint8_t count = 0; count < GLOBAL_TableLength; count++)
             {
+                //grab table mutex
+                xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
                 if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
                 {
-                    //pull information from table, load the output buffer with 8 byte address
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].XBeeADD, 8, portMAX_DELAY);
-                    //next load the 1 byte wired address
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].WiredADD, 1, portMAX_DELAY);
-                    //next load the channel
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].Channel, 1, portMAX_DELAY);
-                    //next load the device type
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].Type, 1, portMAX_DELAY);
+                    //load header
+                    headerbuf[0] = GLOBAL_DEVICE_TABLE[count].XBeeADD[0];
+                    headerbuf[1] = GLOBAL_DEVICE_TABLE[count].XBeeADD[1];
+                    headerbuf[2] = GLOBAL_DEVICE_TABLE[count].XBeeADD[2];
+                    headerbuf[3] = GLOBAL_DEVICE_TABLE[count].XBeeADD[3];
+                    headerbuf[4] = GLOBAL_DEVICE_TABLE[count].XBeeADD[4];
+                    headerbuf[5] = GLOBAL_DEVICE_TABLE[count].XBeeADD[5];
+                    headerbuf[6] = GLOBAL_DEVICE_TABLE[count].XBeeADD[6];
+                    headerbuf[7] = GLOBAL_DEVICE_TABLE[count].XBeeADD[7];
+                    headerbuf[8] = GLOBAL_DEVICE_TABLE[count].WiredADD;
+                    headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
+                    headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
                     //don't need the table anymore, drop the MUTEX
                     xSemaphoreGive(xTABLE_MUTEX);
+                    //load the output stream with the header
+                    xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
                     //next load the message (subtract last 2 bytes for commands)
                     xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
                     //full message should be loaded into the output buffer now, prepare to start sending
