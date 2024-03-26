@@ -441,11 +441,40 @@ static void prvRS485InTask(void * parameters)
         for(int i = 0; i < MAX_MESSAGE_SIZE; i++)
         {
             xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
-            //check if delimiter
+            //check if delimiter(3 * 0x03 in a row)
             if(byte_buffer[0] == 0x03)
             {
-                //don't increment length, end loop
-                i = MAX_MESSAGE_SIZE;
+                buffer[i] = byte_buffer[0]; //add to buffer for now and increment length
+                length++;
+                i++;
+                xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                //2nd 0x03 check
+                if(byte_buffer[0] == 0x03) //add to buffer for now and increment length
+                {
+                    buffer[i] = byte_buffer[0];
+                    length++;
+                    i++;
+                    xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                    //3rd 0x03 check
+                    if(byte_buffer[0] == 0x03)
+                    {// end of message, reduce length by 2 and end loop
+                        i = MAX_MESSAGE_SIZE;
+                        length = length - 2; //remove partial end delimiter
+                    }
+                    else
+                    {
+                        buffer[i] = byte_buffer[0];
+                        length++;
+                        i++;
+                    }
+                }
+                else
+                {
+                    buffer[i] = byte_buffer[0];
+                    length++;
+                    i++;
+                }
+                        
             }
             else
             {

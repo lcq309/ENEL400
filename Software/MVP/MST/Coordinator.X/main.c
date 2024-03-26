@@ -193,7 +193,7 @@ static void prvRoundRobinTask(void * parameters)
             xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, portMAX_DELAY);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
-            {} //do nothing yet
+            {xSemaphoreGive(xRoundRobin_MUTEX)} //do nothing yet
             else
             xSemaphoreGive(xRoundRobin_MUTEX); //release round robin
             //end of loop, start again after incrementing
@@ -272,16 +272,46 @@ static void prvRS485InTask(void * parameters)
             {
                 xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
                 //check if delimiter
-                if(byte_buffer[0] == 0x03)
+                //check if delimiter(3 * 0x03 in a row)
+            if(byte_buffer[0] == 0x03)
+            {
+                message_buffer[i] = byte_buffer[0]; //add to buffer for now and increment length
+                length++;
+                i++;
+                xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                //2nd 0x03 check
+                if(byte_buffer[0] == 0x03) //add to buffer for now and increment length
                 {
-                    //don't increment length, end loop
-                    i = MAX_MESSAGE_SIZE;
+                    message_buffer[i] = byte_buffer[0];
+                    length++;
+                    i++;
+                    xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                    //3rd 0x03 check
+                    if(byte_buffer[0] == 0x03)
+                    {// end of message, reduce length by 2 and end loop
+                        i = MAX_MESSAGE_SIZE;
+                        length = length - 2; //remove partial end delimiter
+                    }
+                    else
+                    {
+                        message_buffer[i] = byte_buffer[0];
+                        length++;
+                        i++;
+                    }
                 }
                 else
                 {
-                    message_buffer[i] = byte_buffer[0]; // add to message buffer
-                    length++; //increment length
+                    message_buffer[i] = byte_buffer[0];
+                    length++;
+                    i++;
                 }
+                        
+            }
+            else
+            {
+                message_buffer[i] = byte_buffer[0]; // add to message buffer
+                length++; //increment length
+            }
             }
             //assembled message is within the buffer, end delimiter received
             //release MUTEX and perform routing
