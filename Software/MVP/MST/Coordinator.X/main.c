@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
     initmessage[2] = 0x03; //end of message
     //message is setup now, ping a device, wait 5ms, then check the input buffer.
     //could be moved into a separate c file or function
-    for(int i = 1; i < 2; i++)
+    for(int i = 1; i < 3; i++)
     {
         initmessage[1] = i;
         //first, ping while waiting between bytes for DRE to set

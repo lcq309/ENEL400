@@ -21,13 +21,14 @@
 #include "semphr.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
+#include "event_groups.h"
 #include "ShiftReg.h"
 
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable, includes formatting
 #define DEVICE_TABLE_SIZE 250
 
-static uint8_t GLOBAL_DeviceID = 0; //device ID is set during initial startup
-static uint8_t GLOBAL_Channel = 0; //channel number is set during initial startup
+static uint8_t GLOBAL_DeviceID = 0x02; //device ID is set during initial startup
+static uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x32; //this will be device type 0x32, generic light
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
 
@@ -69,7 +70,12 @@ static SemaphoreHandle_t xDeviceBuffer_MUTEX = NULL;
 
 //Semaphores
 
-//no semaphores for this device, uses only direct notification
+static SemaphoreHandle_t xPermission = NULL; //task notification replacement
+static SemaphoreHandle_t xTXC = NULL;
+
+//event groups
+
+static EventGroupHandle_t xInit = NULL;
 
 //stream handles
 
@@ -110,7 +116,9 @@ int main(int argc, char** argv) {
     xDeviceBuffer_MUTEX = xSemaphoreCreateMutex();
     
     //setup semaphore
-    //no semaphore for this one
+    
+    xPermission = xSemaphoreCreateBinary();
+    xTXC = xSemaphoreCreateBinary();
     
     //setup tasks
     
@@ -120,12 +128,17 @@ int main(int argc, char** argv) {
     xTaskCreate(prvLightOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvWLDTask, "WBM", 600, NULL, mainWLD_TASK_PRIORITY, NULL);
     
-    //setup device ID and channel here, read shift registers and move into global variables
+    //setup event group
     
+    xInit = xEventGroupCreate();
+    
+    //setup device ID and channel here, read shift registers and move into global variables
+    /* removed for testing
     InitShiftIn(); //initialize shift register pins
     LTCHIn(); //latch input register
     ShiftIn(GLOBAL_Channel); //grab channel
     ShiftIn(GLOBAL_DeviceID); //grab DeviceID
+    */
     //should now be done with shift registers
     
     //initialize device table to all 0s? Not needed
@@ -150,12 +163,20 @@ static void prvWiredInitTask(void * parameters)
      * 10. release RS485 MUTEX
      * 11. sleep until reset
      */
+    //wait for the device to finish initializing.
     for(;;){
     //1. Take RS485 MUTEX
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //2. Start Flashing Indicators
-    uint8_t lightsFlash[2] = {'Y', 0x02};
+    uint8_t lightsFlash[2] = {'Y', 0x2};
     xQueueSendToBack(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
+    xSemaphoreTake(xInit, 0);
+    /*//testing, feed the correct init message to the device.
+    lightsFlash[0] = 0xaa;
+    lightsFlash[1] = GLOBAL_DeviceID;
+    vTaskDelay(500); //wait about half a second.
+    xStreamBufferSend(xRS485_in_Stream, lightsFlash, 2, portMAX_DELAY);
+    */
     //3. Listen for correct init message
     uint8_t ByteBuffer[1];
     /*
@@ -167,7 +188,7 @@ static void prvWiredInitTask(void * parameters)
     {
         //wait for buffer
         xStreamBufferReceive(xRS485_in_Stream, ByteBuffer, 1, portMAX_DELAY);
-        if(ByteBuffer[0] != 0xAA) //start delimiter, next byte should be device ID during init
+        if(ByteBuffer[0] == 0xAA) //start delimiter, next byte should be device ID during init
         {
             xStreamBufferReceive(xRS485_in_Stream, ByteBuffer, 1, portMAX_DELAY);
             if(ByteBuffer[0] == GLOBAL_DeviceID)// if this is the right device
@@ -193,15 +214,14 @@ static void prvWiredInitTask(void * parameters)
     USART0.STATUS |= USART_TXCIF_bm;
     PORTD.OUTCLR = PIN7_bm;
     //stop flashing lights
-    lightsFlash[0] = 0; //command 0, off
-    xQueueSendToFront(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
-    //send network join message to RS485 output buffer
-    uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
-    xMessageBufferSend(xRS485_out_Buffer, &StartMessage, 11, portMAX_DELAY);
+    lightsFlash[0] = 0xff;
+    lightsFlash[1] = 0; //command 0, off
+    xQueueSendToFront(xLIGHT_Queue ,lightsFlash, portMAX_DELAY);
     //enable TXCIE
     USART0.CTRLA |= USART_TXCIE_bm;
     //release MUTEX
     xSemaphoreGive(xUSART0_MUTEX);
+    xEventGroupSetBits(xInit, 0x1); //set initialization flags
     //go to sleep until restart
     vTaskSuspend(NULL);
     }
@@ -221,14 +241,47 @@ static void prvRS485OutTask(void * parameters)
      * 9. set to receive mode
      * 10. release MUTEX
      */
-    for(;;){
-    uint8_t buffer[MAX_MESSAGE_SIZE];
+    /*first wakeup, wait for notification and send the join message*/
+    //send network join message to RS485 output buffer
+    xEventGroupWaitBits(xInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
     // wait for notification
-    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+    xSemaphoreTake(xPermission, portMAX_DELAY);
+    //acquire mutex
+    xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+    vTaskDelay(1); //delay for communications?
+    uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
+    xStreamBufferSend(xRS485_out_Stream, StartMessage, 11, portMAX_DELAY);
+    //enable transmitter
+    PORTD.OUTSET = PIN7_bm; //set transmit mode
+    //send preamble
+    USART0.TXDATAL = 0xaa;
+    //enable DRE interrupt
+    USART0.CTRLA |= USART_DREIE_bm;
+    //wait for TXcomplete notification
+    xSemaphoreTake(xTXC, portMAX_DELAY);
+    //return to receive mode
+    PORTD.OUTCLR = PIN7_bm;
+    //release USART MUTEX
+    xSemaphoreGive(xUSART0_MUTEX);
+    
+    //now that this is done, we should be able to loop normally
+    //load the output buffer with 8 byte address (all 0's)
+    uint8_t pingres[11];
+    for(uint8_t i = 0; i < 8; i++)
+    pingres[i] = 0;
+    pingres[8] = GLOBAL_DeviceID;
+    pingres[9] = GLOBAL_Channel;
+    pingres[10] = GLOBAL_DeviceType;
+    uint8_t headerbuf[11];
+    uint8_t buffer[MAX_MESSAGE_SIZE];
+    for(;;){
+    // wait for notification
+    xSemaphoreTake(xPermission, portMAX_DELAY);
+    vTaskDelay(1); //delay for communications?
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //check for waiting output message
-    uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 10);
+    uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
     {
      /* send a message
@@ -248,17 +301,23 @@ static void prvRS485OutTask(void * parameters)
         {
             //take table MUTEX
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
-            //pull information from table, load the output buffer with 8 byte address
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD, 8, portMAX_DELAY);
-            //next load the 1 byte wired address
-            xStreamBufferSend(xRS485_out_Stream, (void *)GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD, 1, portMAX_DELAY);
-            //next load the channel
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel, 1, portMAX_DELAY);
-            //next load the device type
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[buffer[size - 1]].Type, 1, portMAX_DELAY);
+            //load header with info
+            headerbuf[0] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[0];
+            headerbuf[1] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[1];
+            headerbuf[2] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[2];
+            headerbuf[3] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[3];
+            headerbuf[4] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[4];
+            headerbuf[5] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[5];
+            headerbuf[6] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[6];
+            headerbuf[7] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[7];
+            headerbuf[8] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD;
+            headerbuf[9] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel;
+            headerbuf[10] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Type;
             //don't need the table anymore, drop the MUTEX
             xSemaphoreGive(xTABLE_MUTEX);
-            //next load the message (subtract last 2 bytes for commands)
+            //next load the device type
+            xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
+            //next load the message (subtract last 2 bytes for intertask commands)
             xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
             //full message should be loaded into the output buffer now, prepare to start sending
             PORTD.OUTSET = PIN7_bm; //set transmit mode
@@ -267,7 +326,7 @@ static void prvRS485OutTask(void * parameters)
             //enable DRE interrupt
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
-            ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+            xSemaphoreTake(xTXC, portMAX_DELAY);
             //return to receive mode
             PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
@@ -287,23 +346,29 @@ static void prvRS485OutTask(void * parameters)
              * 8. wait until next notification
              * 9. loop until entire table is cleared
              */
-            //grab table mutex
-            xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //search table for devices marked relevant
             for(uint8_t count = 0; count < GLOBAL_TableLength; count++)
             {
+                //grab table mutex
+                xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
                 if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
                 {
-                    //pull information from table, load the output buffer with 8 byte address
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].XBeeADD, 8, portMAX_DELAY);
-                    //next load the 1 byte wired address
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].WiredADD, 1, portMAX_DELAY);
-                    //next load the channel
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].Channel, 1, portMAX_DELAY);
-                    //next load the device type
-                    xStreamBufferSend(xRS485_out_Stream, GLOBAL_DEVICE_TABLE[count].Type, 1, portMAX_DELAY);
+                    //load header
+                    headerbuf[0] = GLOBAL_DEVICE_TABLE[count].XBeeADD[0];
+                    headerbuf[1] = GLOBAL_DEVICE_TABLE[count].XBeeADD[1];
+                    headerbuf[2] = GLOBAL_DEVICE_TABLE[count].XBeeADD[2];
+                    headerbuf[3] = GLOBAL_DEVICE_TABLE[count].XBeeADD[3];
+                    headerbuf[4] = GLOBAL_DEVICE_TABLE[count].XBeeADD[4];
+                    headerbuf[5] = GLOBAL_DEVICE_TABLE[count].XBeeADD[5];
+                    headerbuf[6] = GLOBAL_DEVICE_TABLE[count].XBeeADD[6];
+                    headerbuf[7] = GLOBAL_DEVICE_TABLE[count].XBeeADD[7];
+                    headerbuf[8] = GLOBAL_DEVICE_TABLE[count].WiredADD;
+                    headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
+                    headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
                     //don't need the table anymore, drop the MUTEX
                     xSemaphoreGive(xTABLE_MUTEX);
+                    //load the output stream with the header
+                    xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
                     //next load the message (subtract last 2 bytes for commands)
                     xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
                     //full message should be loaded into the output buffer now, prepare to start sending
@@ -313,7 +378,7 @@ static void prvRS485OutTask(void * parameters)
                     //enable DRE interrupt
                     USART0.CTRLA |= USART_DREIE_bm;
                     //wait for TXcomplete notification
-                    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+                    xSemaphoreTake(xTXC, portMAX_DELAY);
                     //return to receive mode
                     PORTD.OUTCLR = PIN7_bm;
                     //release USART MUTEX
@@ -325,20 +390,16 @@ static void prvRS485OutTask(void * parameters)
                 }
             }
         }
-        else // ping response, generic response is anything (or nothing in this case)
+    }
+    else // ping response, generic response is anything (or nothing in this case)
         {
             /* 1. assemble message in buffer as above
              * 2. perform sending process as above
              * 3. go back to start of task loop
              */
-            //load the output buffer with 8 byte address (all 0's)
-            xStreamBufferSend(xRS485_out_Stream, 0x00000000, 8, portMAX_DELAY);
-            //next load the 1 byte wired address
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DeviceID, 1, portMAX_DELAY);
-            //next load the channel
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_Channel, 1, portMAX_DELAY);
+            
             //next load the device type
-            xStreamBufferSend(xRS485_out_Stream, GLOBAL_DeviceType, 1, portMAX_DELAY);
+            xStreamBufferSend(xRS485_out_Stream, pingres, 11, portMAX_DELAY);
             //full message should be loaded into the output buffer now, prepare to start sending
             PORTD.OUTSET = PIN7_bm; //set transmit mode
             //send preamble to start transmission
@@ -346,13 +407,12 @@ static void prvRS485OutTask(void * parameters)
             //enable DRE interrupt
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
-            ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+            xSemaphoreTake(xTXC, portMAX_DELAY);
             //return to receive mode
             PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
         }
-    }
     }
 }
 
@@ -366,12 +426,13 @@ static void prvRS485InTask(void * parameters)
     uint8_t buffer[MAX_MESSAGE_SIZE];
     uint8_t byte_buffer[1];
     uint8_t length = 0;
+    xEventGroupWaitBits(xInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
     for(;;)
     {
     length = 0;
-    //wait for something to come in
+    //wait for something to come i
     xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
-    if(byte_buffer[0] == 0xAA) //if not start delimiter, break somehow
+    if(byte_buffer[0] == 0xaa) //if not start delimiter, break somehow
     {
         //take MUTEX
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
@@ -403,7 +464,7 @@ static void prvRS485InTask(void * parameters)
             if(buffer[8] == GLOBAL_DeviceID) //if right device
             {
                 //send notification to the output task
-                xTaskNotifyGiveIndexed(RS485OutHandle, 1);
+                xSemaphoreGive(xPermission);
             }
         }
         else if(buffer[9] == GLOBAL_Channel) //if channel matches
