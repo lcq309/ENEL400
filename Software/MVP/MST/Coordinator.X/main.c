@@ -121,18 +121,22 @@ int main(int argc, char** argv) {
         }
         while((USART0.STATUS & USART_TXCIF_bm) == 0)
         {} //busy wait for transmission to complete
-        _delay_ms(5);
         PORTD.OUTCLR = PIN7_bm; //disable transmitter
         USART0.STATUS |= USART_TXCIF_bm; //clear flag
         //after sending the ping, wait for a response
         //busy wait should be fine, since the receiver is interrupt driven
-        _delay_ms(5); //5ms should be plenty of time
-        if(xStreamBufferReceiveFromISR(xRS485_in_Stream, initmessage, 3, NULL) != 0); //if something was received
+        _delay_ms(15); //15ms should be plenty of time
+        initmessage[1] = 0; //
+        xStreamBufferReceiveFromISR(xRS485_in_Stream, initmessage, 3, NULL);
+        if(initmessage[1] == i)
         {
             GLOBAL_DEVICE_TABLE[table_pos] = i;
             table_pos++;
         }
         //otherwise, just move on to the next one.
+        initmessage[0] = 0xAA; //wired preamble
+        initmessage[2] = 0x03; //end of message
+        _delay_ms(15);
     }
     _delay_ms(500);
     USART0.CTRLA |= USART_TXCIE_bm; //enable TXC interrupt
@@ -155,6 +159,7 @@ static void prvRoundRobinTask(void * parameters)
     {
         for(uint8_t count = 0; count < 256; count++)
         {
+            vTaskDelay(15);
             /* process:
              * check if device table is NULL(set count to 1 if so)
              * secure both MUTEXes
@@ -195,10 +200,10 @@ static void prvRoundRobinTask(void * parameters)
             xSemaphoreGive(xUSART0_MUTEX);
             //wait for a response in the message queue
             //receives from round robin buffer, puts into acknowledge array, max length 1, waits forever
-            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, portMAX_DELAY);
+            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 50);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
-            {} //break here for debug purposes
+            {xSemaphoreGive(xRoundRobin_MUTEX);} //break here for debug purposes
             else
             xSemaphoreGive(xRoundRobin_MUTEX); //release round robin
             //end of loop, start again after incrementing

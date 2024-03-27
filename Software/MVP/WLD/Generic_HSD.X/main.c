@@ -1,10 +1,10 @@
 /* 
- * File:   main.c - WBM Generic
+ * File:   main.c - WLD Generic
  * Author: Michael King
  * MVP version
  *
  * The purpose of this is to create a minimum viable running code for the Wired 
- * Button Modules, this code is for the general case.
+ * Light Modules, this code is for the general case.
  * Created on March 17, 2024
  */
 /* Version one: Basics only
@@ -99,8 +99,8 @@ int main(int argc, char** argv) {
     //enable USART0 (RS485 USART)
     USART0_init();
     //set output mode for PD7 (485W) and ensure it is clear
-    PORTD.DIRSET = PIN7_bm;
-    PORTD.OUTCLR = PIN7_bm;
+    PORTA.DIRSET = PIN2_bm;
+    PORTA.OUTCLR = PIN2_bm;
     //setup buffers and streams
     
     xRS485_in_Stream = xStreamBufferCreate(50,1); //50 bytes, triggers when a byte is added
@@ -198,6 +198,10 @@ static void prvWiredInitTask(void * parameters)
             {
                 received = 1;
             }
+            if(xStreamBufferReceive(xRS485_in_Stream, ByteBuffer, 1, portMAX_DELAY == 0x03))
+            {
+            }
+            //clear out the buffer before moving on
         }
         // just loop and discard anything else
     }
@@ -205,8 +209,11 @@ static void prvWiredInitTask(void * parameters)
     ByteBuffer[0] = GLOBAL_DeviceID; //message prepared
     //load device ID into output buffer
     xStreamBufferSend(xRS485_out_Stream, ByteBuffer, 1, portMAX_DELAY);
+    ByteBuffer[0] = 0x03;
+    xStreamBufferSend(xRS485_out_Stream, ByteBuffer, 1, portMAX_DELAY);
     //start transmit mode
-    PORTD.OUTSET = PIN7_bm;
+    vTaskDelay(1);
+    PORTA.OUTSET = PIN2_bm;
     //send preamble to output buffer
     USART0.TXDATAL = 0xAA;
     //enable DRE interrupt
@@ -215,9 +222,9 @@ static void prvWiredInitTask(void * parameters)
     while(!(USART0.STATUS & USART_TXCIF_bm)); //just busy wait until done
     //now that transmission has finished, clear flag and set to receive mode
     USART0.STATUS |= USART_TXCIF_bm;
-    PORTD.OUTCLR = PIN7_bm;
+    PORTA.OUTCLR = PIN2_bm;
     //stop flashing lights
-    lightsFlash[0] = 0xff;
+    lightsFlash[0] = 0;
     lightsFlash[1] = 0; //command 0, off
     xQueueSendToFront(xLIGHT_Queue ,lightsFlash, portMAX_DELAY);
     //enable TXCIE
@@ -257,7 +264,7 @@ static void prvRS485OutTask(void * parameters)
     //tack on end delimiter
     xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
     //enable transmitter
-    PORTD.OUTSET = PIN7_bm; //set transmit mode
+    PORTA.OUTSET = PIN2_bm; //set transmit mode
     //send preamble
     USART0.TXDATAL = 0xaa;
     //enable DRE interrupt
@@ -265,7 +272,7 @@ static void prvRS485OutTask(void * parameters)
     //wait for TXcomplete notification
     xSemaphoreTake(xTXC, portMAX_DELAY);
     //return to receive mode
-    PORTD.OUTCLR = PIN7_bm;
+    PORTA.OUTCLR = PIN2_bm;
     //release USART MUTEX
     xSemaphoreGive(xUSART0_MUTEX);
     
@@ -327,7 +334,7 @@ static void prvRS485OutTask(void * parameters)
             //full message should be loaded into the output buffer now, prepare to start sending
             //tack on end delimiter
             xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
-            PORTD.OUTSET = PIN7_bm; //set transmit mode
+            PORTA.OUTSET = PIN2_bm; //set transmit mode
             //send preamble to start transmisson
             USART0.TXDATAL = 0xAA;
             //enable DRE interrupt
@@ -335,7 +342,7 @@ static void prvRS485OutTask(void * parameters)
             //wait for TXcomplete notification
             xSemaphoreTake(xTXC, portMAX_DELAY);
             //return to receive mode
-            PORTD.OUTCLR = PIN7_bm;
+            PORTA.OUTCLR = PIN2_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //now complete message sending process, return to start of loop
@@ -381,7 +388,7 @@ static void prvRS485OutTask(void * parameters)
                     //full message should be loaded into the output buffer now, prepare to start sending
                     //tack on end delimiter
                     xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
-                    PORTD.OUTSET = PIN7_bm; //set transmit mode
+                    PORTA.OUTSET = PIN2_bm; //set transmit mode
                     //send preamble to start transmission
                     USART0.TXDATAL = 0xAA;
                     //enable DRE interrupt
@@ -389,7 +396,7 @@ static void prvRS485OutTask(void * parameters)
                     //wait for TXcomplete notification
                     xSemaphoreTake(xTXC, portMAX_DELAY);
                     //return to receive mode
-                    PORTD.OUTCLR = PIN7_bm;
+                    PORTA.OUTCLR = PIN2_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
                     //now complete message sending process, wait for the next opportunity
@@ -412,7 +419,7 @@ static void prvRS485OutTask(void * parameters)
             //full message should be loaded into the output buffer now, prepare to start sending
             //tack on end delimiter
             xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
-            PORTD.OUTSET = PIN7_bm; //set transmit mode
+            PORTA.OUTSET = PIN2_bm; //set transmit mode
             //send preamble to start transmission
             USART0.TXDATAL = 0xAA;
             //enable DRE interrupt
@@ -420,7 +427,7 @@ static void prvRS485OutTask(void * parameters)
             //wait for TXcomplete notification
             xSemaphoreTake(xTXC, portMAX_DELAY);
             //return to receive mode
-            PORTD.OUTCLR = PIN7_bm;
+            PORTA.OUTCLR = PIN2_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
         }
@@ -451,8 +458,11 @@ static void prvRS485InTask(void * parameters)
         for(int i = 0; i < MAX_MESSAGE_SIZE; i++)
         {
             xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            //check if start delimiter
+            if(byte_buffer[0] == 0xaa)
+            {i = MAX_MESSAGE_SIZE;}
             //check if delimiter(3 * 0x03 in a row)
-            if(byte_buffer[0] == 0x03)
+                else if(byte_buffer[0] == 0x03)
             {
                 buffer[i] = byte_buffer[0]; //add to buffer for now and increment length
                 length++;
@@ -804,7 +814,9 @@ ISR(USART0_RXC_vect)
     /* Receive complete interrupt
      * move received byte into byte buffer for RS485 in task
      */
-    xMessageBufferSendFromISR(xRS485_in_Stream, USART0.RXDATAL, 1, NULL);
+    uint8_t buf[1];
+    buf[0] = USART0.RXDATAL;
+    xMessageBufferSendFromISR(xRS485_in_Stream, buf, 1, NULL);
 }
 ISR(USART0_DRE_vect)
 {
@@ -824,6 +836,6 @@ ISR(USART0_TXC_vect)
      * 1. set semaphore
      * 2. clear interrupt flag
      */
-    xTaskNotifyGiveIndexed(RS485OutHandle, 1); //send notification to output task
+    xSemaphoreGive(xTXC); //send notification to output task
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
 }

@@ -199,6 +199,10 @@ static void prvWiredInitTask(void * parameters)
             {
                 received = 1;
             }
+            if(xStreamBufferReceive(xRS485_in_Stream, ByteBuffer, 1, portMAX_DELAY == 0x03))
+            {
+            }
+            //clear out the buffer before moving on
         }
         // just loop and discard anything else
     }
@@ -206,7 +210,10 @@ static void prvWiredInitTask(void * parameters)
     ByteBuffer[0] = GLOBAL_DeviceID; //message prepared
     //load device ID into output buffer
     xStreamBufferSend(xRS485_out_Stream, ByteBuffer, 1, portMAX_DELAY);
+    ByteBuffer[0] = 0x03;
+    xStreamBufferSend(xRS485_out_Stream, ByteBuffer, 1, portMAX_DELAY);
     //start transmit mode
+    vTaskDelay(1);
     PORTD.OUTSET = PIN7_bm;
     //send preamble to output buffer
     USART0.TXDATAL = 0xAA;
@@ -452,8 +459,11 @@ static void prvRS485InTask(void * parameters)
         for(int i = 0; i < MAX_MESSAGE_SIZE; i++)
         {
             xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            //check if start delimiter
+            if(byte_buffer[0] == 0xaa)
+            {i = MAX_MESSAGE_SIZE;}
             //check if delimiter(3 * 0x03 in a row)
-            if(byte_buffer[0] == 0x03)
+                else if(byte_buffer[0] == 0x03)
             {
                 buffer[i] = byte_buffer[0]; //add to buffer for now and increment length
                 length++;
