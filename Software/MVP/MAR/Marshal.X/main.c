@@ -1,11 +1,11 @@
 /* 
- * File:   main.c - WBM Generic
+ * File:   main.c - MAR generic
  * Author: Michael King
  * MVP version
  *
- * The purpose of this is to create a minimum viable running code for the Wired 
- * Button Modules, this code is for the general case.
- * Created on March 17, 2024
+ * The purpose of this is to create a minimum viable running code for the Marshal
+ * controllers, this code is for the general case.
+ * Created on March 26, 2024
  */
 /* Version one: Basics only
  * The purpose of this is to provide a testbed for the RS485 network, and networking

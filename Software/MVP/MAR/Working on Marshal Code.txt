@@ -1,0 +1,9 @@
+code for the Marshal is primarily copied from the wired button module. Some inputs and outputs will need to be changed.
+
+I will be replacing the RS485 tasks with a wireless xbee version of them.
+
+The wired init may need to be changed to perform any initialization that the xbee needs, if not then we can remove it.
+
+WBM task will be renamed to MAR task, but should be mostly the same.
+
+USART0 no longer requires a MUTEX, as far as I can tell.
