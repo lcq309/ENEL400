@@ -30,7 +30,7 @@
 // messaging constants
 static const uint8_t end_delimiter[3] = {0x03,0x03,0x03};
 
-static uint8_t GLOBAL_DeviceID = 0x01; //device ID is set during initial startup
+static uint8_t GLOBAL_DeviceID = 0x02; //device ID is set during initial startup
 static uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x31; //this will be device type 0x31, generic controller
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
@@ -172,7 +172,7 @@ static void prvWiredInitTask(void * parameters)
     //1. Take RS485 MUTEX
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //2. Start Flashing Indicators
-    uint8_t lightsFlash[2] = {0xFF, 0x2};
+    uint8_t lightsFlash[2] = {0xff, 0x2};
     xQueueSendToBack(xIND_Queue, lightsFlash, portMAX_DELAY);
     xSemaphoreTake(xInit, 0);
     /*//testing, feed the correct init message to the device.
@@ -225,7 +225,6 @@ static void prvWiredInitTask(void * parameters)
     USART0.STATUS |= USART_TXCIF_bm;
     PORTD.OUTCLR = PIN7_bm;
     //stop flashing lights
-    lightsFlash[0] = 0xff;
     lightsFlash[1] = 0; //command 0, off
     xQueueSendToFront(xIND_Queue ,lightsFlash, portMAX_DELAY);
     //enable TXCIE
@@ -259,7 +258,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(1); //delay for communications?
+    vTaskDelay(15); //delay for communications?
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xStreamBufferSend(xRS485_out_Stream, StartMessage, 11, portMAX_DELAY);
     //tack on end delimiter
@@ -290,7 +289,7 @@ static void prvRS485OutTask(void * parameters)
     for(;;){
     // wait for notification
     xSemaphoreTake(xPermission, portMAX_DELAY);
-    vTaskDelay(1); //delay for communications?
+    vTaskDelay(15); //delay for communications?
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //check for waiting output message
@@ -515,6 +514,7 @@ static void prvRS485InTask(void * parameters)
             if(buffer[8] == GLOBAL_DeviceID) //if right device
             {
                 //send notification to the output task
+
                 xSemaphoreGive(xPermission);
             }
         }
@@ -638,6 +638,7 @@ static void prvRS485InTask(void * parameters)
     
     }
 }
+
 
 static void prvPbInTask(void * parameters)
 {

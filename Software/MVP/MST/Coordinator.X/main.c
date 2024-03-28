@@ -33,7 +33,7 @@
 
 // messaging constants
 static const uint8_t end_delimiter[3] = {0x03,0x03,0x03};
-
+static uint8_t table_pos = 0; //table length
 // Priority Definitions:
 
 #define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -101,14 +101,13 @@ int main(int argc, char** argv) {
     //initialize wired network, build device table
     //ping each device (devices will be in an initialization mode, so only need to send a number with preamble and end)
     uint8_t initmessage[3];
-    uint8_t table_pos = 0; //position in table
     for(int i = 0; i < 256; i++)
         GLOBAL_DEVICE_TABLE[i] = 0; //initialize table to all zeroes
     initmessage[0] = 0xAA; //wired preamble
     initmessage[2] = 0x03; //end of message
     //message is setup now, ping a device, wait 5ms, then check the input buffer.
     //could be moved into a separate c file or function
-    for(int i = 1; i < 3; i++)
+    for(int i = 1; i < 10; i++)
     {
         initmessage[1] = i;
         //first, ping while waiting between bytes for DRE to set
@@ -157,9 +156,9 @@ static void prvRoundRobinTask(void * parameters)
     //initialization complete, begin looping code
     for(;;)
     {
-        for(uint8_t count = 0; count < 256; count++)
+        for(uint8_t count = 0; count < table_pos; count++)
         {
-            vTaskDelay(15);
+            vTaskDelay(50);
             /* process:
              * check if device table is NULL(set count to 1 if so)
              * secure both MUTEXes
@@ -173,9 +172,6 @@ static void prvRoundRobinTask(void * parameters)
              * check response, release robin MUTEX
              * go to next number when available again
              */
-            //device table checks
-            if (GLOBAL_DEVICE_TABLE[count] == 0)
-                count = 0;
             //first, try to secure the RS485 line
             xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
             //then, secure output
@@ -186,6 +182,7 @@ static void prvRoundRobinTask(void * parameters)
             xStreamBufferSend(xRS485_out_Stream, message, 11, portMAX_DELAY);
             //tack on end delimiter
             xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
+            vTaskDelay(50);
             //set RS485 transceiver to transmit mode
             PORTD.OUTSET = PIN7_bm;
             //start transmission by sending preamble
@@ -200,7 +197,7 @@ static void prvRoundRobinTask(void * parameters)
             xSemaphoreGive(xUSART0_MUTEX);
             //wait for a response in the message queue
             //receives from round robin buffer, puts into acknowledge array, max length 1, waits forever
-            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 50);
+            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 1500);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
             {xSemaphoreGive(xRoundRobin_MUTEX);} //break here for debug purposes

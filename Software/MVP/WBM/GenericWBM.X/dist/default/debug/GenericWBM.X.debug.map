@@ -711,7 +711,7 @@ END GROUP
  .debug_abbrev  0x0000000000003272       0xea build/default/debug/USART.o
  .debug_abbrev  0x000000000000335c      0x26b build/default/debug/main.o
 
-.debug_line     0x0000000000000000     0x471c
+.debug_line     0x0000000000000000     0x4716
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000      0x190 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_line    0x0000000000000190      0x2bc build/default/debug/_ext/1913665898/port.o
@@ -723,7 +723,7 @@ END GROUP
  .debug_line    0x00000000000032c9      0x671 build/default/debug/_ext/1614498856/timers.o
  .debug_line    0x000000000000393a      0x16c build/default/debug/_ext/2145274299/heap_1.o
  .debug_line    0x0000000000003aa6      0x105 build/default/debug/USART.o
- .debug_line    0x0000000000003bab      0xb71 build/default/debug/main.o
+ .debug_line    0x0000000000003bab      0xb6b build/default/debug/main.o
 
 .debug_frame    0x0000000000000000     0x1808
  *(.debug_frame)
@@ -1040,58 +1040,58 @@ LOAD data_init
                 0x0000000000000147        0x3 build/default/debug/main.o
 
 .text.prvRS485OutTask
-                0x000000000000014a      0x484
+                0x000000000000014a      0x488
  .text.prvRS485OutTask
-                0x000000000000014a      0x484 build/default/debug/main.o
+                0x000000000000014a      0x488 build/default/debug/main.o
 
 .text.prvRS485InTask
-                0x00000000000005ce      0x472
+                0x00000000000005d2      0x472
  .text.prvRS485InTask
-                0x00000000000005ce      0x472 build/default/debug/main.o
+                0x00000000000005d2      0x472 build/default/debug/main.o
 
 .text.prvWBMTask
-                0x0000000000000a40      0x2be
+                0x0000000000000a44      0x2be
  .text.prvWBMTask
-                0x0000000000000a40      0x2be build/default/debug/main.o
+                0x0000000000000a44      0x2be build/default/debug/main.o
 
 .text.xTaskGenericNotifyFromISR
-                0x0000000000000cfe      0x260
+                0x0000000000000d02      0x260
  .text.xTaskGenericNotifyFromISR
-                0x0000000000000cfe      0x260 build/default/debug/_ext/1614498856/tasks.o
-                0x0000000000000cfe                xTaskGenericNotifyFromISR
+                0x0000000000000d02      0x260 build/default/debug/_ext/1614498856/tasks.o
+                0x0000000000000d02                xTaskGenericNotifyFromISR
 
 .text.xTaskIncrementTick
-                0x0000000000000f5e      0x234
+                0x0000000000000f62      0x234
  .text.xTaskIncrementTick
-                0x0000000000000f5e      0x234 build/default/debug/_ext/1614498856/tasks.o
-                0x0000000000000f5e                xTaskIncrementTick
+                0x0000000000000f62      0x234 build/default/debug/_ext/1614498856/tasks.o
+                0x0000000000000f62                xTaskIncrementTick
 
 .text.xTaskGenericNotify
-                0x0000000000001192      0x20a
+                0x0000000000001196      0x20a
  .text.xTaskGenericNotify
-                0x0000000000001192      0x20a build/default/debug/_ext/1614498856/tasks.o
-                0x0000000000001192                xTaskGenericNotify
+                0x0000000000001196      0x20a build/default/debug/_ext/1614498856/tasks.o
+                0x0000000000001196                xTaskGenericNotify
 
 .text.xTaskResumeAll
-                0x000000000000139c      0x1aa
+                0x00000000000013a0      0x1aa
  .text.xTaskResumeAll
-                0x000000000000139c      0x1aa build/default/debug/_ext/1614498856/tasks.o
-                0x000000000000139c                xTaskResumeAll
+                0x00000000000013a0      0x1aa build/default/debug/_ext/1614498856/tasks.o
+                0x00000000000013a0                xTaskResumeAll
 
-.text.main      0x0000000000001546      0x1a6
- .text.main     0x0000000000001546      0x1a6 build/default/debug/main.o
-                0x0000000000001546                main
-
-.text.prvWiredInitTask
-                0x00000000000016ec      0x188
- .text.prvWiredInitTask
-                0x00000000000016ec      0x188 build/default/debug/main.o
+.text.main      0x000000000000154a      0x1a6
+ .text.main     0x000000000000154a      0x1a6 build/default/debug/main.o
+                0x000000000000154a                main
 
 .text.xTaskRemoveFromEventList
-                0x0000000000001874      0x184
+                0x00000000000016f0      0x184
  .text.xTaskRemoveFromEventList
-                0x0000000000001874      0x184 build/default/debug/_ext/1614498856/tasks.o
-                0x0000000000001874                xTaskRemoveFromEventList
+                0x00000000000016f0      0x184 build/default/debug/_ext/1614498856/tasks.o
+                0x00000000000016f0                xTaskRemoveFromEventList
+
+.text.prvWiredInitTask
+                0x0000000000001874      0x184
+ .text.prvWiredInitTask
+                0x0000000000001874      0x184 build/default/debug/main.o
 
 .text.xQueueSemaphoreTake
                 0x00000000000019f8      0x17e
