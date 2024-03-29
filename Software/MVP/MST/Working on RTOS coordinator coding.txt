@@ -1,0 +1,80 @@
+To ensure that an RS485 data reception is not interrupted (only half-duplex), I will enforce a MUTEX for all tasks receiving from or writing to it.
+
+(I.E. receiver task will hold a MUTEX until data reception is complete to ensure that it isn't interrupted)
+A second MUTEX will be used to ensure that the RS485_out task does not interfere with the RoundRobin task.
+A semaphore will be used to tell the RS485 outputs that transmission has completed.
+
+I need to modify the diagram to reflect this.
+
+Other USARTS are full-duplex, so this shouldn't be necessary.
+
+At minimum, FreeRTOS requires the following source files: (from freeRTOS.org/Creating-a-new-FreeRTOS-project.html)
+	tasks.c
+	queue.c
+	list.c
+	portable/[compiler]/[architecture]/port.c
+	portable/MemMang/heap_x.c
+	if there is an assembly language file then that is also required to be included
+	
+
+	if we need software timers, then also need timers.c
+	if we need event grousp, then also need event_groups.c
+	if we need buffers, then also need stream_buffer.c
+	do not use croutine.c, it is depreciated
+
+Required header files: (need to be included for compiler)
+FreeRTOS/Source/include
+FreeRTOS/Source/portable/[compiler]/[architecture]
+directory containing FreeRTOSConfig.h
+potentially the port directory as well(same as port.c above?)
+
+Every project requires a FreeRTOSConfig.h, we will probably use one from the provided demo and modify it to suit our needs.
+Note that the clk_config.h is also required or the FreeRTOSConfig.h will fail
+
+Interrupt Vectors:
+information about the interrupt vectoring is from the RTOS port documentation, provided with the demo online
+
+
+FreeRTOS config notes:
+- look into optimized task selection for our port as it may save some overhead if it exists.
+
+- Can consider omitting the Trace and Stats formatting functions to save overhead if we have no use for them.
+
+- Consider using 16 bit ticks, this will improve performance on our 8-bit architecture and we don't have much need for a large counter
+	- USE_16_BIT_TICKS is obsoleted by TICK_TYPE_WIDTH_IN_BITS, so consider using this instead.
+
+- I intend on using task notifications, so I should ensure that USE_TASK_NOTIFICATIONS is enabled. (adds 8 bytes per task, but this is pretty minimal)
+
+- configTASK_NOTIFICATION_ARRAY_ENTRIES should probably be set to one.
+
+- USE_MUTEXES should be set to one, as we will be using some mutexes
+
+- may consider using MESSAGE_BUFFER_LENGTH_TYPE of either 8 bit or 16 bit, as we will likely not need the larger types.
+
+
+Wired messaging protocol:
+
+preamble(0xAA)->8 byte wireless address->1 byte wired address->1 byte channel->x bytes message->end delimiter(0x03)
+
+for round robin, and transmissions between wired devices on the same network, the wireless address is empty (all zeroes?) and channel is broadcast (id number used in lieu of channel)
+so message length would be 1+8+1+1+1+1 = 13 bytes
+message is 0x05 (ENQ)
+
+response is the ID number, to be sent to round robin from RS485_in after the response is received. Any message can be the reply, as long as the correct ID number is used. If the device doesn't have anything to say it will just reply with an empty message (ACK)
+
+during initialization, to build the device list, just send the number (pre-amble and end delimiter still needed), and the device (also in initialization mode) will respond if it exists.
+we should be able to use the stream buffers without starting the task scheduler, just be careful to use ISR versions of the functions.
+(may be incorporated into an initialization task eventually)
+
+the device list is then used in round robin where it iterates until it hits a null and starts over.
+
+_________________________________________________________NEW OUTPUT PROCEDURE________________________________________
+
+A decision has been made to use output buffers directly fed into the DRE interrupts, this should result in less processing time and more consistent message sending as it just goes back and forth until the message has finished sending. This requires somewhat extensive modification to the existing code.
+now, a message is sent over RS485 by first transmitting the intended message into the output stream buffer, enabling the DRE interrupt, then writing the preamble to the output data register to begin the process.
+
+this slightly increases RAM overhead, but should reduce processor overhead of transmission overall
+
+the DRE interrupt will disable itself when the buffer is empty, after sending the end delimiter, allowing to return to normal running code.
+
+this should be considered for other output tasks as well.

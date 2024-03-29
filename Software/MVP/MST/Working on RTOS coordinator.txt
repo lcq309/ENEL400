@@ -1,0 +1,60 @@
+Working on RTOS coordinator:
+
+Note on Queues vs streams:
+- A Queue is complex, with lots of overhead especially for messages of variable length, but it has the advantage of being capable of putting messages at the front of the queue. Sends a callback anytime something is added to the queue.
+- A message buffer is capable of collecting a message of variable length within a fixed buffer, it is a much more efficient usage of RAM than queues if most messages will be smaller than the maximum message size. Sends a callback when a full message is received.
+-a stream buffer functions as a byte-by-byte buffer, not capable of accepting from multiple sources but very lightweight and good in cases where you only need a stream of bytes coming in. It is capable of holding until a certain number of bytes are ready for processing.
+RS485 section:
+note on MUTEX:
+Since the RS485 network is half duplex and can only ever be sending or receiving, all tasks interacting with it are required to adhere to a MUTEX.
+	Before a task starts using the USART it must:
+		1. try to take the MUTEX, or hold until it becomes available
+		2. Ensure the state of the transceiver (send/receive)
+	It must then take the MUTEX and return it when finished with USART0.
+	The default state of the transceiver should be listening mode, so a task that uses it as a transmitter should return it to receiver mode before
+	returning the MUTEX. But the receiving task should double check before holding anyways.
+Round Robin:
+	Round Robin is what the system does when not processing other messages (always takes priority), but it is important that a message doesn't interrupt the process in the middle, so it will make use of a semaphore to block the RS485 task from sending something and breaking the process.
+Round Robin shouldn't need blocking of it's own, since it will be the lowest priority task it will be blocked until the system is done processing other messages anyways. (so there shouldn't be any chance of it interrupting an output message in the middle)
+	The Round Robin process will also determine the timeout time on the wired network, if a confirmation message is not received by the time the message buffer unblocks it will be considered a messaging failure.
+	A maximum response time of 5ms should be considered, as the initial response message will be quite short and should be the maximum priority of the responding device. If a response takes longer than 5ms the device has most likely failed in some way.
+The sequence of messaging for round robin could look like:
+	System "idle" -> Round Robin task picks up -> semaphore blocks the RS485 out task -> sends a request to the next device ID in the list (generated	during startup, a numbered list of up to 255 devices) -> block and wait up to 5ms for a response (if response fails, send an error message and move 	to the next device on the list) -> after response, send permission to speak to the device -> after device has finished speaking, unblock the RS485 	(at this point, if anything is queued to output then RS485 will take priority until the system has reached an "idle" state again).
+
+	Within the Round Robin, or potentially a separate task, I could also incorporate a timer on a separate list to keep track of critical devices (stop button) and ensure that no more than 250ms goes between checks to these devices. (i.e. it will perform a simple check every 250ms to see if the critical device has been contacted during that time, and if not it will check this device next to ensure that stop messages are sent out in a timely fashion)
+
+USART0_ISR:
+	The USART0_ISR just sends an input message from RS485 into the stream buffer for the RS_485 processing task.
+
+RS_485_IN:
+	the RS_485 input task processes the stream from the RS485 USART ISR. It assembles a message buffer, splits it into relevant parts and ensures they are sent to the proper destination. (wireless_out, menu_out, round_robin(for confirmation and end of talk))
+
+RS_485_OUT:
+	RS_485_OUT takes a variable message buffer and transmits it over the wired network, it may be blocked by traffic from the wired network (half duplex only) but otherwise it is free to send messages as they arrive.
+
+Menu Section:
+Since this is full duplex, a MUTEX should not be required.
+Menu_Out:
+	Menu_Out sends a variable message buffer to the menu micro, this should be full duplex communication so there aren't any reasons this should ever be blocked. This is the destination within the coordinator for channel 0 (system) messages.
+
+Menu_In:
+	Menu_In takes a stream of bits from the menu micro and assembles them into a complete message, the message may be sent to RS_485_OUT, WIRELESS_OUT, or both depending on what has been requested by the menu controller.
+
+Wireless Section:
+Since this is full duplex, a MUTEX should not be required.
+WIRELESS_OUT:
+	WIRELESS_OUT takes a variable size message buffer from the other tasks, parses relevant information (destination address(es?)), and sends the correct configuration options to the xbee before sending the message out if necessary.
+
+WIRELESS_IN:
+	WIRELESS_IN takes a variable size buffer from the xbee, parses any relevant information from it (signal strength, channel id, device id(?)), strips any networking headers, and sends the information to the relevant destinations.
+
+note for all output tasks:
+unless output is fast enough to make it not worth the overhead, all output tasks will hold and allow a context switch while waiting for transmission to complete, in order to ensure that system resources are not tied up transmitting a single message. Since processing speed should be much faster than transmission time in most cases this shouldn't cause issues. But will need some testing to confirm this.
+
+
+V2 notes:
+	Updating to use direct task notification instead of semaphores in cases where only a single task is being notified (Round Robin/RS485 out still 	needs to use a semaphore)
+	
+	Updating to include mutex write protection on the message buffers to make them thread safe
+
+	Most likely will need one more round of updates to add the status task, for the portable version of this board

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/Generic_HSD.X.production.elf">                 
+  <executable name="dist/default/production/Marshal.X.production.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>17723</used>                     
-      <free>113349</free>                     
+      <used>18550</used>                     
+      <free>112522</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 
       <length>16384</length>                 
-      <used>15446</used>                     
-      <free>938</free>                     
+      <used>15448</used>                     
+      <free>936</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

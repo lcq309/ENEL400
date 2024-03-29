@@ -30,7 +30,7 @@
 // messaging constants
 static const uint8_t end_delimiter[3] = {0x03,0x03,0x03};
 
-static uint8_t GLOBAL_DeviceID = 0x02; //device ID is set during initial startup
+static uint8_t GLOBAL_DeviceID = 0x06; //device ID is set during initial startup
 static uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x31; //this will be device type 0x31, generic controller
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
@@ -289,9 +289,9 @@ static void prvRS485OutTask(void * parameters)
     for(;;){
     // wait for notification
     xSemaphoreTake(xPermission, portMAX_DELAY);
-    vTaskDelay(15); //delay for communications?
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+    vTaskDelay(15); //delay for communications?
     //check for waiting output message
     uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
