@@ -545,6 +545,8 @@ static void prvRS485InTask(void * parameters)
                             {
                                 buffer[i - 9] = buffer[i];
                             }
+                            //release table MUTEX
+                            xSemaphoreGive(xTABLE_MUTEX);
                             //reduce length by 9
                             length = length - 9;
                             //grab device buffer MUTEX
@@ -555,8 +557,6 @@ static void prvRS485InTask(void * parameters)
                             xSemaphoreGive(xDeviceBuffer_MUTEX);
                             //set matched byte
                             matched = 1;
-                            //release table MUTEX
-                            xSemaphoreGive(xTABLE_MUTEX);
                             //now done with message processing
                         }
             }
@@ -586,6 +586,8 @@ static void prvRS485InTask(void * parameters)
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Flags = 0;
                 //increment table length
                 GLOBAL_TableLength++;
+                //release table MUTEX
+                xSemaphoreGive(xTABLE_MUTEX);
                 //grab device buffer MUTEX
                 xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
                 //check message will be defined as {0x05, index}
@@ -743,6 +745,7 @@ static void prvWLDTask(void * parameters)
     {
         //1. wait up to 50 ticks for input, need to grab MUTEX?
         //grab device buffer MUTEX
+        inlen = 0;
         xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
         //keep track of length as well
         inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 50);
