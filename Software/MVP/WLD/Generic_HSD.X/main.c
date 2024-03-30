@@ -828,7 +828,6 @@ static void prvWLDTask(void * parameters)
                         break;
                 }
             case 3: //length of 3 indicates from controller or other device (just controller for now)
-                //no confirmation from light just yet, that will come after some design work on Friday
                 //just change colour and echo back to controllers (relevant devices)
                 switch(buffer[2])
                 {
@@ -853,6 +852,12 @@ static void prvWLDTask(void * parameters)
                         xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
                         break;
                 }
+                //now send response
+                uint8_t response[3];
+                response[0] = buffer[2];
+                response[1] = 0x05;
+                response[2] = 0x01;
+                xMessageBufferSend(xRS485_out_Stream, response, 3, portMAX_DELAY);
                 break;
         }
     }
