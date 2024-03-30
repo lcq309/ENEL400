@@ -516,7 +516,7 @@ static void prvRS485InTask(void * parameters)
                 xSemaphoreGive(xPermission);
             }
         }
-//        else if(buffer[9] == GLOBAL_Channel) //if channel matches
+        else if(buffer[9] == GLOBAL_Channel) //if channel matches
         {
             /* channel check
              * 1. acquire table MUTEX
@@ -526,7 +526,7 @@ static void prvRS485InTask(void * parameters)
              * 5. perform actions based on that
              * 6. if no match found, create a new table entry at next empty spot
              */
-        /*    //acquire table MUTEX
+            //acquire table MUTEX
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //loop through table entries
             uint8_t matched = 0;
@@ -572,7 +572,7 @@ static void prvRS485InTask(void * parameters)
                  * 7. check table relevance bit and either pass or discard
                  */
                 //add to current end of table (add a check against max length at some point)
-        /*        GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[1];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[2];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[3];
@@ -594,8 +594,8 @@ static void prvRS485InTask(void * parameters)
                 xMessageBufferSend(xDevice_Buffer, check, 2, portMAX_DELAY);
                 //release device MUTEX
                 xSemaphoreGive(xDeviceBuffer_MUTEX);
-                //wait 2ms to allow device specific some time to process
-                vTaskDelay(2 / portTICK_PERIOD_MS);
+                //wait 5ms to allow device specific some time to process
+                vTaskDelay(5 / portTICK_PERIOD_MS);
                 //reacquire table mutex
                 xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
                 //check relevance bit
