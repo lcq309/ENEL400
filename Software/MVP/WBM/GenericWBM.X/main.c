@@ -346,6 +346,8 @@ static void prvRS485OutTask(void * parameters)
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //now complete message sending process, return to start of loop
+            // wait for notification
+            xSemaphoreTake(xPermission, portMAX_DELAY);
         }
         else if(buffer[size - 2] == 0x05) //relevant devices
         {
@@ -365,7 +367,7 @@ static void prvRS485OutTask(void * parameters)
             {
                 //grab table mutex
                 xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
-                if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
+                if((GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) && (count == GLOBAL_TableLength - 1)) //relevant device and last in list
                 {
                     //load header
                     headerbuf[0] = GLOBAL_DEVICE_TABLE[count].XBeeADD[0];
@@ -399,10 +401,49 @@ static void prvRS485OutTask(void * parameters)
                     PORTD.OUTCLR = PIN7_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
-                    //now complete message sending process, wait for the next opportunity
-                    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+                }
+                else if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
+                {
+                    //load header
+                    headerbuf[0] = GLOBAL_DEVICE_TABLE[count].XBeeADD[0];
+                    headerbuf[1] = GLOBAL_DEVICE_TABLE[count].XBeeADD[1];
+                    headerbuf[2] = GLOBAL_DEVICE_TABLE[count].XBeeADD[2];
+                    headerbuf[3] = GLOBAL_DEVICE_TABLE[count].XBeeADD[3];
+                    headerbuf[4] = GLOBAL_DEVICE_TABLE[count].XBeeADD[4];
+                    headerbuf[5] = GLOBAL_DEVICE_TABLE[count].XBeeADD[5];
+                    headerbuf[6] = GLOBAL_DEVICE_TABLE[count].XBeeADD[6];
+                    headerbuf[7] = GLOBAL_DEVICE_TABLE[count].XBeeADD[7];
+                    headerbuf[8] = GLOBAL_DEVICE_TABLE[count].WiredADD;
+                    headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
+                    headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
+                    //don't need the table anymore, drop the MUTEX
+                    xSemaphoreGive(xTABLE_MUTEX);
+                    //load the output stream with the header
+                    xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
+                    //next load the message (subtract last 2 bytes for commands)
+                    xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
+                    //full message should be loaded into the output buffer now, prepare to start sending
+                    //tack on end delimiter
+                    xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
+                    PORTD.OUTSET = PIN7_bm; //set transmit mode
+                    //send preamble to start transmission
+                    USART0.TXDATAL = 0xAA;
+                    //enable DRE interrupt
+                    USART0.CTRLA |= USART_DREIE_bm;
+                    //wait for TXcomplete notification
+                    xSemaphoreTake(xTXC, portMAX_DELAY);
+                    //return to receive mode
+                    PORTD.OUTCLR = PIN7_bm;
+                    //release USART MUTEX
+                    xSemaphoreGive(xUSART0_MUTEX);
+                    // wait for notification
+                    xSemaphoreTake(xPermission, portMAX_DELAY);
                     //grab USART MUTEX
                     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+                }
+                else if(count == GLOBAL_TableLength - 1) //last in list, no relevant device found
+                {
+                    xSemaphoreGive(xUSART0_MUTEX);
                 }
             }
         }
@@ -517,7 +558,7 @@ static void prvRS485InTask(void * parameters)
                 xSemaphoreGive(xPermission);
             }
         }
-//        else if(buffer[9] == GLOBAL_Channel) //if channel matches
+        else if(buffer[9] == GLOBAL_Channel) //if channel matches
         {
             /* channel check
              * 1. acquire table MUTEX
@@ -527,7 +568,7 @@ static void prvRS485InTask(void * parameters)
              * 5. perform actions based on that
              * 6. if no match found, create a new table entry at next empty spot
              */
-        /*    //acquire table MUTEX
+            //acquire table MUTEX
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //loop through table entries
             uint8_t matched = 0;
@@ -546,6 +587,8 @@ static void prvRS485InTask(void * parameters)
                             {
                                 buffer[i - 9] = buffer[i];
                             }
+                            //release table MUTEX
+                            xSemaphoreGive(xTABLE_MUTEX);
                             //reduce length by 9
                             length = length - 9;
                             //grab device buffer MUTEX
@@ -556,8 +599,6 @@ static void prvRS485InTask(void * parameters)
                             xSemaphoreGive(xDeviceBuffer_MUTEX);
                             //set matched byte
                             matched = 1;
-                            //release table MUTEX
-                            xSemaphoreGive(xTABLE_MUTEX);
                             //now done with message processing
                         }
             }
@@ -573,7 +614,7 @@ static void prvRS485InTask(void * parameters)
                  * 7. check table relevance bit and either pass or discard
                  */
                 //add to current end of table (add a check against max length at some point)
-        /*        GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[1];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[2];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[3];
@@ -587,6 +628,8 @@ static void prvRS485InTask(void * parameters)
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Flags = 0;
                 //increment table length
                 GLOBAL_TableLength++;
+                //release table MUTEX
+                xSemaphoreGive(xTABLE_MUTEX);
                 //grab device buffer MUTEX
                 xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
                 //check message will be defined as {0x05, index}
@@ -595,8 +638,8 @@ static void prvRS485InTask(void * parameters)
                 xMessageBufferSend(xDevice_Buffer, check, 2, portMAX_DELAY);
                 //release device MUTEX
                 xSemaphoreGive(xDeviceBuffer_MUTEX);
-                //wait 2ms to allow device specific some time to process
-                vTaskDelay(2 / portTICK_PERIOD_MS);
+                //wait 5ms to allow device specific some time to process
+                vTaskDelay(5 / portTICK_PERIOD_MS);
                 //reacquire table mutex
                 xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
                 //check relevance bit
@@ -637,7 +680,6 @@ static void prvRS485InTask(void * parameters)
     
     }
 }
-
 
 static void prvPbInTask(void * parameters)
 {
@@ -780,7 +822,7 @@ static void prvWBMTask(void * parameters)
     uint8_t indbuffer[2]; //buffer for commands to indicators
     uint8_t buffer[MAX_MESSAGE_SIZE]; //message buffer
     uint8_t lights[20]; //one controller can track up to 20 lights?
-    uint8_t lightnum = 1; //keep track of how many lights are controlled
+    uint8_t lightnum = 0; //keep track of how many lights are controlled
     uint8_t lightrem = 0; //track how many lights need to be confirmed
     //uint8_t controllers[20]; //when implemented
     //uint8_t broadcast[20]; //20 broadcast channel devices
@@ -919,7 +961,7 @@ static void prvWBMTask(void * parameters)
             //send to relevant devices for now
             //last two bytes of message need to be 0x0401
             buffer[0] = colour_track;
-            buffer[1] = 0x04;
+            buffer[1] = 0x05;
             buffer[2] = 0x01;
             xMessageBufferSend(xRS485_out_Buffer, buffer, 3, portMAX_DELAY);
         }
@@ -933,7 +975,6 @@ static void prvWBMTask(void * parameters)
             indbuffer[0] = 0xff;
             indbuffer[1] = 0;
             xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
-            indbuffer[1] = 1;
             switch(colour_light)
             {
                 case 'B':
