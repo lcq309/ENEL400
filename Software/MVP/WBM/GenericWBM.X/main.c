@@ -576,7 +576,7 @@ static void prvRS485InTask(void * parameters)
             {
                 if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[0] == buffer[0]) //if first byte in wireless address matches, should be changed to check all
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
-                        if(GLOBAL_DEVICE_TABLE[pos].Flags & 1 == 1) //if relevant
+                        if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
                             //assemble a new buffer containing only the message portion with the index entry as the first byte.
                             //message starts at byte 11
