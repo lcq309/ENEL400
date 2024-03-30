@@ -288,9 +288,9 @@ static void prvRS485OutTask(void * parameters)
     for(;;){
     // wait for notification
     xSemaphoreTake(xPermission, portMAX_DELAY);
-    vTaskDelay(15); //delay for communications?
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+    vTaskDelay(15); //delay for communications?
     //check for waiting output message
     uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
@@ -345,6 +345,8 @@ static void prvRS485OutTask(void * parameters)
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //now complete message sending process, return to start of loop
+            // wait for notification
+            xSemaphoreTake(xPermission, portMAX_DELAY);
         }
         else if(buffer[size - 2] == 0x05) //relevant devices
         {
@@ -364,7 +366,7 @@ static void prvRS485OutTask(void * parameters)
             {
                 //grab table mutex
                 xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
-                if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
+                if((GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) && (count == GLOBAL_TableLength - 1)) //relevant device and last in list
                 {
                     //load header
                     headerbuf[0] = GLOBAL_DEVICE_TABLE[count].XBeeADD[0];
@@ -398,10 +400,49 @@ static void prvRS485OutTask(void * parameters)
                     PORTA.OUTCLR = PIN2_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
-                    //now complete message sending process, wait for the next opportunity
-                    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+                }
+                else if(GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) //relevant device
+                {
+                    //load header
+                    headerbuf[0] = GLOBAL_DEVICE_TABLE[count].XBeeADD[0];
+                    headerbuf[1] = GLOBAL_DEVICE_TABLE[count].XBeeADD[1];
+                    headerbuf[2] = GLOBAL_DEVICE_TABLE[count].XBeeADD[2];
+                    headerbuf[3] = GLOBAL_DEVICE_TABLE[count].XBeeADD[3];
+                    headerbuf[4] = GLOBAL_DEVICE_TABLE[count].XBeeADD[4];
+                    headerbuf[5] = GLOBAL_DEVICE_TABLE[count].XBeeADD[5];
+                    headerbuf[6] = GLOBAL_DEVICE_TABLE[count].XBeeADD[6];
+                    headerbuf[7] = GLOBAL_DEVICE_TABLE[count].XBeeADD[7];
+                    headerbuf[8] = GLOBAL_DEVICE_TABLE[count].WiredADD;
+                    headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
+                    headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
+                    //don't need the table anymore, drop the MUTEX
+                    xSemaphoreGive(xTABLE_MUTEX);
+                    //load the output stream with the header
+                    xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
+                    //next load the message (subtract last 2 bytes for commands)
+                    xStreamBufferSend(xRS485_out_Stream, buffer, size - 2, portMAX_DELAY);
+                    //full message should be loaded into the output buffer now, prepare to start sending
+                    //tack on end delimiter
+                    xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
+                    PORTA.OUTSET = PIN2_bm; //set transmit mode
+                    //send preamble to start transmission
+                    USART0.TXDATAL = 0xAA;
+                    //enable DRE interrupt
+                    USART0.CTRLA |= USART_DREIE_bm;
+                    //wait for TXcomplete notification
+                    xSemaphoreTake(xTXC, portMAX_DELAY);
+                    //return to receive mode
+                    PORTA.OUTCLR = PIN2_bm;
+                    //release USART MUTEX
+                    xSemaphoreGive(xUSART0_MUTEX);
+                    // wait for notification
+                    xSemaphoreTake(xPermission, portMAX_DELAY);
                     //grab USART MUTEX
                     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+                }
+                else if(count == GLOBAL_TableLength - 1) //last in list, no relevant device found
+                {
+                    xSemaphoreGive(xUSART0_MUTEX);
                 }
             }
         }
@@ -534,7 +575,7 @@ static void prvRS485InTask(void * parameters)
             {
                 if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[0] == buffer[0]) //if first byte in wireless address matches, should be changed to check all
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
-                        if(GLOBAL_DEVICE_TABLE[pos].Flags & 1 == 1) //if relevant
+                        if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
                             //assemble a new buffer containing only the message portion with the index entry as the first byte.
                             //message starts at byte 11
