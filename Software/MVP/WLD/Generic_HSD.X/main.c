@@ -321,7 +321,7 @@ static void prvRS485OutTask(void * parameters)
             headerbuf[5] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[5];
             headerbuf[6] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[6];
             headerbuf[7] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[7];
-            headerbuf[8] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].WiredADD;
+            headerbuf[8] = GLOBAL_DeviceID;
             headerbuf[9] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel;
             headerbuf[10] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Type;
             //don't need the table anymore, drop the MUTEX
@@ -377,7 +377,7 @@ static void prvRS485OutTask(void * parameters)
                     headerbuf[5] = GLOBAL_DEVICE_TABLE[count].XBeeADD[5];
                     headerbuf[6] = GLOBAL_DEVICE_TABLE[count].XBeeADD[6];
                     headerbuf[7] = GLOBAL_DEVICE_TABLE[count].XBeeADD[7];
-                    headerbuf[8] = GLOBAL_DEVICE_TABLE[count].WiredADD;
+                    headerbuf[8] = GLOBAL_DeviceID;
                     headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
                     headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
                     //don't need the table anymore, drop the MUTEX
@@ -412,7 +412,7 @@ static void prvRS485OutTask(void * parameters)
                     headerbuf[5] = GLOBAL_DEVICE_TABLE[count].XBeeADD[5];
                     headerbuf[6] = GLOBAL_DEVICE_TABLE[count].XBeeADD[6];
                     headerbuf[7] = GLOBAL_DEVICE_TABLE[count].XBeeADD[7];
-                    headerbuf[8] = GLOBAL_DEVICE_TABLE[count].WiredADD;
+                    headerbuf[8] = GLOBAL_DeviceID;
                     headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
                     headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
                     //don't need the table anymore, drop the MUTEX
@@ -482,6 +482,8 @@ static void prvRS485InTask(void * parameters)
      * 3. check (in working on WBM code document)
      */
     uint8_t buffer[MAX_MESSAGE_SIZE];
+    for(uint8_t x = 0; x < MAX_MESSAGE_SIZE; x++)
+        buffer[x] = 0;
     uint8_t byte_buffer[1];
     uint8_t length = 0;
     xEventGroupWaitBits(xInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
@@ -577,28 +579,32 @@ static void prvRS485InTask(void * parameters)
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
                         if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
-                            //assemble a new buffer containing only the message portion with the index entry as the first byte.
-                            //message starts at byte 11
-                            buffer[0] = pos;
-                            buffer[1] = 0x00; //NULL padding to increase message length
-                            //copy bytes back to start of buffer
-                            for(int i = 11; i < length; i++)
-                            {
-                                buffer[i - 9] = buffer[i];
-                            }
                             //release table MUTEX
                             xSemaphoreGive(xTABLE_MUTEX);
-                            //reduce length by 9
-                            length = length - 9;
-                            //grab device buffer MUTEX
-                            xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
-                            //send to device buffer
-                            xMessageBufferSend(xDevice_Buffer, buffer, length, portMAX_DELAY);
-                            //release device MUTEX
-                            xSemaphoreGive(xDeviceBuffer_MUTEX);
                             //set matched byte
                             matched = 1;
-                            //now done with message processing
+                            if(length != 11) //only go further if it isn't a generic ping response.
+                            {
+                                //add another nested check, see if there even is a message to begin with.
+                                //assemble a new buffer containing only the message portion with the index entry as the first byte.
+                                //message starts at byte 11
+                                buffer[0] = pos;
+                                buffer[1] = 0x00; //NULL padding to increase message length
+                                //copy bytes back to start of buffer
+                                for(int i = 11; i < length; i++)
+                                {
+                                    buffer[i - 9] = buffer[i];
+                                }
+                                //reduce length by 9
+                                length = length - 9;
+                                //grab device buffer MUTEX
+                                xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+                                //send to device buffer
+                                xMessageBufferSend(xDevice_Buffer, buffer, length, portMAX_DELAY);
+                                //release device MUTEX
+                                xSemaphoreGive(xDeviceBuffer_MUTEX);
+                                //now done with message processing
+                            }
                         }
             }
             if(matched == 0)
