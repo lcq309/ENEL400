@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     //setup tasks
     
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvRS485OutTask, "RSOUT", 500, NULL, mainRS485OUT_TASK_PRIORITY, RS485OutHandle);
+    xTaskCreate(prvRS485OutTask, "RSOUT", 500, NULL, mainRS485OUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvRS485InTask, "RSIN", 400, NULL, mainRS485IN_TASK_PRIORITY, NULL);
     xTaskCreate(prvLightOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvWLDTask, "WBM", 600, NULL, mainWLD_TASK_PRIORITY, NULL);
@@ -173,7 +173,6 @@ static void prvWiredInitTask(void * parameters)
     //2. Start Flashing Indicators
     uint8_t lightsFlash[2] = {'Y', 0x2};
     xQueueSendToBack(xLIGHT_Queue, lightsFlash, portMAX_DELAY);
-    xSemaphoreTake(xInit, 0);
     /*//testing, feed the correct init message to the device.
     lightsFlash[0] = 0xaa;
     lightsFlash[1] = GLOBAL_DeviceID;
@@ -517,7 +516,7 @@ static void prvRS485InTask(void * parameters)
                 xSemaphoreGive(xPermission);
             }
         }
-        else if(buffer[9] == GLOBAL_Channel) //if channel matches
+//        else if(buffer[9] == GLOBAL_Channel) //if channel matches
         {
             /* channel check
              * 1. acquire table MUTEX
@@ -527,7 +526,7 @@ static void prvRS485InTask(void * parameters)
              * 5. perform actions based on that
              * 6. if no match found, create a new table entry at next empty spot
              */
-            //acquire table MUTEX
+        /*    //acquire table MUTEX
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //loop through table entries
             uint8_t matched = 0;
@@ -573,7 +572,7 @@ static void prvRS485InTask(void * parameters)
                  * 7. check table relevance bit and either pass or discard
                  */
                 //add to current end of table (add a check against max length at some point)
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
+        /*        GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[1];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[2];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[3];

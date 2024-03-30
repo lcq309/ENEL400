@@ -514,11 +514,10 @@ static void prvRS485InTask(void * parameters)
             if(buffer[8] == GLOBAL_DeviceID) //if right device
             {
                 //send notification to the output task
-
                 xSemaphoreGive(xPermission);
             }
         }
-        else if(buffer[9] == GLOBAL_Channel) //if channel matches
+//        else if(buffer[9] == GLOBAL_Channel) //if channel matches
         {
             /* channel check
              * 1. acquire table MUTEX
@@ -528,7 +527,7 @@ static void prvRS485InTask(void * parameters)
              * 5. perform actions based on that
              * 6. if no match found, create a new table entry at next empty spot
              */
-            //acquire table MUTEX
+        /*    //acquire table MUTEX
             xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //loop through table entries
             uint8_t matched = 0;
@@ -574,7 +573,7 @@ static void prvRS485InTask(void * parameters)
                  * 7. check table relevance bit and either pass or discard
                  */
                 //add to current end of table (add a check against max length at some point)
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
+        /*        GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[0];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[1];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[2];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[3];
