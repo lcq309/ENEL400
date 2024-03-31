@@ -550,10 +550,34 @@ static void prvRS485InTask(void * parameters)
              * 6. if no match found, create a new table entry at next empty spot
              */
             //loop through table entries
-            uint8_t matched = 0;
-            for(int pos = 0; pos < GLOBAL_TableLength; pos++)
+            uint8_t same_bus = 1;
+            //check if the device is on the same bus
+            for(uint8_t zero = 0; zero < 6; zero++)
             {
-                if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[0] == buffer[0]) //if first byte in wireless address matches, should be changed to check all
+                if(buffer[zero] != 0x0)
+                    same_bus = 0;
+            }
+            for(uint8_t broadcast = 6; broadcast < 8; broadcast++)
+            {
+                if(buffer[broadcast] != 0xff)
+                    same_bus = 0;
+            }
+            if(same_bus)
+            {
+                for(uint8_t zero = 0; zero < 8; zero++)
+                    buffer[zero] = 0;
+            }
+            //switch to all zeros on same bus
+            uint8_t matched = 0;
+            for(uint8_t pos = 0; pos < GLOBAL_TableLength; pos++)
+            {
+                uint8_t XBeeCheck = 0;
+                for(uint8_t check = 0; check < 8; check++)
+                {
+                    if(GLOBAL_DEVICE_TABLE[pos].XBeeADD[check] != buffer[check])
+                        XBeeCheck = 1;
+                }
+                if(XBeeCheck == 0) //if wireless address matches
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
                         if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
