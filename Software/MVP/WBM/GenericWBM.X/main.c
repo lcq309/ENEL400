@@ -47,9 +47,9 @@ static struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device tab
 
 // Priority Definitions:
 
-#define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-#define mainRS485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainRS485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define mainRS485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainRS485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainWBM_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -1072,6 +1072,8 @@ ISR(USART0_TXC_vect)
      * 1. set semaphore
      * 2. clear interrupt flag
      */
-    xSemaphoreGive(xTXC); //send notification to output task
+    xSemaphoreGiveFromISR(xTXC, NULL); //send notification to output task
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
+    //return transceiver to receive mode
+    PORTD.OUTCLR = PIN7_bm;
 }

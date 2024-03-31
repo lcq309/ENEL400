@@ -48,8 +48,8 @@ static struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device tab
 // Priority Definitions:
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define mainRS485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainRS485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainRS485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainRS485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainTABLEWRITE_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainWLD_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -270,8 +270,6 @@ static void prvRS485OutTask(void * parameters)
     USART0.CTRLA |= USART_DREIE_bm;
     //wait for TXcomplete notification
     xSemaphoreTake(xTXC, portMAX_DELAY);
-    //return to receive mode
-    PORTA.OUTCLR = PIN2_bm;
     //release USART MUTEX
     xSemaphoreGive(xUSART0_MUTEX);
     
@@ -340,8 +338,6 @@ static void prvRS485OutTask(void * parameters)
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
             xSemaphoreTake(xTXC, portMAX_DELAY);
-            //return to receive mode
-            PORTA.OUTCLR = PIN2_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //now complete message sending process, return to start of loop
@@ -396,8 +392,6 @@ static void prvRS485OutTask(void * parameters)
                     USART0.CTRLA |= USART_DREIE_bm;
                     //wait for TXcomplete notification
                     xSemaphoreTake(xTXC, portMAX_DELAY);
-                    //return to receive mode
-                    PORTA.OUTCLR = PIN2_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
                 }
@@ -431,8 +425,6 @@ static void prvRS485OutTask(void * parameters)
                     USART0.CTRLA |= USART_DREIE_bm;
                     //wait for TXcomplete notification
                     xSemaphoreTake(xTXC, portMAX_DELAY);
-                    //return to receive mode
-                    PORTA.OUTCLR = PIN2_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
                     // wait for notification
@@ -466,8 +458,6 @@ static void prvRS485OutTask(void * parameters)
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
             xSemaphoreTake(xTXC, portMAX_DELAY);
-            //return to receive mode
-            PORTA.OUTCLR = PIN2_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
         }
@@ -894,6 +884,8 @@ ISR(USART0_TXC_vect)
      * 1. set semaphore
      * 2. clear interrupt flag
      */
-    xSemaphoreGive(xTXC); //send notification to output task
+    xSemaphoreGiveFromISR(xTXC, NULL); //send notification to output task
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
+    //return transceiver to receive mode
+    PORTA.OUTCLR = PIN2_bm;
 }

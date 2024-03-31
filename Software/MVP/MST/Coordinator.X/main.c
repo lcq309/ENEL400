@@ -189,8 +189,6 @@ static void prvRoundRobinTask(void * parameters)
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete semaphore
             xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
-            //return transceiver to receive mode
-            PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //wait for a response in the message queue
@@ -240,8 +238,6 @@ static void prvRS485OutTask(void * parameters)
         USART0.CTRLA |= USART_DREIE_bm;
         //wait for TXcomplete semaphore
         xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
-        //return transceiver to receive mode
-        PORTD.OUTCLR = PIN7_bm;
         //release MUTEXes
         xSemaphoreGive(xRoundRobin_MUTEX);
         xSemaphoreGive(xUSART0_MUTEX);
@@ -387,4 +383,6 @@ ISR(USART0_TXC_vect)
      */
     xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
+    //return transceiver to receive mode
+    PORTD.OUTCLR = PIN7_bm;
 }
