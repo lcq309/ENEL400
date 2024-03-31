@@ -66,7 +66,7 @@ void LTCHOut(void);
  * requires external handling of P/S
  * requires the util/delay.h library, for internal microsecond delays
  */
-void ShiftIn(uint8_t* in);
+uint8_t ShiftIn(void);
 /*
  * LTCHIn();
  * Pulses input latch high to save switch state

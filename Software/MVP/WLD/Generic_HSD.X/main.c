@@ -30,8 +30,8 @@
 // messaging constants
 static const uint8_t end_delimiter[3] = {0x03,0x03,0x03};
 
-static volatile uint8_t GLOBAL_DeviceID = 0x02; //device ID is set during initial startup
-static volatile uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
+static uint8_t GLOBAL_DeviceID = 0x02; //device ID is set during initial startup
+static uint8_t GLOBAL_Channel = 0x01; //channel number is set during initial startup
 static uint8_t GLOBAL_DeviceType = 0x32; //this will be device type 0x32, generic light
 static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
 

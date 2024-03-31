@@ -52,7 +52,7 @@ uint8_t ShiftIn(void)
         PORTA.OUTCLR = CLK1;
         _delay_us(50);
     }
-    return(digit);
+    return(~digit);
 }
 void LTCHIn(void)
 {

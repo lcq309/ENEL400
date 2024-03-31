@@ -140,13 +140,12 @@ int main(int argc, char** argv) {
     xTaskCreate(prvWBMTask, "WBM", 600, NULL, mainWBM_TASK_PRIORITY, NULL);
     
     //setup device ID and channel here, read shift registers and move into global variables
-    /*
+        //setup device ID and channel here, read shift registers and move into global variables
     InitShiftIn(); //initialize shift register pins
     LTCHIn(); //latch input register
-    ShiftIn(GLOBAL_Channel); //grab channel
-    ShiftIn(GLOBAL_DeviceID); //grab DeviceID
+    GLOBAL_Channel = ShiftIn(); //grab channel
+    GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
     //should now be done with shift registers
-    */
     //initialize device table to all 0s? Not needed
     vTaskStartScheduler(); //start scheduler
     return (EXIT_SUCCESS);
