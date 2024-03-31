@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
     initmessage[2] = 0x03; //end of message
     //message is setup now, ping a device, wait 5ms, then check the input buffer.
     //could be moved into a separate c file or function
-    for(int i = 1; i < 10; i++)
+    for(int i = 1; i < 256; i++)
     {
         initmessage[1] = i;
         //first, ping while waiting between bytes for DRE to set
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
         USART0.STATUS |= USART_TXCIF_bm; //clear flag
         //after sending the ping, wait for a response
         //busy wait should be fine, since the receiver is interrupt driven
-        _delay_ms(15); //15ms should be plenty of time
+        _delay_ms(5); //5ms should be plenty of time
         initmessage[1] = 0; //
         xStreamBufferReceiveFromISR(xRS485_in_Stream, initmessage, 3, NULL);
         if(initmessage[1] == i)
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
         //otherwise, just move on to the next one.
         initmessage[0] = 0xAA; //wired preamble
         initmessage[2] = 0x03; //end of message
-        _delay_ms(15);
+        _delay_ms(5);
     }
     _delay_ms(500);
     USART0.CTRLA |= USART_TXCIE_bm; //enable TXC interrupt
