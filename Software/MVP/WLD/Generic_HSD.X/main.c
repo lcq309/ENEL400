@@ -829,28 +829,31 @@ static void prvWLDTask(void * parameters)
                 }
             case 3: //length of 3 indicates from controller or other device (just controller for now)
                 //just change colour and echo back to controllers (relevant devices)
-                switch(buffer[2])
+                if(buffer[2] != colour_light) //if colour is changing
                 {
-                    case 'B': //Blue (flash implied)
-                        lightbuffer[0] = buffer[2];
-                        lightbuffer[1] = 0x2;
-                        xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
+                    switch(buffer[2])
+                    {
+                        case 'B': //Blue (flash implied)
+                            lightbuffer[0] = buffer[2];
+                            lightbuffer[1] = 0x2;
+                            xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
                         break;
-                    case 'G': //Green (not flash)
-                        lightbuffer[0] = buffer[2];
-                        lightbuffer[1] = 0x1;
-                        xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
+                        case 'G': //Green (not flash)
+                            lightbuffer[0] = buffer[2];
+                            lightbuffer[1] = 0x1;
+                            xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
                         break;
-                    case 'Y': //Yellow (not flash)
-                        lightbuffer[0] = buffer[2];
-                        lightbuffer[1] = 0x1;
-                        xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
+                        case 'Y': //Yellow (not flash)
+                            lightbuffer[0] = buffer[2];
+                            lightbuffer[1] = 0x1;
+                            xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
                         break;
-                    case 'R': //Red (not flash)
-                        lightbuffer[0] = buffer[2];
-                        lightbuffer[1] = 0x1;
-                        xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
+                        case 'R': //Red (not flash)
+                            lightbuffer[0] = buffer[2];
+                            lightbuffer[1] = 0x1;
+                            xQueueSend(xLIGHT_Queue, lightbuffer, portMAX_DELAY);
                         break;
+                    }
                 }
                 //now send response
                 uint8_t response[3];
