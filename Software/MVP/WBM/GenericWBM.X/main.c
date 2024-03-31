@@ -258,7 +258,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(1); //delay for communications?
+    //vTaskDelay(1); //delay for communications?
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xStreamBufferSend(xRS485_out_Stream, StartMessage, 11, portMAX_DELAY);
     //tack on end delimiter
@@ -271,8 +271,6 @@ static void prvRS485OutTask(void * parameters)
     USART0.CTRLA |= USART_DREIE_bm;
     //wait for TXcomplete notification
     xSemaphoreTake(xTXC, portMAX_DELAY);
-    //return to receive mode
-    PORTD.OUTCLR = PIN7_bm;
     //release USART MUTEX
     xSemaphoreGive(xUSART0_MUTEX);
     
@@ -291,7 +289,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(1); //delay for communications?
+    //vTaskDelay(1); //delay for communications?
     //check for waiting output message
     uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
@@ -341,8 +339,6 @@ static void prvRS485OutTask(void * parameters)
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
             xSemaphoreTake(xTXC, portMAX_DELAY);
-            //return to receive mode
-            PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //now complete message sending process, return to start of loop
@@ -397,8 +393,6 @@ static void prvRS485OutTask(void * parameters)
                     USART0.CTRLA |= USART_DREIE_bm;
                     //wait for TXcomplete notification
                     xSemaphoreTake(xTXC, portMAX_DELAY);
-                    //return to receive mode
-                    PORTD.OUTCLR = PIN7_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
                 }
@@ -432,8 +426,6 @@ static void prvRS485OutTask(void * parameters)
                     USART0.CTRLA |= USART_DREIE_bm;
                     //wait for TXcomplete notification
                     xSemaphoreTake(xTXC, portMAX_DELAY);
-                    //return to receive mode
-                    PORTD.OUTCLR = PIN7_bm;
                     //release USART MUTEX
                     xSemaphoreGive(xUSART0_MUTEX);
                     // wait for notification
@@ -467,8 +459,6 @@ static void prvRS485OutTask(void * parameters)
             USART0.CTRLA |= USART_DREIE_bm;
             //wait for TXcomplete notification
             xSemaphoreTake(xTXC, portMAX_DELAY);
-            //return to receive mode
-            PORTD.OUTCLR = PIN7_bm;
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
         }

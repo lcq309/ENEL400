@@ -225,7 +225,7 @@ static void prvRS485OutTask(void * parameters)
         //acquire MUTEX after pulling message into internal buffer
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
-        vTaskDelay(1); //delay for communications?
+        //vTaskDelay(1); //delay for communications?
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
         //tack on end delimiter
