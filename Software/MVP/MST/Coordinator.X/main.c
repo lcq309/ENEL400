@@ -158,7 +158,7 @@ static void prvRoundRobinTask(void * parameters)
     {
         for(uint8_t count = 0; count < table_pos; count++)
         {
-            vTaskDelay(50);
+            vTaskDelay(2);
             /* process:
              * check if device table is NULL(set count to 1 if so)
              * secure both MUTEXes
@@ -182,7 +182,7 @@ static void prvRoundRobinTask(void * parameters)
             xStreamBufferSend(xRS485_out_Stream, message, 11, portMAX_DELAY);
             //tack on end delimiter
             xStreamBufferSend(xRS485_out_Stream, end_delimiter, 3, portMAX_DELAY);
-            vTaskDelay(50);
+            vTaskDelay(2);
             //set RS485 transceiver to transmit mode
             PORTD.OUTSET = PIN7_bm;
             //start transmission by sending preamble
@@ -229,7 +229,7 @@ static void prvRS485OutTask(void * parameters)
         //acquire MUTEX after pulling message into internal buffer
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
-        vTaskDelay(1); //delay for communications?
+        vTaskDelay(2); //delay for communications?
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
         //tack on end delimiter

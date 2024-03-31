@@ -258,7 +258,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(15); //delay for communications?
+    vTaskDelay(2); //delay for communications?
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xStreamBufferSend(xRS485_out_Stream, StartMessage, 11, portMAX_DELAY);
     //tack on end delimiter
@@ -291,7 +291,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(15); //delay for communications?
+    vTaskDelay(2); //delay for communications?
     //check for waiting output message
     uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
@@ -696,6 +696,7 @@ static void prvPbInTask(void * parameters)
      * 2. acquire device specific MUTEX
      * 3. pass to device specific
      */
+    uint8_t last = 0; //variable for software debouncing
     //I will setup the interrupts and inputs here
     //I will start by ensuring all pins are inputs
     PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm;
@@ -715,6 +716,8 @@ static void prvPbInTask(void * parameters)
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
         //add a messaging byte to the front, 0x04 in this case
         //device specific needs to check for a two-byte message and react according to the first byte of the message
+        if(input[0] != last)
+        {
         uint8_t output[2];
         output[0] = 0x04;
         output[1] = input[0];
@@ -724,6 +727,7 @@ static void prvPbInTask(void * parameters)
         xMessageBufferSend(xDevice_Buffer, output, 2, portMAX_DELAY);
         //release device MUTEX
         xSemaphoreGive(xDeviceBuffer_MUTEX);
+        }
     }
 }
 
@@ -841,7 +845,7 @@ static void prvWBMTask(void * parameters)
         //grab device buffer MUTEX
         xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
         //keep track of length as well
-        inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 250);
+        inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 500);
         //release device buffer MUTEX
         xSemaphoreGive(xDeviceBuffer_MUTEX);
         //2. check input
@@ -981,6 +985,7 @@ static void prvWBMTask(void * parameters)
             indbuffer[0] = 0xff;
             indbuffer[1] = 0;
             xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
+            indbuffer[1] = 1;
             switch(colour_light)
             {
                 case 'B':
