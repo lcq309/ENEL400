@@ -48,8 +48,8 @@ static struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device tab
 // Priority Definitions:
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define mainRS485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainRS485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainRS485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainRS485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainWBM_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -291,7 +291,7 @@ static void prvRS485OutTask(void * parameters)
     //vTaskDelay(1); //delay for communications?
     //check for waiting output message
     uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
-    if(size != 0) // if there is a message
+    if((size != 0) && (GLOBAL_TableLength != 0)) // if there is a message, and a place to send it
     {
      /* send a message
       * 1. check instruction from device specific
@@ -308,8 +308,6 @@ static void prvRS485OutTask(void * parameters)
         //check instruction
         if(buffer[size - 2] == 0) //index entry
         {
-            //take table MUTEX
-            xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //load header with info
             headerbuf[0] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[0];
             headerbuf[1] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[1];
@@ -322,8 +320,6 @@ static void prvRS485OutTask(void * parameters)
             headerbuf[8] = GLOBAL_DeviceID;
             headerbuf[9] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Channel;
             headerbuf[10] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].Type;
-            //don't need the table anymore, drop the MUTEX
-            xSemaphoreGive(xTABLE_MUTEX);
             //next load the device type
             xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
             //next load the message (subtract last 2 bytes for intertask commands)
@@ -360,8 +356,6 @@ static void prvRS485OutTask(void * parameters)
             //search table for devices marked relevant
             for(uint8_t count = 0; count < GLOBAL_TableLength; count++)
             {
-                //grab table mutex
-                xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
                 if((GLOBAL_DEVICE_TABLE[count].Flags & 0x01 == 1) && (count == GLOBAL_TableLength - 1)) //relevant device and last in list
                 {
                     //load header
@@ -376,8 +370,6 @@ static void prvRS485OutTask(void * parameters)
                     headerbuf[8] = GLOBAL_DeviceID;
                     headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
                     headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
-                    //don't need the table anymore, drop the MUTEX
-                    xSemaphoreGive(xTABLE_MUTEX);
                     //load the output stream with the header
                     xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
                     //next load the message (subtract last 2 bytes for commands)
@@ -409,8 +401,6 @@ static void prvRS485OutTask(void * parameters)
                     headerbuf[8] = GLOBAL_DeviceID;
                     headerbuf[9] = GLOBAL_DEVICE_TABLE[count].Channel;
                     headerbuf[10] = GLOBAL_DEVICE_TABLE[count].Type;
-                    //don't need the table anymore, drop the MUTEX
-                    xSemaphoreGive(xTABLE_MUTEX);
                     //load the output stream with the header
                     xStreamBufferSend(xRS485_out_Stream, headerbuf, 11, portMAX_DELAY);
                     //next load the message (subtract last 2 bytes for commands)
@@ -552,15 +542,13 @@ static void prvRS485InTask(void * parameters)
         else if(buffer[9] == GLOBAL_Channel) //if channel matches
         {
             /* channel check
-             * 1. acquire table MUTEX
+             * 1. acquire table MUTEX, not needed anymore
              * 2. check if wireless address 1st byte matches
              * 3. check if wired address matches
              * 4. check relevance bit
              * 5. perform actions based on that
              * 6. if no match found, create a new table entry at next empty spot
              */
-            //acquire table MUTEX
-            xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
             //loop through table entries
             uint8_t matched = 0;
             for(int pos = 0; pos < GLOBAL_TableLength; pos++)
@@ -569,8 +557,6 @@ static void prvRS485InTask(void * parameters)
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
                         if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
-                            //release table MUTEX
-                            xSemaphoreGive(xTABLE_MUTEX);
                             //set matched byte
                             matched = 1;
                             if(length != 11) //only go further if it isn't a generic ping response.
@@ -623,8 +609,6 @@ static void prvRS485InTask(void * parameters)
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Flags = 0;
                 //increment table length
                 GLOBAL_TableLength++;
-                //release table MUTEX
-                xSemaphoreGive(xTABLE_MUTEX);
                 //grab device buffer MUTEX
                 xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
                 //check message will be defined as {0x05, index}
@@ -633,10 +617,8 @@ static void prvRS485InTask(void * parameters)
                 xMessageBufferSend(xDevice_Buffer, check, 2, portMAX_DELAY);
                 //release device MUTEX
                 xSemaphoreGive(xDeviceBuffer_MUTEX);
-                //wait 5ms to allow device specific some time to process
-                vTaskDelay(5 / portTICK_PERIOD_MS);
-                //reacquire table mutex
-                xSemaphoreTake(xTABLE_MUTEX, portMAX_DELAY);
+                //wait 2ms to allow device specific some time to process
+                vTaskDelay(2 / portTICK_PERIOD_MS);
                 //check relevance bit
                 if(GLOBAL_DEVICE_TABLE[GLOBAL_TableLength-1].Flags & 1)
                 {   
@@ -659,8 +641,6 @@ static void prvRS485InTask(void * parameters)
                     //release device MUTEX
                     xSemaphoreGive(xDeviceBuffer_MUTEX);
                 }
-                //return MUTEX
-                xSemaphoreGive(xTABLE_MUTEX);
             }
         }
         else if(buffer[9] == 0xff) //special channel check for broadcast devices
