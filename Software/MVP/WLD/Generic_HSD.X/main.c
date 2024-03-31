@@ -257,7 +257,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(2); //delay for communications?
+    vTaskDelay(1); //delay for communications?
     uint8_t StartMessage[11] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType};
     xStreamBufferSend(xRS485_out_Stream, StartMessage, 11, portMAX_DELAY);
     //tack on end delimiter
@@ -290,7 +290,7 @@ static void prvRS485OutTask(void * parameters)
     xSemaphoreTake(xPermission, portMAX_DELAY);
     //acquire mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    vTaskDelay(2); //delay for communications?
+    vTaskDelay(1); //delay for communications?
     //check for waiting output message
     uint8_t size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
     if(size != 0) // if there is a message
@@ -831,6 +831,7 @@ static void prvWLDTask(void * parameters)
                 //just change colour and echo back to controllers (relevant devices)
                 if(buffer[2] != colour_light) //if colour is changing
                 {
+                    colour_light = buffer[2];
                     switch(buffer[2])
                     {
                         case 'B': //Blue (flash implied)
