@@ -196,8 +196,8 @@ static void prvRoundRobinTask(void * parameters)
             //release USART MUTEX
             xSemaphoreGive(xUSART0_MUTEX);
             //wait for a response in the message queue
-            //receives from round robin buffer, puts into acknowledge array, max length 1, waits forever
-            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 1500);
+            //receives from round robin buffer, puts into acknowledge array, max length 1, waits 250ms
+            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 250);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
             {xSemaphoreGive(xRoundRobin_MUTEX);} //break here for debug purposes
@@ -229,7 +229,7 @@ static void prvRS485OutTask(void * parameters)
         //acquire MUTEX after pulling message into internal buffer
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
-        vTaskDelay(2); //delay for communications?
+        //vTaskDelay(1); //delay for communications?
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
         //tack on end delimiter
