@@ -841,13 +841,9 @@ static void prvWBMTask(void * parameters)
     xEventGroupWaitBits(xInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
     for(;;)
     {
-        //1. wait up to 50 ticks for input, need to grab MUTEX?
-        //grab device buffer MUTEX
-        xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+        //1. wait up to 50 ticks for input, need to grab MUTEX? MUTEX shouldn't be necessary for only a single task taking out
         //keep track of length as well
         inlen = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 500);
-        //release device buffer MUTEX
-        xSemaphoreGive(xDeviceBuffer_MUTEX);
         //2. check input
         switch (inlen)
         {
