@@ -576,9 +576,11 @@ static void prvRS485InTask(void * parameters)
                         XBeeCheck = 1;
                 }
                 if(XBeeCheck == 0) //if wireless address matches
+                {
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
                         //set matched byte
                         matched = 1;
+                    {
                         if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
                             if(length != 11) //only go further if it isn't a generic ping response.
@@ -603,7 +605,9 @@ static void prvRS485InTask(void * parameters)
                                 xSemaphoreGive(xDeviceBuffer_MUTEX);
                                 //now done with message processing
                             }
-                        }
+                        }  
+                    }
+                }
             }
             if(matched == 0)
             {
