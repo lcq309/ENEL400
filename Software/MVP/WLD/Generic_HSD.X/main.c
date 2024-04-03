@@ -577,10 +577,11 @@ static void prvRS485InTask(void * parameters)
                 }
                 if(XBeeCheck == 0) //if wireless address matches
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
+                    {
+                        //set matched byte
+                        matched = 1;
                         if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
-                            //set matched byte
-                            matched = 1;
                             if(length != 11) //only go further if it isn't a generic ping response.
                             {
                                 //add another nested check, see if there even is a message to begin with.
@@ -604,6 +605,7 @@ static void prvRS485InTask(void * parameters)
                                 //now done with message processing
                             }
                         }
+                    }
             }
             if(matched == 0)
             {
