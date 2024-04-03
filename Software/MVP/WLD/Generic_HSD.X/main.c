@@ -482,7 +482,7 @@ static void prvRS485InTask(void * parameters)
             if(byte_buffer[0] == 0xaa)
             {i = MAX_MESSAGE_SIZE;}
             //check if delimiter(3 * 0x03 in a row)
-            else if(byte_buffer[0] == 0x03)
+                else if(byte_buffer[0] == 0x03)
             {
                 buffer[i] = byte_buffer[0]; //add to buffer for now and increment length
                 length++;
@@ -505,12 +505,14 @@ static void prvRS485InTask(void * parameters)
                     {
                         buffer[i] = byte_buffer[0];
                         length++;
+                        i++;
                     }
                 }
                 else
                 {
                     buffer[i] = byte_buffer[0];
                     length++;
+                    i++;
                 }
                         
             }
@@ -575,10 +577,10 @@ static void prvRS485InTask(void * parameters)
                 }
                 if(XBeeCheck == 0) //if wireless address matches
                     if(GLOBAL_DEVICE_TABLE[pos].WiredADD == buffer[8]) //if wired address matches
-                        //set matched byte
-                        matched = 1;
-                if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
+                        if((GLOBAL_DEVICE_TABLE[pos].Flags & 1) == 1) //if relevant
                         {
+                            //set matched byte
+                            matched = 1;
                             if(length != 11) //only go further if it isn't a generic ping response.
                             {
                                 //add another nested check, see if there even is a message to begin with.

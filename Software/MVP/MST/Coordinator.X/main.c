@@ -299,12 +299,14 @@ static void prvRS485InTask(void * parameters)
                     {
                         message_buffer[i] = byte_buffer[0];
                         length++;
+                        i++;
                     }
                 }
                 else
                 {
                     message_buffer[i] = byte_buffer[0];
                     length++;
+                    i++;
                 }
                         
             }
