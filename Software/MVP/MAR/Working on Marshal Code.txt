@@ -7,3 +7,13 @@ The wired init may need to be changed to perform any initialization that the xbe
 WBM task will be renamed to MAR task, but should be mostly the same.
 
 USART0 no longer requires a MUTEX, as far as I can tell.
+
+for our simple example, there is no initialization required, we will pre-seed the sending device with the address of the receiver and vice versa.
+network learning will be implemented with the production rework of all programming.
+
+a wireless device does not have an ID (especially not in this basic example), otherwise the ID of a wireless end device will always be 0x00. a wireless coordinator will use the device ID of the sending wired device.
+
+there will be no device table for this simple test, it will likely be reworked slightly for the production code anyways.
+
+A theory on some of the communications delay has come up, the output buffer may be blocking for space and consuming MUTEX time.
+to avoid this issue, the MUTEX sections should be simplified.
