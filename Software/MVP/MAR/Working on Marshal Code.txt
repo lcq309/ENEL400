@@ -16,4 +16,8 @@ a wireless device does not have an ID (especially not in this basic example), ot
 there will be no device table for this simple test, it will likely be reworked slightly for the production code anyways.
 
 A theory on some of the communications delay has come up, the output buffer may be blocking for space and consuming MUTEX time.
-to avoid this issue, the MUTEX sections should be simplified.
+to avoid this issue, the MUTEX sections should be simplified. A potential other source may be spammed button presses causing a buffer to fill up and block something else.
+if the device buffer fills up, then the input task will block waiting for the input mutex, this could be avoided through the use of two seperate message sources, like a queue for intertask commands and a buffer for external messages.
+To speed up the table checking, the input task could start by checking device type against devices on the table, then wired address, then finally wireless address.
+output task only takes a table index and uses that to construct the output message header, no more relevant device searching to reduce overhead at a critical time.
+The device specific task is fully responsible for keeping track of locations.

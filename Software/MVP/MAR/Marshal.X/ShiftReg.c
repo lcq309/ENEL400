@@ -39,7 +39,7 @@ void LTCHOut(void)
     PORTC.OUTCLR = LTCH2;
 }
 
-void ShiftIn(uint8_t* in)
+uint8_t ShiftIn(void)
 //for this shift register, read first, then pulse clock, big Endian
 {
     uint8_t digit = 0;
@@ -52,7 +52,7 @@ void ShiftIn(uint8_t* in)
         PORTA.OUTCLR = CLK1;
         _delay_us(50);
     }
-    in = digit;
+    return(~digit);
 }
 void LTCHIn(void)
 {

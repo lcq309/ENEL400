@@ -1,0 +1,19 @@
+- Device specific task is fully responsible for sending to the correct location, no more relevant devices destination.
+- all devices on same channel are assumed to be relevant by input task, device specific has to decide what to discard on it's own
+- (may split into an additional task that handles searching the table and passing the index to the device specific, if it is found to be a point of slowdown)
+- two separate message buffers (one queue and one buffer), one from the pushbutton and other internal tasks (to prevent the MUTEX from interfering with the input task) and one from the comms input task
+- RS485 header changed to include an inbound/outbound segment, as well as a length byte instead of an end delimiter
+
+controlling algorithms:
+- controllers will be aware of other controllers, and will coordinate to avoid accidentally overriding a safety level.
+- lights may not be aware of other lights (too many duplicate messages) but will have a lockout for yellow as well as red.
+- the red lockout can only be released by the stop buttons (must be unlatched?)
+- the yellow lockout can be released by the sending controller (or by any controller after all lights have confirmed for a few seconds and sender hasn't yet.)
+- 
+
+
+network recovery: (optional bonus)
+- if a message hasn't been responded to after two tries, send a notification message and wait a few seconds before trying again.
+- if a device hasn't responded after maybe 20 seconds, send an error message and (remove it from the device table?)
+- resent messages should have a reasonably long delay, could use a software timer to avoid message spam
+- blue light should probably flash faster, and could return to green after a few seconds
