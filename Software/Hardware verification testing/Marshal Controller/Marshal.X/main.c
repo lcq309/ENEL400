@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <avr/io.h>
+#include <util/delay.h>
 
 #define GBut PIN4_bm    //PD4
 #define BBut PIN5_bm    //PD5
@@ -37,6 +38,8 @@ int main(int argc, char** argv) {
     // Clock configuration for 24MHz
     _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL.OSCHFCTRLA | CLKCTRL_FRQSEL_24M_gc);
     // initialize outputs
+    //init USART
+    USART0_init();
     PORTC.DIRSET = Stat | YInd;
     PORTD.DIRSET = BInd | GInd;
     // initialize inputs
@@ -50,18 +53,28 @@ int main(int argc, char** argv) {
     {
         if(!(PORTD.IN & GBut)) // if green button is pressed
         {
+           USART0.TXDATAL = 0xaa;
            Stat_on();
            GInd_on();
+           while(!(USART0.STATUS & USART_TXCIF_bm))
+           {}
+           USART0.STATUS |= USART_TXCIF_bm;
         }
         else if(!(PORTD.IN & BBut)) // if blue button is pressed
         {
+            USART0.TXDATAL = 0xbb;
             Stat_on();
             BInd_on();
+            _delay_ms(5);
+            USART0.STATUS |= USART_TXCIF_bm;
         }
         else if(!(PORTD.IN & YBut)) // if yellow button is pressed
         {
+            USART0.TXDATAL = 0xcc;
             Stat_on();
             YInd_on();
+            _delay_ms(5);
+            USART0.STATUS |= USART_TXCIF_bm;
         }
         else
         {

@@ -42,8 +42,8 @@ int main(int argc, char** argv) {
     PORTD.DIRSET = BSIG | YSIG;
     // now all outputs should be configured
     USART0_init();
-    PORTD.DIRSET = PIN7_bm;
-    PORTD.OUTCLR = PIN7_bm;
+    //PORTD.DIRSET = PIN7_bm;
+    //PORTD.OUTCLR = PIN7_bm;
 
     while(1)
     {        

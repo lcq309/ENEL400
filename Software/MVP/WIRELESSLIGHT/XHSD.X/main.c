@@ -127,7 +127,7 @@ static void prvXBeeOutTask(void * parameters)
     {
     uint8_t size = xMessageBufferReceive(xBee_out_Buffer, buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
     //prepare message for sending by adding xbee header info to the buffer
-    XBee_Length[0] = 0;
+    /*XBee_Length[0] = 0;
     XBee_Length[1] = size + 8 + 2 + 1 + 1 + 1 + 1;
     //add message length
     xStreamBufferSend(xBee_out_Stream, XBee_Length, 2, portMAX_DELAY);
@@ -148,7 +148,6 @@ static void prvXBeeOutTask(void * parameters)
     //calculate the checksum
     checkcalc = FRAME_TYPE[0] + FRAME_ID[0] + TARGET_ADDRESS[0] + TARGET_ADDRESS[1] + TARGET_ADDRESS[2] + TARGET_ADDRESS[3] + TARGET_ADDRESS[4] + TARGET_ADDRESS[5] + TARGET_ADDRESS[6] + TARGET_ADDRESS[7] + Short_Address[0] + Short_Address[1];
     checkcalc = checkcalc + RADIUS[0] + OPTIONS[0];
-    
     for(int i = 0; i < size; i++)
     {
         checkcalc = checkcalc + buffer[i];
@@ -157,14 +156,15 @@ static void prvXBeeOutTask(void * parameters)
     checksum[0] = 0xff - checksum[0];
     xStreamBufferSend(xBee_out_Stream, checksum, 1, portMAX_DELAY);
     }
+    */
     //message now assembled, send it by loading output register and enabling DRE interrupt
-    USART0.TXDATAL = START[0];
+    USART0.TXDATAL = buffer[0];
     //enable DRE interrupt
     USART0.CTRLA |= USART_DREIE_bm;
     //wait for TXcomplete notification
     xSemaphoreTake(xTXC, portMAX_DELAY);
     //end of loop, start over now
-}
+    }}
 
 static void prvXBeeInTask(void * parameters)
 {   //there is only one sender, we should be able to basically ignore all header stuff and just send the message byte to the controller task
@@ -172,6 +172,7 @@ static void prvXBeeInTask(void * parameters)
     uint8_t buffer[MAX_MESSAGE_SIZE];
     uint8_t length[2];
     xStreamBufferReceive(xBee_in_Stream, byte_buffer, 1, portMAX_DELAY);
+    /*
     if(byte_buffer[0] == 0x7E) //if not start delimiter, break somehow
     {
         //grab length
@@ -191,6 +192,12 @@ static void prvXBeeInTask(void * parameters)
         //now done with message processing
         
     }
+    */
+    xSemaphoreTake(xDeviceBuffer_MUTEX, portMAX_DELAY);
+    //send to device buffer
+    xMessageBufferSend(xDevice_Buffer, byte_buffer, 1, portMAX_DELAY);
+    //release device MUTEX
+    xSemaphoreGive(xDeviceBuffer_MUTEX);
 }
 
 static void prvLightOutTask(void * parameters)

@@ -869,17 +869,17 @@ static void prvWBMTask(void * parameters)
                         switch(buffer[1])
                         {
                             case 0x1: //button 1 (call this blue for now)
-                                colour_track = 'B'; // blue lights
+                                colour_track = 'R'; // blue lights
                                 if(colour_track != colour_light)
                                 lightrem = lightnum;
                                 break;
                             case 0x2: //button 2 (call this green for now)
-                                colour_track = 'G';
+                                colour_track = 'Y';
                                 if(colour_track != colour_light)
                                 lightrem = lightnum;
                                 break;
                             case 0x3: //button 3 (call this yellow for now)
-                                colour_track = 'Y';
+                                colour_track = 'G';
                                 if(colour_track != colour_light)
                                 lightrem = lightnum;
                                 break;
@@ -927,13 +927,13 @@ static void prvWBMTask(void * parameters)
             indbuffer[1] = 2; //flashing
             switch(colour_light)
             {
-                case 'B':
+                case 'R': //blue
                     indbuffer[0] = 1; //indicator 1
                     break;
-                case 'G':
+                case 'Y': //Green
                     indbuffer[0] = 2; //indicator 2
                     break;
-                case 'Y':
+                case 'G': //Yellow
                     indbuffer[0] = 3; //indicator 3
                     break;
                 default:
@@ -942,13 +942,13 @@ static void prvWBMTask(void * parameters)
             xQueueSendToBack(xIND_Queue, indbuffer, portMAX_DELAY);
             switch(colour_track)
             {
-                case 'B':
+                case 'R': //blue
                     indbuffer[0] = 1; //indicator 1
                     break;
-                case 'G':
+                case 'Y': //green
                     indbuffer[0] = 2; //indicator 2
                     break;
-                case 'Y':
+                case 'G': //yellow
                     indbuffer[0] = 3; //indicator 3
                     break;
                 default:
@@ -977,13 +977,13 @@ static void prvWBMTask(void * parameters)
             indbuffer[1] = 1;
             switch(colour_light)
             {
-                case 'B':
+                case 'R': //blue
                     indbuffer[0] = 1; //indicator 1
                     break;
-                case 'G':
+                case 'Y': //green
                     indbuffer[0] = 2; //indicator 2
                     break;
-                case 'Y':
+                case 'G': //yellow
                     indbuffer[0] = 3; //indicator 3
                     break;
                 default:
