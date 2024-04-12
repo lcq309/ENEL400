@@ -2,14 +2,26 @@
 - all devices on same channel are assumed to be relevant by input task, device specific has to decide what to discard on it's own
 - (may split into an additional task that handles searching the table and passing the index to the device specific, if it is found to be a point of slowdown)
 - two separate message buffers (one queue and one buffer), one from the pushbutton and other internal tasks (to prevent the MUTEX from interfering with the input task) and one from the comms input task
-- RS485 header changed to include an inbound/outbound segment, as well as a length byte instead of an end delimiter
+
+- RS485 header changed to include an inbound/outbound segment, we may need a source and destination wired address if we use the wired address for more than just differentiation of devices, as well as a length byte instead of an end delimiter
+
+wired address portion of the header is always the source address, there may need to be a way to track if multiple devices are on the same wired network or not, to avoid duplicate messages over a wired network. Wired address is not used for addressing, only for telling devices apart and for the round robin.
+
+Basically, the device will track responses from individual devices on a wired network, but it should only send a message to the network, instead of individual devices on the network, which will help reduce unnecessary network spam. Maybe there could be an additional check in the flags byte that marks a device as part of a wired network. (devices on a wired network will all have the same wireless address, so the message should only be sent if a response isn't received, only needs to send one). every time a new device is added to the table, the device specific task could check all other devices to see if any share the same wireless address, then mark the (wired network) flag. 
+Devices that are marked on a wireless network will only resend a message if no response is received, they will assume that a message has already been sent by the first device in the list.
+
+Device relevancy may be removed as a concept, with the device specific task just filtering for devices on the same channel. The device specific already reacts differently for different types of device, so it is unnecessary redundancy in message filtering.
+
+To simplify the Comms_in task (and allow it to always be free for receiving) the table processing could be moved to a separate task (basically the comms task would perform basic filtering, then pass it on to the table task to search and add the device to the table. This may also make it easier to change the comms task for different communications methods, but it will use more RAM overall and may have slightly more overhead. I think we will stick to table checks and addition in the comms task for now, but with a streamlined check process to ensure no slowdown occurs from that.
+
+
 
 controlling algorithms:
 - controllers will be aware of other controllers, and will coordinate to avoid accidentally overriding a safety level.
 - lights may not be aware of other lights (too many duplicate messages) but will have a lockout for yellow as well as red.
 - the red lockout can only be released by the stop buttons (must be unlatched?)
 - the yellow lockout can be released by the sending controller (or by any controller after all lights have confirmed for a few seconds and sender hasn't yet.)
-- 
+
 
 
 network recovery: (optional bonus)
