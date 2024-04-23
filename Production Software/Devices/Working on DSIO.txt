@@ -1,0 +1,8 @@
+Device Specific I/O should define:
+- Any tasks that relate to physical inputs and outputs
+- interrupts related to inputs and outputs (except for primary communications interrupts)
+- functions for toggling any inputs and outputs
+
+Task names should be related to their function.
+
+RS485TR needs to be defined in here for devices that are on the wired network

@@ -52,7 +52,8 @@
     </logicalFolder>
     <logicalFolder name="f3" displayName="Modular Tasks" projectFiles="true">
       <logicalFolder name="f1" displayName="Communications" projectFiles="true">
-        <itemPath>RS485TASKS.h</itemPath>
+        <itemPath>../../ModularTasks/Communications/RS485TASKS.c</itemPath>
+        <itemPath>../../ModularTasks/Communications/RS485TASKS.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
@@ -61,13 +62,14 @@
       <itemPath>main.c</itemPath>
       <itemPath>FreeRTOSConfig/FreeRTOSConfig.h</itemPath>
       <itemPath>clk_config.h</itemPath>
+      <itemPath>../../Drivers/DSIO.h</itemPath>
+      <itemPath>../../Drivers/DSIO.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>RS485TASKS.c</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../../Drivers</Elem>
@@ -127,7 +129,7 @@
         <property key="define-macros" value=""/>
         <property key="disable-optimizations" value="false"/>
         <property key="extra-include-directories"
-                  value="..\..\Drivers;..\..\FreeRTOS\include;FreeRTOSConfig;..\..\FreeRTOS\AVR_AVRDx"/>
+                  value="..\..\Drivers;..\..\FreeRTOS\include;FreeRTOSConfig;..\..\FreeRTOS\AVR_AVRDx;..\..\ModularTasks\Communications"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>

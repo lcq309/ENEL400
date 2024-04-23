@@ -26,3 +26,5 @@ flags have been removed, any tracking will have to be done internal to the devic
 might split input into two separate tasks, message construction and filtering. Not sure there would be a benefit to it, though, so maybe not for now.
 
 Is the USART0 mutex necessary for wired devices? I should investigate later.
+
+I can test by feeding a sample message into the software manually once it is ready to go.
