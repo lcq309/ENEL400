@@ -10,6 +10,9 @@
 
 void DSIOSetup()
 {
+    //485 R/W pin setup
+    PORTD.DIRSET = PIN7_bm;
+    
     //setup Queues
     
     xPB_Queue = xQueueCreate(3, sizeof(uint8_t)); //up to 3 button presses held
@@ -20,18 +23,54 @@ void DSIOSetup()
     
     xTaskCreate(dsIOInTask, "PBIN", 250, NULL, mainPBIN_TASK_PRIORITY, NULL);
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
+    
+    //setup timers
+    xPBTimer = xTimerCreate("PBT", 500, pdFALSE, 0, vPBTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    
+    //start the indicator timer
+    xTimerStart(xINDTimer, 0);
 }
 
 static void dsIOInTask (void * parameters)
 {
+    
+    uint8_t last = 0; //variable for software anti-spam
+    //initialize inputs
+    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm;
+    //Then I will set up the multi-configure register for port D.
+    PORTD.PINCONFIG = 0x3 | PORT_PULLUPEN_bm; //enable falling edge interrupt and pullup
+    //update configuration for selected pins
+    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm;
+            
     //for now, this just reads button presses with a half second debounce delay to avoid spam.
     //block until a button press occurs, then check anti spam timer and reset timer
-    
-    //wait for input
-    
-    //check timer if the button pressed was the same
-    
-    //send message to inter-task queue
+    //initialization complete, enter looping section.
+    uint8_t input[1];
+    uint8_t output[2] = {'P',0}; //P for pushbutton in intertask messages
+    for(;;)
+    {
+        //wait for input
+        xQueueReceive(xPB_Queue, input, portMAX_DELAY);
+        //check timer if the button pressed was the same
+        if((last == input[0]) && (xPBTimerSet == 1))
+        {
+            output[1] = input[0];
+            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
+            xPBTimerSet = 0;
+            xTimerReset(xPBTimer, portMAX_DELAY);
+        }
+        else if(last != input[0])
+        {
+            last = input[0];
+            output[1] = input[0];
+            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
+            xPBTimerSet = 0;
+            xTimerReset(xPBTimer, portMAX_DELAY);
+        }
+        
+        //send message to inter-task queue
+    }
     
 }
 
@@ -162,18 +201,32 @@ static void dsIOOutTask (void * parameters)
     }
 }
 
+//RS485 in/out
 void RS485TR(uint8_t dir)
 {
     //set transceiver direction
     switch(dir)
     {
         case 'T': //transmit
+            PORTD.DIRSET = PIN7_bm;
             break;
         case 'R': //receive
+            PORTD.DIRCLR = PIN7_bm;
             break;
         default: //incorrect command
             break;
     }
+}
+
+//timer callback functions
+void vPBTimerFunc( TimerHandle_t xTimer )
+{
+    xPBTimerSet = 1;
+}
+
+void vINDTimerFunc( TimerHandle_t xTimer )
+{
+    xINDTimerSet = 1;
 }
 
 void dsioGreenOn(void)
@@ -216,3 +269,30 @@ void dsioBlueTGL(void)
 }
 
 //interrupts go here
+
+ISR(PORTD_PORT_vect)
+{
+    /* PORTD interrupt:
+     * 1. check which line the interrupt is on
+     * 2. clear the interrupt
+     * 3. send the button colour to the button task
+     */
+    //1. check which pin the interrupt is on
+    uint8_t pb[1] = {0};
+    switch(PORTD.INTFLAGS)
+    {
+        case PIN6_bm: //button 1
+            PORTD.INTFLAGS = PIN6_bm; //reset interrupt
+            pb[0] = 'B';
+            break;
+        case PIN5_bm: //button 2
+            PORTD.INTFLAGS = PIN5_bm; //reset interrupt
+            pb[0] = 'Y';
+            break;
+        case PIN3_bm: //button 3
+            PORTD.INTFLAGS = PIN3_bm; //reset interrupt
+            pb[0] = 'G';
+            break;
+    }
+    xQueueSendToFrontFromISR(xPB_Queue, pb, NULL);
+}
