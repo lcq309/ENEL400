@@ -13,8 +13,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "event_groups.h"
-#include "stream_buffer.h"
-#include "message_buffer.h"
+#include "timers.h"
 
 #ifndef DSIO_H
 #define	DSIO_H
@@ -25,6 +24,16 @@ extern "C" {
 
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+    
+    //timer globals
+    
+    static uint8_t xPBTimerSet = 0;
+    static uint8_t xINDTimerSet = 0;
+    
+    //timer handles
+    
+    TimerHandle_t xPBTimer = NULL;
+    TimerHandle_t xINDTimer = NULL;
     
     //queue handles
 
@@ -41,12 +50,31 @@ extern "C" {
     
     //task setup function
     void DSIOSetup(void);
-
+    
+    //timer callback functions
+    void vPBTimerFunc( TimerHandle_t xTimer );
+    void vINDTimerFunc( TimerHandle_t xTimer ); 
+    
     /* RS 485 TR
      * Transceiver control function for transmit or receive.
      * 'T' should set the transceiver, 'R' should set the receiver.
      */
     void RS485TR(uint8_t dir);
+    
+    /* output indicator functions
+     * functions to toggle, turn on, or turn off the output indicators
+     */
+    void dsioGreenOn(void);
+    void dsioGreenOff(void);
+    void dsioGreenTGL(void);
+    
+    void dsioYellowOn(void);
+    void dsioYellowOff(void);
+    void dsioYellowTGL(void);
+    
+    void dsioYellowOn(void);
+    void dsioYellowOff(void);
+    void dsioYellowTGL(void);
     
 #ifdef	__cplusplus
 }

@@ -6,3 +6,6 @@ Device Specific I/O should define:
 Task names should be related to their function.
 
 RS485TR needs to be defined in here for devices that are on the wired network
+
+To coordinate flashing and blinking, I could use a software timer with a 50 tick period. flashing could toggle every 50ms, while blinking could toggle every 5 cycles.
+I could use a separate one-shot timer to provide software debouncing for inputs.
