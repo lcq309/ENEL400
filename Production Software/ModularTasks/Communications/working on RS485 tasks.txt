@@ -9,4 +9,20 @@ if multiple device specific tasks interact with it, they may require MUTEX acces
 INPUT task is still responsible for populating the device table, but can make use of a slightly more efficient sorting algorithm.
 OUTPUT task will now only send to a specific index entry, device specific task is responsible for pointing out correct indexes of destination devices.
 
-a specific command is responsible for telling the output task to send out the network join message, this way it can be sent more than once.
+a specific command is responsible for telling the output task to send out the network join message, this way it can be sent more than once easily.
+
+The rs485 output could be constantly adding messages to the output buffer. Care will be needed with the device specific tasks to avoid duplicate messages. (i.e, 1 second delay between repeat commands)
+
+wired header:
+
+{(start), (length), (direction/type), (sender wired address), (channel), (sender device type), (contextual wireless address), (message)}
+
+network join message is just this, but with broadcast xbee address and output with no message.
+
+device table:
+flags have been removed, any tracking will have to be done internal to the device specific task
+{(wireless address), (wired address), (channel), (device type)}
+
+might split input into two separate tasks, message construction and filtering. Not sure there would be a benefit to it, though, so maybe not for now.
+
+Is the USART0 mutex necessary for wired devices? I should investigate later.
