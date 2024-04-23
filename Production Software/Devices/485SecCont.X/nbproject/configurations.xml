@@ -1,28 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="65">
   <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="f1" displayName="Drivers" projectFiles="true">
+      <itemPath>../../Drivers/USART.c</itemPath>
+      <itemPath>../../Drivers/USART.h</itemPath>
+      <itemPath>../../Drivers/ShiftReg.c</itemPath>
+      <itemPath>../../Drivers/ShiftReg.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f2" displayName="FreeRTOS" projectFiles="true">
+      <logicalFolder name="f1" displayName="AVR_AVRDx" projectFiles="true">
+        <itemPath>../../FreeRTOS/AVR_AVRDx/port.c</itemPath>
+        <itemPath>../../FreeRTOS/AVR_AVRDx/porthardware.h</itemPath>
+        <itemPath>../../FreeRTOS/AVR_AVRDx/portmacro.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="Include" projectFiles="true">
+        <itemPath>../../FreeRTOS/include/FreeRTOS.h</itemPath>
+        <itemPath>../../FreeRTOS/include/StackMacros.h</itemPath>
+        <itemPath>../../FreeRTOS/include/atomic.h</itemPath>
+        <itemPath>../../FreeRTOS/include/croutine.h</itemPath>
+        <itemPath>../../FreeRTOS/include/deprecated_definitions.h</itemPath>
+        <itemPath>../../FreeRTOS/include/event_groups.h</itemPath>
+        <itemPath>../../FreeRTOS/include/list.h</itemPath>
+        <itemPath>../../FreeRTOS/include/message_buffer.h</itemPath>
+        <itemPath>../../FreeRTOS/include/mpu_prototypes.h</itemPath>
+        <itemPath>../../FreeRTOS/include/mpu_wrappers.h</itemPath>
+        <itemPath>../../FreeRTOS/include/portable.h</itemPath>
+        <itemPath>../../FreeRTOS/include/projdefs.h</itemPath>
+        <itemPath>../../FreeRTOS/include/queue.h</itemPath>
+        <itemPath>../../FreeRTOS/include/semphr.h</itemPath>
+        <itemPath>../../FreeRTOS/include/stack_macros.h</itemPath>
+        <itemPath>../../FreeRTOS/include/stdint.readme</itemPath>
+        <itemPath>../../FreeRTOS/include/stream_buffer.h</itemPath>
+        <itemPath>../../FreeRTOS/include/task.h</itemPath>
+        <itemPath>../../FreeRTOS/include/timers.h</itemPath>
+      </logicalFolder>
+      <itemPath>../../FreeRTOS/event_groups.c</itemPath>
+      <itemPath>../../FreeRTOS/heap_1.c</itemPath>
+      <itemPath>../../FreeRTOS/list.c</itemPath>
+      <itemPath>../../FreeRTOS/queue.c</itemPath>
+      <itemPath>../../FreeRTOS/stream_buffer.c</itemPath>
+      <itemPath>../../FreeRTOS/tasks.c</itemPath>
+      <itemPath>../../FreeRTOS/timers.c</itemPath>
+    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>USART.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
     </logicalFolder>
+    <logicalFolder name="f3" displayName="Modular Tasks" projectFiles="true">
+      <logicalFolder name="f1" displayName="Communications" projectFiles="true">
+        <itemPath>RS485TASKS.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
-      <itemPath>USART.c</itemPath>
+      <itemPath>FreeRTOSConfig/FreeRTOSConfig.h</itemPath>
+      <itemPath>clk_config.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>RS485TASKS.c</itemPath>
   </logicalFolder>
   <sourceRootList>
+    <Elem>../../Drivers</Elem>
+    <Elem>../../FreeRTOS</Elem>
+    <Elem>../../ModularTasks/Communications</Elem>
     <Elem>.</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
@@ -33,7 +83,7 @@
         <targetDevice>AVR128DA28</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PK5Tool</platformTool>
+        <platformTool>noID</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>2.45</languageToolchainVersion>
         <platform>3</platform>
@@ -76,7 +126,8 @@
         <property key="default-char-type" value="true"/>
         <property key="define-macros" value=""/>
         <property key="disable-optimizations" value="false"/>
-        <property key="extra-include-directories" value=""/>
+        <property key="extra-include-directories"
+                  value="..\..\Drivers;..\..\FreeRTOS\include;FreeRTOSConfig;..\..\FreeRTOS\AVR_AVRDx"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
@@ -148,128 +199,6 @@
         <property key="program-the-device-with-default-config-words" value="false"/>
         <property key="remove-unused-sections" value="true"/>
       </HI-TECH-LINK>
-      <PK5Tool>
-        <property key="AutoSelectMemRanges" value="auto"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
-        <property key="ToolFirmwareFilePath"
-                  value="Press to browse for a specific firmware version"/>
-        <property key="ToolFirmwareOption.UpdateOptions"
-                  value="ToolFirmwareOption.UseLatest"/>
-        <property key="ToolFirmwareToolPack"
-                  value="Press to select which tool pack to use"/>
-        <property key="communication.activationmode" value="nohv"/>
-        <property key="communication.interface" value="updi"/>
-        <property key="communication.interface.jtag" value="2wire"/>
-        <property key="communication.speed" value="0.500"/>
-        <property key="debugoptions.debug-startup" value="Use system settings"/>
-        <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
-        <property key="event.recorder.enabled" value="false"/>
-        <property key="event.recorder.scvd.files" value=""/>
-        <property key="hwtoolclock.frcindebug" value="false"/>
-        <property key="lastid" value=""/>
-        <property key="memories.aux" value="false"/>
-        <property key="memories.bootflash" value="true"/>
-        <property key="memories.configurationmemory" value="true"/>
-        <property key="memories.configurationmemory2" value="true"/>
-        <property key="memories.dataflash" value="true"/>
-        <property key="memories.eeprom" value="true"/>
-        <property key="memories.exclude.configurationmemory" value="true"/>
-        <property key="memories.flashdata" value="true"/>
-        <property key="memories.id" value="true"/>
-        <property key="memories.instruction.ram.ranges"
-                  value="${memories.instruction.ram.ranges}"/>
-        <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="true"/>
-        <property key="programmerToGoImageName" value="Marshal_ptg"/>
-        <property key="programoptions.donoteraseauxmem" value="false"/>
-        <property key="programoptions.eraseb4program" value="true"/>
-        <property key="programoptions.ledbrightness" value="5"/>
-        <property key="programoptions.pgcconfig" value="pull down"/>
-        <property key="programoptions.pgcresistor.value" value="4.7"/>
-        <property key="programoptions.pgdconfig" value="pull down"/>
-        <property key="programoptions.pgdresistor.value" value="4.7"/>
-        <property key="programoptions.pgmentry.voltage" value="low"/>
-        <property key="programoptions.pgmspeed" value="Med"/>
-        <property key="programoptions.preservedataflash" value="false"/>
-        <property key="programoptions.preserveeeprom" value="false"/>
-        <property key="programoptions.preserveeeprom.ranges" value="1400-15ff"/>
-        <property key="programoptions.preserveprogram.ranges" value=""/>
-        <property key="programoptions.preserveprogramrange" value="false"/>
-        <property key="programoptions.preserveuserid" value="false"/>
-        <property key="programoptions.programcalmem" value="false"/>
-        <property key="programoptions.programuserotp" value="false"/>
-        <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
-        <property key="ptgProgramImage" value="true"/>
-        <property key="ptgSendImage" value="true"/>
-        <property key="toolpack.updateoptions"
-                  value="toolpack.updateoptions.uselatestoolpack"/>
-        <property key="toolpack.updateoptions.packversion"
-                  value="Press to select which tool pack to use"/>
-        <property key="voltagevalue" value="3.3"/>
-      </PK5Tool>
-      <Tool>
-        <property key="AutoSelectMemRanges" value="auto"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
-        <property key="ToolFirmwareFilePath"
-                  value="Press to browse for a specific firmware version"/>
-        <property key="ToolFirmwareOption.UpdateOptions"
-                  value="ToolFirmwareOption.UseLatest"/>
-        <property key="ToolFirmwareToolPack"
-                  value="Press to select which tool pack to use"/>
-        <property key="communication.activationmode" value="nohv"/>
-        <property key="communication.interface" value="updi"/>
-        <property key="communication.interface.jtag" value="2wire"/>
-        <property key="communication.speed" value="0.500"/>
-        <property key="debugoptions.debug-startup" value="Use system settings"/>
-        <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
-        <property key="event.recorder.enabled" value="false"/>
-        <property key="event.recorder.scvd.files" value=""/>
-        <property key="hwtoolclock.frcindebug" value="false"/>
-        <property key="lastid" value=""/>
-        <property key="memories.aux" value="false"/>
-        <property key="memories.bootflash" value="true"/>
-        <property key="memories.configurationmemory" value="true"/>
-        <property key="memories.configurationmemory2" value="true"/>
-        <property key="memories.dataflash" value="true"/>
-        <property key="memories.eeprom" value="true"/>
-        <property key="memories.exclude.configurationmemory" value="true"/>
-        <property key="memories.flashdata" value="true"/>
-        <property key="memories.id" value="true"/>
-        <property key="memories.instruction.ram.ranges"
-                  value="${memories.instruction.ram.ranges}"/>
-        <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="true"/>
-        <property key="programmerToGoImageName" value="Marshal_ptg"/>
-        <property key="programoptions.donoteraseauxmem" value="false"/>
-        <property key="programoptions.eraseb4program" value="true"/>
-        <property key="programoptions.ledbrightness" value="5"/>
-        <property key="programoptions.pgcconfig" value="pull down"/>
-        <property key="programoptions.pgcresistor.value" value="4.7"/>
-        <property key="programoptions.pgdconfig" value="pull down"/>
-        <property key="programoptions.pgdresistor.value" value="4.7"/>
-        <property key="programoptions.pgmentry.voltage" value="low"/>
-        <property key="programoptions.pgmspeed" value="Med"/>
-        <property key="programoptions.preservedataflash" value="false"/>
-        <property key="programoptions.preserveeeprom" value="false"/>
-        <property key="programoptions.preserveeeprom.ranges" value="1400-15ff"/>
-        <property key="programoptions.preserveprogram.ranges" value=""/>
-        <property key="programoptions.preserveprogramrange" value="false"/>
-        <property key="programoptions.preserveuserid" value="false"/>
-        <property key="programoptions.programcalmem" value="false"/>
-        <property key="programoptions.programuserotp" value="false"/>
-        <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
-        <property key="ptgProgramImage" value="true"/>
-        <property key="ptgSendImage" value="true"/>
-        <property key="toolpack.updateoptions"
-                  value="toolpack.updateoptions.uselatestoolpack"/>
-        <property key="toolpack.updateoptions.packversion"
-                  value="Press to select which tool pack to use"/>
-        <property key="voltagevalue" value="3.3"/>
-      </Tool>
       <XC8-CO>
         <property key="coverage-enable" value=""/>
         <property key="stack-guidance" value="false"/>

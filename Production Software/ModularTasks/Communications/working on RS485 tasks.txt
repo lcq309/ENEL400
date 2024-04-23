@@ -1,0 +1,12 @@
+To keep things moving smoothly, the RS485 tasks will not block for any MUTEXes (except the USART MUTEX), this is to ensure that the communications loop is not broken, and could be adopted for all communications code.
+
+To facilitate this, The device_specific message buffer is to be used only for external communications, so a MUTEX is not needed.
+Internal communications (button press, etc.) will use a separate buffer.
+
+The device table should not need MUTEX protection from these, as the parts they interact with should not change in a way that breaks the system.
+if multiple device specific tasks interact with it, they may require MUTEX access. Device relevance is removed as a concept, the comms task will assume a device is relevant on the same channel and pass it to the device specific task which will then filter it.
+
+INPUT task is still responsible for populating the device table, but can make use of a slightly more efficient sorting algorithm.
+OUTPUT task will now only send to a specific index entry, device specific task is responsible for pointing out correct indexes of destination devices.
+
+a specific command is responsible for telling the output task to send out the network join message, this way it can be sent more than once.
