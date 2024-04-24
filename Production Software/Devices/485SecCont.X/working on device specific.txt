@@ -1,0 +1,49 @@
+The device specific main.c is responsible for providing the main running task, as well as the initialization task for devices that need to be initialized with the scheduler running.
+
+network initialization will involve a few steps:
+1. on boot, all devices perform their internal initialization and any diagnostics that they can
+2. after a short delay to allow all devices time to initialize, the coordinator sends out pings to all devices on the wired bus sequentially.
+3. the devices respond with the generic ping response and unlock any tasks waiting for initialization.
+4. after constructing the round robin table, the coordinator begins sending out sequential round robin pings to all devices that responded.
+
+the initialization task should do something to show that the device is on, like flashing an indicator.
+
+the controller task should be capable of:
+- forming a table of controllers and lights on the same network
+- the messages sent to each is identical, but the way they respond to it changes.
+
+A controller receiving a message from another controller will:
+- yield (stop trying to change light colours) if the controller is sending a command of a higher priority level
+& acknowledge (respond to the controller with the new colour) & set its internal lockout to prevent any lower priority input until released.
+
+A controller receiving a message from a light will:
+- mark the light as confirmed, if this is a confirmation response.
+- check lockout and colour status, if the message is a warning.
+- blink the corresponding indicator, if the message is an error or failure message.
+
+once all lights are confirmed:
+for green and blue, the controller will light the indicators (blue will flash for a few seconds then return to green) and blank all other indicators.
+for yellow, the controller will light the indicator and send the lockout release byte (with a delay if this wasn't the sending controller and hasn't been released yet).
+for red, the controller will start blinking all indicators.
+for off, the controller will turn off all light indicators.
+
+Green and Blue:
+Blue will always return to green after a few seconds, and blue is a somewhat lower priority signal, so don't resend more than once.
+and once confirmed, assume that the lights will return to green after (lights will confirm with blue, then green). Controller will flash blue, then return to green once confirmed.
+
+Yellow:
+Once yellow is received, lights and controller will set a yellow lockout that can only be released by either the release signal, or by the colour red which will override this lockout.
+The release command will be 2 bytes, "C" "Y" for clear yellow, and "C" "R" for clear red.
+
+Clear Yellow can be sent by any controller, but they will wait a few seconds for the initiating controller before taking over (not yet implemented).
+
+Red:
+once red is received, lights and controllers will override any other lockouts, and set the red lockout. This lockout can only be released from one of the stop buttons by releasing the switch.
+
+Off:
+The off command is only sent from the director's controllers, and should be considered the lowest priority colour. Any lockouts will need to be released before a light responds to an off command.
+
+colour change operation:
+when a colour change is requested, and in progress. Flash the colours that the controller is trying to change between.
+if there is still an active lockout when trying to change colours, flash the lockout colour.
+

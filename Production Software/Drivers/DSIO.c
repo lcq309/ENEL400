@@ -100,7 +100,7 @@ static void dsIOOutTask (void * parameters)
         //first, check for commands from other tasks (hold for 50ms)
         if(xQueueReceive(xIND_Queue, received, 50) == pdTRUE)
         {
-        switch(received[0]) //first check is the intended target
+        switch(received[0]) //first check the intended target
         {
             case 0x0: //do nothing/no target
                 break;

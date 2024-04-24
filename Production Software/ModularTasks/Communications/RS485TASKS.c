@@ -33,6 +33,10 @@ void COMMSetup()
     
     xTaskCreate(modCOMMOutTask, "COMMOUT", (MAX_MESSAGE_SIZE + 300), NULL, mainCOMMOUT_TASK_PRIORITY, NULL);
     xTaskCreate(modCOMMInTask, "COMMIN", 400, NULL, mainCOMMIN_TASK_PRIORITY, NULL);
+    
+    //initialize USART0
+    
+    USART0_init();
 }
 
 static void modCOMMOutTask (void * parameters)

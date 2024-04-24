@@ -1,0 +1,6 @@
+Device Types:
+
+'1' Generic sector controller: wired sector controllers
+'2' Generic sector controller: wireless marshal controller
+'3' generic sector light: wired light
+'4' generic sector light: wireless light

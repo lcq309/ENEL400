@@ -16,6 +16,7 @@
 #include "stream_buffer.h"
 #include "message_buffer.h"
 #include "DSIO.h"
+#include "USART.h"
 
 #ifndef RS485TASKS_H
 #define	RS485TASKS_H
