@@ -700,15 +700,15 @@ void prvWSCTask( void * parameters )
                 if(Requester == 1)
                 {
                     //check lights and other controllers
-                }
-                else //only check lights
-                {
                     
+                    //check retransmission timers if needed and retransmit
                 }
-            }
-            //check retransmission timers if needed and retransmit
-            if(colour_cur != colour_req)
-            {
+                else 
+                {
+                    //only check lights
+                    
+                    //check retransmission timers if needed and retransmit
+                }
                 
             }
             //update indicators if needed
