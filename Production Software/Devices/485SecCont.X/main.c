@@ -502,12 +502,28 @@ void prvWSCTask( void * parameters )
                                 case 'B': //clear blue lockout, clear and confirm by sending 'c' 'b' in response
                                     switch(lockout)
                                     {
-                                        case 'B': //clear the blue lockout and confirm clearance.
-                                            lockout = 'C';
+                                        case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
-                                            buffer[1] = 'b';
-                                            buffer[2] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                        case 'B': //clear the blue lockout and confirm clearance.
+                                            if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
+                                                lockout = 'B';
+                                            else
+                                            {
+                                                lockout = 'C';
+                                                colour_cur = 'B';
+                                            }
+                                            buffer[0] = 'c';
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                            
+                                        case 'b': //we are working on clearing lights, just confirm clearance.
+                                            buffer[0] = 'c';
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                             
                                         default: //just ignore anything else for now
@@ -518,12 +534,29 @@ void prvWSCTask( void * parameters )
                                 case 'Y': //clear yellow lockout, clear and confirm by sending 'c' 'y' in response
                                     switch(lockout)
                                     {
-                                        case 'Y': //clear the yellow lockout and confirm clearance.
-                                            lockout = 'C';
+                                            case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
-                                            buffer[1] = 'y';
-                                            buffer[2] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                            
+                                        case 'Y': //clear the yellow lockout and confirm clearance.
+                                            if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
+                                                lockout = 'Y';
+                                            else    //if we are not responsible for releasing lights, assume all lights are the correct colour
+                                            {
+                                                lockout = 'C';
+                                                colour_cur = 'Y';
+                                            }
+                                            buffer[0] = 'c';
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                            
+                                        case 'y': //we are working on clearing lights, just confirm clearance.
+                                            buffer[0] = 'c';
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                             
                                         default: //just ignore anything else for now
@@ -534,12 +567,29 @@ void prvWSCTask( void * parameters )
                                 case 'G': //clear green lockout, clear and confirm by sending 'c' 'g' in response
                                     switch(lockout)
                                     {
-                                        case 'G': //clear the yellow lockout and confirm clearance.
-                                            lockout = 'C';
+                                        case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
-                                            buffer[1] = 'g';
-                                            buffer[2] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                            
+                                        case 'G': //clear the yellow lockout and confirm clearance.
+                                            if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
+                                                lockout = 'G';
+                                            else
+                                            {
+                                                lockout = 'C';
+                                                colour_cur = 'G';
+                                            }
+                                            buffer[0] = 'c';
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                            
+                                        case 'g': //we are working on clearing lights, just confirm clearance.
+                                            buffer[0] = 'c';
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                             
                                         default: //just ignore anything else for now
@@ -551,30 +601,125 @@ void prvWSCTask( void * parameters )
                             break;
                             
                         case 'c': //clearance confirmation, only relevant to requester 1 devices update status.
+                            ControllerTable[tablePos].status = 'C'; //mark device as cleared
                             break;
-                        default:
+                        default: //can put an error message here, for incorrect command.
                             break;
                     }
                 }
                 break;
                 
                 case 'L': //light device, should only ever be confirming colours or giving an error response (not yet implemented)
+                    //just mark starus as confirmed
+                    //first check if on the table, add if not
+                    for(uint8_t i = 0; i < numLights; i++)
+                    {
+                        if(LightTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numLights;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        LightTable[numLights].index = buffer[0];
+                        tablePos = numLights;
+                        numLights++;
+                    }
+                    //Light device should now be on the table
+                    switch(buffer[1])
+                    {
+                        case 'E': //Error messages?
+                            break;
+                            
+                        default: //anything else should just be state confirmations
+                            LightTable[tablePos].status = (buffer[1] - 32); //subtract 32 to get uppercase letter
+                            break;
+                    }
                     break;
                     
-                case 'S': //special device, stop button and etc.
+                case 'S': //special device, stop button and etc. we are always subordinate
+                    //check table and add if needed
+                    for(uint8_t i = 0; i < numSpecials; i++)
+                    {
+                        if(SpecialTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numSpecials;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        SpecialTable[numSpecials].index = buffer[0];
+                        tablePos = numSpecials;
+                        numSpecials++;
+                    }
+                    switch(buffer[1])
+                    {
+                        case 'R': //red request, we are required to turn red
+                            lockout = 'R'; //can only be released by Stop button
+                            colour_req = 'R';
+                            Requester = 2;
+                            buffer[0] = 'r'; //confirm red
+                            buffer[1] = SpecialTable[tablePos].index;
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            break;
+                            
+                        case 'Y': //will send yellow when the stop command has been cleared
+                            //overrides any normal colour change logic, will be released by the stop button
+                            lockout = 'Y';
+                            colour_req = 'Y';
+                            Requester = 2;
+                            buffer[0] = 'y'; //confirm yellow
+                            buffer[1] = SpecialTable[tablePos].index;
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            break;
+                            
+                        case 'O': //off command, overrides any normal colour change logic
+                            lockout = 'C';
+                            colour_req = 'O';
+                            Requester = 2;
+                            buffer[0] = 'o'; //confirm off
+                            buffer[1] = SpecialTable[tablePos].index;
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            break;
+                    }
                     break;
                     
-                case 'M': //menu
+                case 'M': //menu (to be implemented)
+                    
                     break;
             }
             //message processing now complete, check the status of any colour change request
-            
-            //check retransmission timers if still needed
-            
-            //retransmit messages
-            
+            //if all colours are matching colour_req, then change colour_cur into colour_req
+            if(colour_cur != colour_req)
+            {
+                //how this acts depends on if it is a requester 1 or 2
+                if(Requester == 1)
+                {
+                    //check lights and other controllers
+                }
+                else //only check lights
+                {
+                    
+                }
+            }
+            //check retransmission timers if needed and retransmit
+            if(colour_cur != colour_req)
+            {
+                
+            }
             //update indicators if needed
-            
+            if(colour_cur != colour_req)
+            {
+                //set both to flash
+            }
+            else if(colour_cur == colour_req)
+            {
+                //set solid
+            }
             //loop and restart
         }
     }

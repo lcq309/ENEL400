@@ -66,9 +66,11 @@ Requester 1 can only be set by buttons (or failover functionality if implemented
 Requester 2 is set when a colour change is requested by another controller, this controller will help change light colours until released by the initial controller.
 Requester 0 is set once the controller is released by another controller, or has confirmed the lockout conditions and released all controllers.
 
-Requester 2 is released when the lockout is cleared.
+Requester 2 sends command messages to lights, as they are only reactive.
+
+Requester 2 is released when the lockout is cleared by Requester 1.
 Requester 1 is released once all lights and controllers have confirmed the lockout release.
-- Requester 1 won't release controllers until all lights have confirmed lockout release, to prevent light confusion.
+- Requester 1 won't release lights until all controllers have confirmed lockout release, to prevent controller confusion
 
 Requester 2 sets colour_cur once all lights have confirmed.
 Requester 1 sets colour_cur once all lights and subordinate controllers have confirmed.
@@ -95,8 +97,17 @@ lockout = Y, Colour_cur = G, Colour_req = Y means not all devices have confirmed
 
 lockout = Y, Colour_cur = Y, Colour_req = Y means all devices have confirmed the change, and we can start releasing lights.
 
-lockout = y, Colour_cur = Y, Colour_req = Y means all lights have confirmed the lockout release. We can start releasing controllers.
+lockout = y, Colour_cur = Y, Colour_req = Y means all controllers have confirmed the lockout release. We can start releasing lights.
 
 lockout = C, Colour_cur = Y, Colour_req = Y means all lights and controllers have confirmed, we can return to Requester 0.
 
-lockout release response should be 'c' 'colour', and will respond in either a colour lockout, or no lockout to help confirm the state if a message gets lost.
+lockout release response should be 'c' "clear confirm", and will respond in either a colour lockout, or no lockout to help confirm the state if a message gets lost.
+
+Colour check will take two main paths depending on the Requester level of the controller.
+
+For Requester 1, it will check the status of the other controllers as well as the lights. And if it is time to retransmit, it will queue up the messages and reset the timer
+
+For Requester 2, it will only check the status of the lights.
+
+Indicator settings will always send a command to the indicator task, if colour_cur and colour_req are different, it will flash to indicate processing a colour change operation.
+Otherwise, it if colour_cur and colour_req are the same, it will set colour_cur to solid.
