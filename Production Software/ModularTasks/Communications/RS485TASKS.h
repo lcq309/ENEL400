@@ -15,7 +15,6 @@
 #include "event_groups.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
-#include "DSIO.h"
 #include "USART.h"
 
 #ifndef RS485TASKS_H
@@ -31,7 +30,7 @@ extern "C" {
     #define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
     #define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
     
-    static uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
+    extern uint8_t GLOBAL_TableLength; //increments as new entries are added to the table
 
     struct Device {
     uint8_t XBeeADD[8];
@@ -40,7 +39,7 @@ extern "C" {
     uint8_t Type;
 };
 
-    static struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device table
+    extern struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device table
     
     //External Globals
     extern uint8_t GLOBAL_DeviceID;
@@ -49,25 +48,25 @@ extern "C" {
     
     //MUTEXes
     
-    static SemaphoreHandle_t xUSART0_MUTEX = NULL;
+    extern SemaphoreHandle_t xUSART0_MUTEX;
     
     //Semaphores
-    static SemaphoreHandle_t xPermission = NULL; //task notification replacement
-    static SemaphoreHandle_t xTXC = NULL;
+    extern SemaphoreHandle_t xPermission; //task notification replacement
+    extern SemaphoreHandle_t xTXC;
     
     //Event Groups
-    static EventGroupHandle_t xEventInit = NULL;
+    extern EventGroupHandle_t xEventInit;
     
     //stream handles (note device buffer is externally defined in device specific)
 
-    static StreamBufferHandle_t xCOMM_in_Stream = NULL;
-    static StreamBufferHandle_t xCOMM_out_Stream = NULL;
-    static MessageBufferHandle_t xCOMM_out_Buffer = NULL;
-    extern MessageBufferHandle_t xDevice_Buffer = NULL;
+    extern StreamBufferHandle_t xCOMM_in_Stream;
+    extern StreamBufferHandle_t xCOMM_out_Stream;
+    extern MessageBufferHandle_t xCOMM_out_Buffer;
+    extern MessageBufferHandle_t xDevice_Buffer;
     
     //task definition
-    static void modCOMMOutTask ( void *parameters );
-    static void modCOMMInTask ( void *parameters );
+    void modCOMMOutTask ( void *parameters );
+    void modCOMMInTask ( void *parameters );
     
     //task setup function
     void COMMSetup(void);

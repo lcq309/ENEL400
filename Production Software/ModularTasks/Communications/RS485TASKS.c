@@ -7,6 +7,27 @@
  */
 
 #include "RS485TASKS.h"
+    struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE];
+    
+    uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
+    
+    //MUTEXes
+    
+    SemaphoreHandle_t xUSART0_MUTEX;
+    
+    //Semaphores
+    SemaphoreHandle_t xPermission; //task notification replacement
+    SemaphoreHandle_t xTXC;
+    
+    //Event Groups
+    EventGroupHandle_t xEventInit;
+    
+    //stream handles (note device buffer is externally defined in device specific)
+
+    StreamBufferHandle_t xCOMM_in_Stream;
+    StreamBufferHandle_t xCOMM_out_Stream;
+    MessageBufferHandle_t xCOMM_out_Buffer;
+    MessageBufferHandle_t xDevice_Buffer;
 
 void COMMSetup()
 {
@@ -39,7 +60,7 @@ void COMMSetup()
     USART0_init();
 }
 
-static void modCOMMOutTask (void * parameters)
+void modCOMMOutTask (void * parameters)
 {
     /* RS 485 out handling
      * wait for initialization to complete
@@ -72,7 +93,7 @@ static void modCOMMOutTask (void * parameters)
     {
     //loop through messages, stop looping when out of messages to send.
     do {
-        size = xMessageBufferReceive(xRS485_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
+        size = xMessageBufferReceive(xCOMM_out_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         //check index
         if((buffer[0] == 0xff) && (size != 0)) //if network generation message requested, load the join message into the output stream
         {
@@ -125,7 +146,7 @@ static void modCOMMOutTask (void * parameters)
     }
 }
 
-static void modCOMMInTask (void * parameters)
+void modCOMMInTask (void * parameters)
 {
     /* RS 485 in handling
      * wait for initialization
@@ -150,7 +171,7 @@ static void modCOMMInTask (void * parameters)
         xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
         if(byte_buffer[0] == 0x7E)
         {
-            uint8_t pos = 0;
+            pos = 0;
             //next byte is length, grab length for message construction loop
             xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
             length = byte_buffer[0]; // load loop iterator

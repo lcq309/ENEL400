@@ -77,7 +77,7 @@ For other frequency values, update clock_config.h with your own settings */
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION 0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configTOTAL_HEAP_SIZE 0x3000
+#define configTOTAL_HEAP_SIZE 0x2000
 #define configAPPLICATION_ALLOCATED_HEAP 0
 
 /* Hook function related definitions. */

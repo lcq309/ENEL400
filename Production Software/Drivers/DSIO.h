@@ -27,26 +27,26 @@ extern "C" {
     
     //timer globals
     
-    static uint8_t xPBTimerSet = 0;
-    static uint8_t xINDTimerSet = 0;
+    extern uint8_t xPBTimerSet;
+    extern uint8_t xINDTimerSet;
     
     //timer handles
     
-    TimerHandle_t xPBTimer = NULL;
-    TimerHandle_t xINDTimer = NULL;
+    extern TimerHandle_t xPBTimer;
+    extern TimerHandle_t xINDTimer;
     
     //queue handles
 
-    static QueueHandle_t xPB_Queue = NULL;
-    static QueueHandle_t xIND_Queue = NULL;
-    static QueueHandle_t xDeviceIN_Queue = NULL;
+    extern QueueHandle_t xPB_Queue;
+    extern QueueHandle_t xIND_Queue;
+    extern QueueHandle_t xDeviceIN_Queue;
     
     //Event Groups
-    extern EventGroupHandle_t xEventInit = NULL;
+    extern EventGroupHandle_t xEventInit;
 
     //Task Definition
-    static void dsIOInTask ( void * parameters );
-    static void dsIOOutTask ( void * parameters );
+    void dsIOInTask ( void * parameters );
+    void dsIOOutTask ( void * parameters );
     
     //task setup function
     void DSIOSetup(void);
@@ -72,9 +72,9 @@ extern "C" {
     void dsioYellowOff(void);
     void dsioYellowTGL(void);
     
-    void dsioYellowOn(void);
-    void dsioYellowOff(void);
-    void dsioYellowTGL(void);
+    void dsioBlueOn(void);
+    void dsioBlueOff(void);
+    void dsioBlueTGL(void);
     
 #ifdef	__cplusplus
 }

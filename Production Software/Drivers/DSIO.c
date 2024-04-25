@@ -7,7 +7,22 @@
  */
 
 #include "DSIO.h"
+//timer globals
+    
+    uint8_t xPBTimerSet;
+    uint8_t xINDTimerSet;
+    
+    //timer handles
+    
+    TimerHandle_t xPBTimer;
+    TimerHandle_t xINDTimer;
+    
+    //queue handles
 
+    QueueHandle_t xPB_Queue;
+    QueueHandle_t xIND_Queue;
+    QueueHandle_t xDeviceIN_Queue;
+    
 void DSIOSetup()
 {
     //485 R/W pin setup
@@ -32,7 +47,7 @@ void DSIOSetup()
     xTimerStart(xINDTimer, 0);
 }
 
-static void dsIOInTask (void * parameters)
+void dsIOInTask (void * parameters)
 {
     
     uint8_t last = 0; //variable for software anti-spam
@@ -74,7 +89,7 @@ static void dsIOInTask (void * parameters)
     
 }
 
-static void dsIOOutTask (void * parameters)
+void dsIOOutTask (void * parameters)
 {
     //blink, flash, solid, etc.
     //this controls the three indicators on the console

@@ -31,9 +31,13 @@ Green and Blue:
 Blue will always return to green after a few seconds, and blue is a somewhat lower priority signal, so don't resend more than once.
 and once confirmed, assume that the lights will return to green after (lights will confirm with blue, then green). Controller will flash blue, then return to green once confirmed.
 
+Green lockout:
+All lights must confirm green before blue can be issued.
+
 Yellow:
 Once yellow is received, lights and controller will set a yellow lockout that can only be released by either the release signal, or by the colour red which will override this lockout.
 The release command will be 2 bytes, "C" "Y" for clear yellow, and "C" "R" for clear red.
+if a clear command has been received, but not all lights are confirmed for a controller, it will stop sending commands to other controllers
 
 Clear Yellow can be sent by any controller, but they will wait a few seconds for the initiating controller before taking over (not yet implemented).
 
@@ -47,3 +51,52 @@ colour change operation:
 when a colour change is requested, and in progress. Flash the colours that the controller is trying to change between.
 if there is still an active lockout when trying to change colours, flash the lockout colour.
 
+in general, controllers will track light colour, but will only set requested colour when instructed by another controller.
+This way, if messages from lights arrive before a message from a controller, it will still track that message when processing the colour change.
+
+I may implement failover controller functionality later, after ensuring the communications algorithm works.
+failover can include yellow/green lockout override after a timeout.
+
+Requester 1 means this device is a requesting device, and will tell other controllers as well as lights.
+Requester 2 means this device is a helping device, and will only tell lights to avoid controllers repeat locking.
+Requester 2 will only confirm when requested by a requester 1 to minimize unnecessary traffic.
+Requester 0 means this device is idle, and will respond as though another controller is requester 1.
+
+Requester 1 can only be set by buttons (or failover functionality if implemented).
+Requester 2 is set when a colour change is requested by another controller, this controller will help change light colours until released by the initial controller.
+Requester 0 is set once the controller is released by another controller, or has confirmed the lockout conditions and released all controllers.
+
+Requester 2 is released when the lockout is cleared.
+Requester 1 is released once all lights and controllers have confirmed the lockout release.
+- Requester 1 won't release controllers until all lights have confirmed lockout release, to prevent light confusion.
+
+Requester 2 sets colour_cur once all lights have confirmed.
+Requester 1 sets colour_cur once all lights and subordinate controllers have confirmed.
+
+Requester 2 should use a special character when responding to ensure that a loop doesn't occur between two subordinates.
+This character could be the lowercase letter so that controllers can differentiate between Requester 1 and 2.
+
+if there are multiple Requester 1's, they will release each other once all devices have confirmed colour anyways.
+
+for example:
+
+Controller A is trying to turn the network blue, it sends B to all controllers and lights and is designated as Requester 1.
+if Controller B also tries to turn the network blue before becoming a subordinate, they will both be Requester 1.
+They will see eachother as requester 1 anyways and should be able to avoid a locking situation by confirming with each other.
+
+
+for Requester 1, an uppercase status character means the colour is confirmed, but the lockout release has not been confirmed yet.
+while a lowercase means that the lockout release has been confirmed. This naming scheme can also follow for Colour_cur and Colour_req
+
+Requester 1 can also use the lockout variable to provide confirmation once all lights have locked out, so it can move on to releasing controllers.
+I.E.
+
+lockout = Y, Colour_cur = G, Colour_req = Y means not all devices have confirmed yet.
+
+lockout = Y, Colour_cur = Y, Colour_req = Y means all devices have confirmed the change, and we can start releasing lights.
+
+lockout = y, Colour_cur = Y, Colour_req = Y means all lights have confirmed the lockout release. We can start releasing controllers.
+
+lockout = C, Colour_cur = Y, Colour_req = Y means all lights and controllers have confirmed, we can return to Requester 0.
+
+lockout release response should be 'c' 'colour', and will respond in either a colour lockout, or no lockout to help confirm the state if a message gets lost.
