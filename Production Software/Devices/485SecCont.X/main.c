@@ -56,14 +56,32 @@ uint8_t GLOBAL_DeviceType = '1';
 void prvWiredInitTask( void * parameters );
 void prvWSCTask( void * parameters );
 
+//retransmission timer
+
+TimerHandle_t xRetransmitTimer;
+
+//timer callback functions
+
+void vRetransmitTimerFunc( TimerHandle_t xTimer );
+
+//timer global
+
+uint8_t GLOBAL_RetransmissionTimerSet = 0;
 
 int main(int argc, char** argv) {
     
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvWSCTask, "WSC", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
+    
+    //setup modules
+    
     COMMSetup();
     DSIOSetup();
+    
+    //setup timer
+    
+    xRetransmitTimer = xTimerCreate("ReTX", 500, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
@@ -694,22 +712,152 @@ void prvWSCTask( void * parameters )
             }
             //message processing now complete, check the status of any colour change request
             //if all colours are matching colour_req, then change colour_cur into colour_req
+            uint8_t check_variable = 1;
             if(colour_cur != colour_req)
             {
+                switch(Requester)
                 //how this acts depends on if it is a requester 1 or 2
-                if(Requester == 1)
                 {
-                    //check lights and other controllers
-                    
-                    //check retransmission timers if needed and retransmit
+                    case 1: //Lead Requester
+                    //check retransmission timers and retransmit if needed
+                        if(GLOBAL_RetransmissionTimerSet == 1)
+                        {
+                            //check other controllers
+                            for(uint8_t i = 0; i < numControllers; i++)
+                            {
+                                if(ControllerTable[i].status != colour_req)
+                                {
+                                    //send another colour change request, and set check_variable
+                                    buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                    buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    check_variable = 0;
+                                }
+                            }
+                            //check lights
+                            for(uint8_t i = 0; i < numLights; i++)
+                            {
+                                if(LightTable[i].status != colour_req)
+                                {
+                                    //send another colour change request, and set check_variable
+                                    buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                    buffer[1] = LightTable[i].index; //load with retransmission request
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    check_variable = 0;
+                                }
+                            }
+                            //if all colours are matching, we can set colour_cur to colour_req
+                            if(check_variable == 1)
+                            {
+                                colour_cur = colour_req;
+                            }
+                            //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                            else // if something was transmitted, we need to reset the timer.
+                            {
+                                GLOBAL_RetransmissionTimerSet = 0;
+                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            }
+                        }
+                        break;
+                        
+                    case 2: //Subordinate Requester
+                        if(GLOBAL_RetransmissionTimerSet == 1)
+                        {
+                            //check lights
+                            for(uint8_t i = 0; i < numLights; i++)
+                            {
+                                if(LightTable[i].status != colour_req)
+                                {
+                                    //send another colour change request, and set check_variable
+                                    buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                    buffer[1] = LightTable[i].index; //load with retransmission request
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    check_variable = 0;
+                                }
+                            }
+                            //if all colours are matching, we can set colour_cur to colour_req
+                            if(check_variable == 1)
+                            {
+                                colour_cur = colour_req;
+                            }
+                            //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                            else // if something was transmitted, we need to reset the timer.
+                            {
+                                GLOBAL_RetransmissionTimerSet = 0;
+                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            }
+                        }
+                        break;
+                        
+                    case 0: //just do nothing if we are not set to request anything
+                        break;
                 }
-                else 
-                {
-                    //only check lights
+            }
+            check_variable = 1;
+            //if we are requester 1, we should ensure that first the controller lockouts are released
+            //as a requester 2, we can return to requester 0 once all lights have confirmed colour
+            switch(Requester)
+            {
+                case 1:
+                    if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
+                    {
+                        for(uint8_t i = 0; i < numControllers; i++)
+                            {
+                                if(ControllerTable[i].status != 'C') //if not confirmed cleared
+                                {
+                                    //send another clear request, and set check_variable
+                                    buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                    buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    check_variable = 0;
+                                }
+                                //if all controllers are confirmed, we can move on to releasing lights
+                                if(check_variable == 1)
+                                {
+                                    lockout = lockout + 32; //switch to lowercase lockout letter
+                                }
+                                //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                                else // if something was transmitted, we need to reset the timer.
+                                {
+                                    GLOBAL_RetransmissionTimerSet = 0;
+                                    xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                                }
+                            }
+                    }
+                    else if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1))) //at this point, all controllers have confirmed lockout release
+                    {//we can begin releasing the lights
+                        for(uint8_t i = 0; i < numLights; i++)
+                            {
+                                if(LightTable[i].status != 'C') //if not confirmed cleared
+                                {
+                                    //send another clear request, and set check_variable
+                                    buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                    buffer[1] = LightTable[i].index; //load with retransmission request
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    check_variable = 0;
+                                }
+                                //if all controllers and lights are confirmed, we can release internal lockout and return to requester 1
+                                if(check_variable == 1)
+                                {
+                                    lockout = 'C';
+                                    Requester = 0;
+                                }
+                                //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                                else // if something was transmitted, we need to reset the timer.
+                                {
+                                    GLOBAL_RetransmissionTimerSet = 0;
+                                    xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                                }
+                            }
+                    }
+                    break;
                     
-                    //check retransmission timers if needed and retransmit
-                }
-                
+                case 2: // we can return to requester 0 if the lights have confirmed colour
+                    if(colour_cur == colour_req)
+                        Requester = 0;
+                    break;
+                case 0:
+                    break;
             }
             //update indicators if needed
             if(colour_cur != colour_req)
@@ -723,5 +871,9 @@ void prvWSCTask( void * parameters )
             //loop and restart
         }
     }
-    
+}
+
+void vRetransmitTimerFunc( TimerHandle_t xTimer )
+{
+    GLOBAL_RetransmissionTimerSet = 1;
 }
