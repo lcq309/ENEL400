@@ -193,6 +193,7 @@ void prvWSCTask( void * parameters )
     uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
+    uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req; //requested colour
     uint8_t colour_cur; //current confirmed colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
@@ -221,6 +222,7 @@ void prvWSCTask( void * parameters )
                         case 'C': //clear, allow colour change request
                             colour_req = buffer[1];
                             Requester = 1;
+                            updateIND = 1;
                             break;
                             
                         case 'G': //green lockout, allow yellow through but not blue
@@ -229,6 +231,8 @@ void prvWSCTask( void * parameters )
                                 case'Y': //yellow light
                                     colour_req = buffer[1];
                                     Requester = 1;
+                                    updateIND = 1;
+                                    
                                     break;
                                 case'B': //blue light
                                     //flash green for a short time
@@ -249,6 +253,7 @@ void prvWSCTask( void * parameters )
                             buffer[1] = 'F'; //yellow flash
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             vTaskDelay(200);
+                            updateIND = 1;
                             //running code will fix indicators after this delay has passed.
                             break;
                             
@@ -260,6 +265,7 @@ void prvWSCTask( void * parameters )
                             buffer[1] = 'F'; //flash all
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             vTaskDelay(200);
+                            updateIND = 1;
                             break;
                     }
                     break;
@@ -327,6 +333,7 @@ void prvWSCTask( void * parameters )
                             {
                                 case 'C': //Clear, become a subordinate and respond
                                     Requester = 2;
+                                    updateIND = 1;
                                     colour_req = 'B';
                                     lockout = 'B';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -379,6 +386,7 @@ void prvWSCTask( void * parameters )
                                 case 'C': //no lockout, this is a green request from another controller
                                     //set lockout and colour_req to green, update controller status, and reply
                                     ControllerTable[tablePos].status = buffer[1];
+                                    updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
                                     Requester = 2; //start helping with colour change
@@ -389,6 +397,7 @@ void prvWSCTask( void * parameters )
                                 
                                 case 'B': //blue lockout will be overridden
                                     ControllerTable[tablePos].status = buffer[1];
+                                    updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
                                     Requester = 2;
@@ -434,11 +443,12 @@ void prvWSCTask( void * parameters )
                         case 'Y': //yellow colour change request
                             switch(lockout)
                             {
-                                case 'C': //no lockout, this is a green request from another controller
+                                case 'C': //no lockout, this is a yellow request from another controller
                                     //set lockout and colour_req to green, update controller status, and reply
                                     ControllerTable[tablePos].status = buffer[1];
-                                    lockout = 'G';
-                                    colour_req = 'G';
+                                    updateIND = 1;
+                                    lockout = 'Y';
+                                    colour_req = 'Y';
                                     Requester = 2; //start helping with colour change
                                     buffer[0] = 'g';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -447,6 +457,7 @@ void prvWSCTask( void * parameters )
                                 
                                 case 'B': //blue lockout will be overridden
                                     ControllerTable[tablePos].status = buffer[1];
+                                    updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     Requester = 2;
@@ -456,6 +467,7 @@ void prvWSCTask( void * parameters )
                                     
                                 case 'G': //green lockout will be overridden
                                     ControllerTable[tablePos].status = buffer[1];
+                                    updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     Requester = 2;
@@ -504,6 +516,7 @@ void prvWSCTask( void * parameters )
                             ControllerTable[tablePos].status = buffer[1];
                             lockout = 'R';
                             colour_req = 'R';
+                            updateIND = 1;
                             Requester = 2;
                             buffer[0] = 'r';
                             buffer[1] = ControllerTable[tablePos].index;
@@ -532,6 +545,7 @@ void prvWSCTask( void * parameters )
                                             {
                                                 lockout = 'C';
                                                 colour_cur = 'B';
+                                                updateIND = 1;
                                             }
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
@@ -565,6 +579,7 @@ void prvWSCTask( void * parameters )
                                             {
                                                 lockout = 'C';
                                                 colour_cur = 'Y';
+                                                updateIND = 1;
                                             }
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
@@ -598,6 +613,7 @@ void prvWSCTask( void * parameters )
                                             {
                                                 lockout = 'C';
                                                 colour_cur = 'G';
+                                                updateIND = 1;
                                             }
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
@@ -680,6 +696,7 @@ void prvWSCTask( void * parameters )
                             lockout = 'R'; //can only be released by Stop button
                             colour_req = 'R';
                             Requester = 2;
+                            updateIND = 1;
                             buffer[0] = 'r'; //confirm red
                             buffer[1] = SpecialTable[tablePos].index;
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -690,6 +707,7 @@ void prvWSCTask( void * parameters )
                             lockout = 'Y';
                             colour_req = 'Y';
                             Requester = 2;
+                            updateIND = 1;
                             buffer[0] = 'y'; //confirm yellow
                             buffer[1] = SpecialTable[tablePos].index;
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -699,6 +717,7 @@ void prvWSCTask( void * parameters )
                             lockout = 'C';
                             colour_req = 'O';
                             Requester = 2;
+                            updateIND = 1;
                             buffer[0] = 'o'; //confirm off
                             buffer[1] = SpecialTable[tablePos].index;
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -860,13 +879,32 @@ void prvWSCTask( void * parameters )
                     break;
             }
             //update indicators if needed
-            if(colour_cur != colour_req)
+            if(updateIND == 1)
             {
-                //set both to flash
-            }
-            else if(colour_cur == colour_req)
-            {
-                //set solid
+                if(colour_cur != colour_req)
+                {
+                    //set both to flash
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = colour_cur;
+                    buffer[1] = 'F'; //flash
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = colour_req;
+                    buffer[1] = 'F'; //flash
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
+                else if(colour_cur == colour_req)
+                {
+                    //set solid
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = colour_cur;
+                    buffer[1] = 'S'; //solid
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
+                //error case should blink lights slowly.
             }
             //loop and restart
         }
