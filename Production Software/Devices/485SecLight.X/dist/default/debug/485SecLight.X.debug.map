@@ -163,12 +163,12 @@ Discarded input sections
                 0x0000000000000000       0x12 build/default/debug/_ext/1644529106/timers.o
  .text.vTimerSetTimerID
                 0x0000000000000000       0x12 build/default/debug/_ext/1644529106/timers.o
- .text          0x0000000000000000        0x0 build/default/debug/main.o
- .data          0x0000000000000000        0x0 build/default/debug/main.o
- .bss           0x0000000000000000        0x0 build/default/debug/main.o
  .text          0x0000000000000000        0x0 build/default/debug/_ext/2083278984/RS485TASKS.o
  .data          0x0000000000000000        0x0 build/default/debug/_ext/2083278984/RS485TASKS.o
  .bss           0x0000000000000000        0x0 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .text          0x0000000000000000        0x0 build/default/debug/main.o
+ .data          0x0000000000000000        0x0 build/default/debug/main.o
+ .bss           0x0000000000000000        0x0 build/default/debug/main.o
  .text          0x0000000000000000        0x0 build/default/debug/_ext/83377035/DSIO.o
  .data          0x0000000000000000        0x0 build/default/debug/_ext/83377035/DSIO.o
  .bss           0x0000000000000000        0x0 build/default/debug/_ext/83377035/DSIO.o
@@ -336,8 +336,8 @@ LOAD build/default/debug/_ext/1644529106/queue.o
 LOAD build/default/debug/_ext/1644529106/stream_buffer.o
 LOAD build/default/debug/_ext/1644529106/tasks.o
 LOAD build/default/debug/_ext/1644529106/timers.o
-LOAD build/default/debug/main.o
 LOAD build/default/debug/_ext/2083278984/RS485TASKS.o
+LOAD build/default/debug/main.o
 LOAD build/default/debug/_ext/83377035/DSIO.o
 START GROUP
 LOAD c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libm.a
@@ -613,8 +613,8 @@ END GROUP
  .comment       0x000000000000002f       0x30 build/default/debug/_ext/1644529106/stream_buffer.o
  .comment       0x000000000000002f       0x30 build/default/debug/_ext/1644529106/tasks.o
  .comment       0x000000000000002f       0x30 build/default/debug/_ext/1644529106/timers.o
- .comment       0x000000000000002f       0x30 build/default/debug/main.o
  .comment       0x000000000000002f       0x30 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .comment       0x000000000000002f       0x30 build/default/debug/main.o
  .comment       0x000000000000002f       0x30 build/default/debug/_ext/83377035/DSIO.o
  .comment       0x000000000000002f       0x2c c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
                                          0x2d (size before relaxing)
@@ -687,48 +687,48 @@ END GROUP
  .debug_aranges
                 0x00000000000004b0       0xb0 build/default/debug/_ext/1644529106/timers.o
  .debug_aranges
-                0x0000000000000560       0x38 build/default/debug/main.o
+                0x0000000000000560       0x48 build/default/debug/_ext/2083278984/RS485TASKS.o
  .debug_aranges
-                0x0000000000000598       0x48 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x00000000000005a8       0x38 build/default/debug/main.o
  .debug_aranges
                 0x00000000000005e0       0x98 build/default/debug/_ext/83377035/DSIO.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0xfe66
+.debug_info     0x0000000000000000     0xff38
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000     0x2504 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
- .debug_info    0x0000000000002504      0x7ca build/default/debug/_ext/83377035/USART.o
- .debug_info    0x0000000000002cce      0x801 build/default/debug/_ext/83377035/ShiftReg.o
- .debug_info    0x00000000000034cf      0x67f build/default/debug/_ext/1347852338/port.o
- .debug_info    0x0000000000003b4e      0xcbc build/default/debug/_ext/1644529106/event_groups.o
- .debug_info    0x000000000000480a      0x40c build/default/debug/_ext/1644529106/heap_1.o
- .debug_info    0x0000000000004c16      0x586 build/default/debug/_ext/1644529106/list.o
- .debug_info    0x000000000000519c     0x1f87 build/default/debug/_ext/1644529106/queue.o
- .debug_info    0x0000000000007123     0x18aa build/default/debug/_ext/1644529106/stream_buffer.o
- .debug_info    0x00000000000089cd     0x272f build/default/debug/_ext/1644529106/tasks.o
- .debug_info    0x000000000000b0fc     0x15d0 build/default/debug/_ext/1644529106/timers.o
- .debug_info    0x000000000000c6cc     0x19e8 build/default/debug/main.o
- .debug_info    0x000000000000e0b4     0x107e build/default/debug/_ext/2083278984/RS485TASKS.o
- .debug_info    0x000000000000f132      0xd34 build/default/debug/_ext/83377035/DSIO.o
+ .debug_info    0x0000000000002504      0x7ee build/default/debug/_ext/83377035/USART.o
+ .debug_info    0x0000000000002cf2      0x80f build/default/debug/_ext/83377035/ShiftReg.o
+ .debug_info    0x0000000000003501      0x67b build/default/debug/_ext/1347852338/port.o
+ .debug_info    0x0000000000003b7c      0xcb6 build/default/debug/_ext/1644529106/event_groups.o
+ .debug_info    0x0000000000004832      0x3e2 build/default/debug/_ext/1644529106/heap_1.o
+ .debug_info    0x0000000000004c14      0x574 build/default/debug/_ext/1644529106/list.o
+ .debug_info    0x0000000000005188     0x1fc5 build/default/debug/_ext/1644529106/queue.o
+ .debug_info    0x000000000000714d     0x18b4 build/default/debug/_ext/1644529106/stream_buffer.o
+ .debug_info    0x0000000000008a01     0x2787 build/default/debug/_ext/1644529106/tasks.o
+ .debug_info    0x000000000000b188     0x15ee build/default/debug/_ext/1644529106/timers.o
+ .debug_info    0x000000000000c776     0x1082 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_info    0x000000000000d7f8     0x19ec build/default/debug/main.o
+ .debug_info    0x000000000000f1e4      0xd54 build/default/debug/_ext/83377035/DSIO.o
 
-.debug_abbrev   0x0000000000000000     0x3d14
+.debug_abbrev   0x0000000000000000     0x3ea0
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000     0x230e C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_abbrev  0x000000000000230e       0xea build/default/debug/_ext/83377035/USART.o
- .debug_abbrev  0x00000000000023f8      0x155 build/default/debug/_ext/83377035/ShiftReg.o
- .debug_abbrev  0x000000000000254d      0x17f build/default/debug/_ext/1347852338/port.o
- .debug_abbrev  0x00000000000026cc      0x21f build/default/debug/_ext/1644529106/event_groups.o
- .debug_abbrev  0x00000000000028eb      0x111 build/default/debug/_ext/1644529106/heap_1.o
- .debug_abbrev  0x00000000000029fc      0x116 build/default/debug/_ext/1644529106/list.o
- .debug_abbrev  0x0000000000002b12      0x2d8 build/default/debug/_ext/1644529106/queue.o
- .debug_abbrev  0x0000000000002dea      0x253 build/default/debug/_ext/1644529106/stream_buffer.o
- .debug_abbrev  0x000000000000303d      0x358 build/default/debug/_ext/1644529106/tasks.o
- .debug_abbrev  0x0000000000003395      0x32f build/default/debug/_ext/1644529106/timers.o
- .debug_abbrev  0x00000000000036c4      0x25e build/default/debug/main.o
- .debug_abbrev  0x0000000000003922      0x217 build/default/debug/_ext/2083278984/RS485TASKS.o
- .debug_abbrev  0x0000000000003b39      0x1db build/default/debug/_ext/83377035/DSIO.o
+ .debug_abbrev  0x00000000000023f8      0x16f build/default/debug/_ext/83377035/ShiftReg.o
+ .debug_abbrev  0x0000000000002567      0x17f build/default/debug/_ext/1347852338/port.o
+ .debug_abbrev  0x00000000000026e6      0x255 build/default/debug/_ext/1644529106/event_groups.o
+ .debug_abbrev  0x000000000000293b      0x111 build/default/debug/_ext/1644529106/heap_1.o
+ .debug_abbrev  0x0000000000002a4c      0x130 build/default/debug/_ext/1644529106/list.o
+ .debug_abbrev  0x0000000000002b7c      0x340 build/default/debug/_ext/1644529106/queue.o
+ .debug_abbrev  0x0000000000002ebc      0x26f build/default/debug/_ext/1644529106/stream_buffer.o
+ .debug_abbrev  0x000000000000312b      0x38e build/default/debug/_ext/1644529106/tasks.o
+ .debug_abbrev  0x00000000000034b9      0x37d build/default/debug/_ext/1644529106/timers.o
+ .debug_abbrev  0x0000000000003836      0x217 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_abbrev  0x0000000000003a4d      0x25e build/default/debug/main.o
+ .debug_abbrev  0x0000000000003cab      0x1f5 build/default/debug/_ext/83377035/DSIO.o
 
 .debug_line     0x0000000000000000     0x5191
  *(.debug_line .debug_line.* .debug_line_end)
@@ -743,8 +743,8 @@ END GROUP
  .debug_line    0x0000000000001b89      0x741 build/default/debug/_ext/1644529106/stream_buffer.o
  .debug_line    0x00000000000022ca     0x118b build/default/debug/_ext/1644529106/tasks.o
  .debug_line    0x0000000000003455      0x5a4 build/default/debug/_ext/1644529106/timers.o
- .debug_line    0x00000000000039f9      0xba4 build/default/debug/main.o
- .debug_line    0x000000000000459d      0x634 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_line    0x00000000000039f9      0x634 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_line    0x000000000000402d      0xba4 build/default/debug/main.o
  .debug_line    0x0000000000004bd1      0x5c0 build/default/debug/_ext/83377035/DSIO.o
 
 .debug_frame    0x0000000000000000     0x17b8
@@ -759,8 +759,8 @@ END GROUP
  .debug_frame   0x00000000000007c8      0x438 build/default/debug/_ext/1644529106/stream_buffer.o
  .debug_frame   0x0000000000000c00      0x570 build/default/debug/_ext/1644529106/tasks.o
  .debug_frame   0x0000000000001170      0x224 build/default/debug/_ext/1644529106/timers.o
- .debug_frame   0x0000000000001394       0xbc build/default/debug/main.o
- .debug_frame   0x0000000000001450      0x1b8 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_frame   0x0000000000001394      0x1b8 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_frame   0x000000000000154c       0xbc build/default/debug/main.o
  .debug_frame   0x0000000000001608      0x1b0 build/default/debug/_ext/83377035/DSIO.o
 
 .debug_str      0x0000000000000000     0x1e32
@@ -776,24 +776,24 @@ END GROUP
  .debug_str     0x00000000000014bb      0x242 build/default/debug/_ext/1644529106/stream_buffer.o
  .debug_str     0x00000000000016fd      0x26a build/default/debug/_ext/1644529106/tasks.o
  .debug_str     0x0000000000001967      0x1fc build/default/debug/_ext/1644529106/timers.o
- .debug_str     0x0000000000001b63      0x119 build/default/debug/main.o
- .debug_str     0x0000000000001c7c      0x11e build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_str     0x0000000000001b63      0x11e build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_str     0x0000000000001c81      0x119 build/default/debug/main.o
  .debug_str     0x0000000000001d9a       0x98 build/default/debug/_ext/83377035/DSIO.o
 
-.debug_loc      0x0000000000000000     0x7631
+.debug_loc      0x0000000000000000     0x9c91
  *(.debug_loc)
- .debug_loc     0x0000000000000000      0x311 build/default/debug/_ext/83377035/ShiftReg.o
- .debug_loc     0x0000000000000311       0xc8 build/default/debug/_ext/1347852338/port.o
- .debug_loc     0x00000000000003d9      0x91c build/default/debug/_ext/1644529106/event_groups.o
- .debug_loc     0x0000000000000cf5       0xe0 build/default/debug/_ext/1644529106/heap_1.o
- .debug_loc     0x0000000000000dd5       0xb8 build/default/debug/_ext/1644529106/list.o
- .debug_loc     0x0000000000000e8d     0x18ac build/default/debug/_ext/1644529106/queue.o
- .debug_loc     0x0000000000002739     0x15ad build/default/debug/_ext/1644529106/stream_buffer.o
- .debug_loc     0x0000000000003ce6     0x1ac5 build/default/debug/_ext/1644529106/tasks.o
- .debug_loc     0x00000000000057ab      0xa9b build/default/debug/_ext/1644529106/timers.o
- .debug_loc     0x0000000000006246      0xb47 build/default/debug/main.o
- .debug_loc     0x0000000000006d8d      0x3fe build/default/debug/_ext/2083278984/RS485TASKS.o
- .debug_loc     0x000000000000718b      0x4a6 build/default/debug/_ext/83377035/DSIO.o
+ .debug_loc     0x0000000000000000      0x340 build/default/debug/_ext/83377035/ShiftReg.o
+ .debug_loc     0x0000000000000340       0xc8 build/default/debug/_ext/1347852338/port.o
+ .debug_loc     0x0000000000000408      0xba7 build/default/debug/_ext/1644529106/event_groups.o
+ .debug_loc     0x0000000000000faf      0x10f build/default/debug/_ext/1644529106/heap_1.o
+ .debug_loc     0x00000000000010be      0x145 build/default/debug/_ext/1644529106/list.o
+ .debug_loc     0x0000000000001203     0x2050 build/default/debug/_ext/1644529106/queue.o
+ .debug_loc     0x0000000000003253     0x1e4d build/default/debug/_ext/1644529106/stream_buffer.o
+ .debug_loc     0x00000000000050a0     0x2381 build/default/debug/_ext/1644529106/tasks.o
+ .debug_loc     0x0000000000007421      0xd73 build/default/debug/_ext/1644529106/timers.o
+ .debug_loc     0x0000000000008194      0x7c5 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_loc     0x0000000000008959      0xc94 build/default/debug/main.o
+ .debug_loc     0x00000000000095ed      0x6a4 build/default/debug/_ext/83377035/DSIO.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -825,13 +825,13 @@ END GROUP
  .debug_ranges  0x0000000000000290       0xa8 build/default/debug/_ext/1644529106/stream_buffer.o
  .debug_ranges  0x0000000000000338      0x1c8 build/default/debug/_ext/1644529106/tasks.o
  .debug_ranges  0x0000000000000500       0xf0 build/default/debug/_ext/1644529106/timers.o
- .debug_ranges  0x00000000000005f0       0x88 build/default/debug/main.o
- .debug_ranges  0x0000000000000678       0xd0 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_ranges  0x00000000000005f0       0xd0 build/default/debug/_ext/2083278984/RS485TASKS.o
+ .debug_ranges  0x00000000000006c0       0x88 build/default/debug/main.o
  .debug_ranges  0x0000000000000748      0x130 build/default/debug/_ext/83377035/DSIO.o
 
 .debug_macro
  *(.debug_macro)
-OUTPUT(dist/default/debug/485SecCont.X.debug.elf elf32-avr)
+OUTPUT(dist/default/debug/485SecLight.X.debug.elf elf32-avr)
 LOAD linker stubs
 LOAD data_init
 
@@ -990,87 +990,87 @@ LOAD data_init
  .bss.xActiveTimerList1
                 0x0000000000806b19        0x9 build/default/debug/_ext/1644529106/timers.o
 
-.bss.GLOBAL_RetransmissionTimerSet
-                0x0000000000806b61        0x1
- .bss.GLOBAL_RetransmissionTimerSet
-                0x0000000000806b61        0x1 build/default/debug/main.o
-                0x0000000000806b61                GLOBAL_RetransmissionTimerSet
-
-.bss.xRetransmitTimer
-                0x0000000000806b3e        0x2
- .bss.xRetransmitTimer
-                0x0000000000806b3e        0x2 build/default/debug/main.o
-                0x0000000000806b3e                xRetransmitTimer
-
-.bss.GLOBAL_Channel
-                0x0000000000806b63        0x1
- .bss.GLOBAL_Channel
-                0x0000000000806b63        0x1 build/default/debug/main.o
-                0x0000000000806b63                GLOBAL_Channel
-
-.bss.GLOBAL_DeviceID
-                0x0000000000806b64        0x1
- .bss.GLOBAL_DeviceID
-                0x0000000000806b64        0x1 build/default/debug/main.o
-                0x0000000000806b64                GLOBAL_DeviceID
-
 .bss.xDevice_Buffer
-                0x0000000000806b40        0x2
+                0x0000000000806b3e        0x2
  .bss.xDevice_Buffer
-                0x0000000000806b40        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b40                xDevice_Buffer
+                0x0000000000806b3e        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b3e                xDevice_Buffer
 
 .bss.xCOMM_out_Buffer
-                0x0000000000806b42        0x2
+                0x0000000000806b40        0x2
  .bss.xCOMM_out_Buffer
-                0x0000000000806b42        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b42                xCOMM_out_Buffer
+                0x0000000000806b40        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b40                xCOMM_out_Buffer
 
 .bss.xCOMM_out_Stream
-                0x0000000000806b44        0x2
+                0x0000000000806b42        0x2
  .bss.xCOMM_out_Stream
-                0x0000000000806b44        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b44                xCOMM_out_Stream
+                0x0000000000806b42        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b42                xCOMM_out_Stream
 
 .bss.xCOMM_in_Stream
-                0x0000000000806b46        0x2
+                0x0000000000806b44        0x2
  .bss.xCOMM_in_Stream
-                0x0000000000806b46        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b46                xCOMM_in_Stream
+                0x0000000000806b44        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b44                xCOMM_in_Stream
 
 .bss.xEventInit
-                0x0000000000806b48        0x2
+                0x0000000000806b46        0x2
  .bss.xEventInit
-                0x0000000000806b48        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b48                xEventInit
+                0x0000000000806b46        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b46                xEventInit
 
-.bss.xTXC       0x0000000000806b4a        0x2
- .bss.xTXC      0x0000000000806b4a        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b4a                xTXC
+.bss.xTXC       0x0000000000806b48        0x2
+ .bss.xTXC      0x0000000000806b48        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b48                xTXC
 
 .bss.xPermission
-                0x0000000000806b4c        0x2
+                0x0000000000806b4a        0x2
  .bss.xPermission
-                0x0000000000806b4c        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b4c                xPermission
+                0x0000000000806b4a        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b4a                xPermission
 
 .bss.xUSART0_MUTEX
-                0x0000000000806b4e        0x2
+                0x0000000000806b4c        0x2
  .bss.xUSART0_MUTEX
-                0x0000000000806b4e        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b4e                xUSART0_MUTEX
+                0x0000000000806b4c        0x2 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b4c                xUSART0_MUTEX
 
 .bss.GLOBAL_TableLength
-                0x0000000000806b65        0x1
+                0x0000000000806b61        0x1
  .bss.GLOBAL_TableLength
-                0x0000000000806b65        0x1 build/default/debug/_ext/2083278984/RS485TASKS.o
-                0x0000000000806b65                GLOBAL_TableLength
+                0x0000000000806b61        0x1 build/default/debug/_ext/2083278984/RS485TASKS.o
+                0x0000000000806b61                GLOBAL_TableLength
 
 .bss.GLOBAL_DEVICE_TABLE
                 0x0000000000806000      0xabe
  .bss.GLOBAL_DEVICE_TABLE
                 0x0000000000806000      0xabe build/default/debug/_ext/2083278984/RS485TASKS.o
                 0x0000000000806000                GLOBAL_DEVICE_TABLE
+
+.bss.GLOBAL_RetransmissionTimerSet
+                0x0000000000806b62        0x1
+ .bss.GLOBAL_RetransmissionTimerSet
+                0x0000000000806b62        0x1 build/default/debug/main.o
+                0x0000000000806b62                GLOBAL_RetransmissionTimerSet
+
+.bss.xRetransmitTimer
+                0x0000000000806b4e        0x2
+ .bss.xRetransmitTimer
+                0x0000000000806b4e        0x2 build/default/debug/main.o
+                0x0000000000806b4e                xRetransmitTimer
+
+.bss.GLOBAL_Channel
+                0x0000000000806b64        0x1
+ .bss.GLOBAL_Channel
+                0x0000000000806b64        0x1 build/default/debug/main.o
+                0x0000000000806b64                GLOBAL_Channel
+
+.bss.GLOBAL_DeviceID
+                0x0000000000806b65        0x1
+ .bss.GLOBAL_DeviceID
+                0x0000000000806b65        0x1 build/default/debug/main.o
+                0x0000000000806b65                GLOBAL_DeviceID
 
 .bss.xDeviceIN_Queue
                 0x0000000000806b50        0x2
@@ -1132,10 +1132,10 @@ LOAD data_init
                 0x00000000000001d4                uxTopUsedPriority
 
 .data.GLOBAL_DeviceType
-                0x0000000000806b62        0x1 load address 0x00000000000001d5
+                0x0000000000806b63        0x1 load address 0x00000000000001d5
  .data.GLOBAL_DeviceType
-                0x0000000000806b62        0x1 build/default/debug/main.o
-                0x0000000000806b62                GLOBAL_DeviceType
+                0x0000000000806b63        0x1 build/default/debug/main.o
+                0x0000000000806b63                GLOBAL_DeviceType
 
 .text.prvWSCTask
                 0x00000000000001d6     0x1394

@@ -8,6 +8,7 @@
 
 #ifndef SHIFTREG_H
 #define	SHIFTREG_H
+#define F_CPU 240000000UL
 #include <stdio.h>
 #include <stdlib.h>
 #include <avr/io.h>
