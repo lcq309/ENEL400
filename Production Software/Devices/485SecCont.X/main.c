@@ -217,12 +217,14 @@ void prvWSCTask( void * parameters )
             switch(buffer[0])
             {
                 case 'P': //pushbutton
+                    //check if the colour requested is of a higher priority than the current lockout
+                    //either allow it through, or flash the current lockout colour
                     switch(lockout)
                     {
                         case 'C': //clear, allow colour change request
                             colour_req = buffer[1];
-                            Requester = 1;
-                            updateIND = 1;
+                            Requester = 1; //we are initiating this change
+                            updateIND = 1; //update the indicators
                             break;
                             
                         case 'G': //green lockout, allow yellow through but not blue
@@ -230,9 +232,8 @@ void prvWSCTask( void * parameters )
                             {
                                 case'Y': //yellow light
                                     colour_req = buffer[1];
-                                    Requester = 1;
-                                    updateIND = 1;
-                                    
+                                    Requester = 1; //we are initiating this change
+                                    updateIND = 1; //update the indicators
                                     break;
                                 case'B': //blue light
                                     //flash green for a short time
@@ -243,6 +244,7 @@ void prvWSCTask( void * parameters )
                                     buffer[1] = 'F'; //green flash
                                     xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                                     vTaskDelay(200);
+                                    updateIND = 1;
                                     break;
                             }
                         case 'Y': //yellow lockout, flash yellow for a short time
@@ -295,6 +297,10 @@ void prvWSCTask( void * parameters )
                     
                 case '4': //wireless light
                     router = 'L';
+                    break;
+                    
+                case 'S': //stop button card
+                    router = 'S';
                     break;
                     
                 default: //not programmed device type
