@@ -194,8 +194,8 @@ void prvWSCTask( void * parameters )
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
-    uint8_t colour_req; //requested colour
-    uint8_t colour_cur; //current confirmed colour
+    uint8_t colour_req = 'O'; //requested colour
+    uint8_t colour_cur = 'O'; //current confirmed colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     
     /* High level overview
@@ -301,6 +301,10 @@ void prvWSCTask( void * parameters )
                     
                 case 'S': //stop button card
                     router = 'S';
+                    break;
+                    
+                case 'M': //menu controller
+                    router = 'M';
                     break;
                     
                 default: //not programmed device type
@@ -836,44 +840,46 @@ void prvWSCTask( void * parameters )
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     check_variable = 0;
                                 }
-                                //if all controllers are confirmed, we can move on to releasing lights
-                                if(check_variable == 1)
-                                {
-                                    lockout = lockout + 32; //switch to lowercase lockout letter
-                                }
-                                //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                                else // if something was transmitted, we need to reset the timer.
-                                {
-                                    GLOBAL_RetransmissionTimerSet = 0;
-                                    xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                                }
                             }
+                        //if all controllers are confirmed, we can move on to releasing lights
+                        if(check_variable == 1)
+                        {
+                            lockout = lockout + 32; //switch to lowercase lockout letter
+                        }
+                        //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                        else // if something was transmitted, we need to reset the timer.
+                        {
+                            GLOBAL_RetransmissionTimerSet = 0;
+                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                        }
                     }
                     else if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1))) //at this point, all controllers have confirmed lockout release
                     {//we can begin releasing the lights
                         for(uint8_t i = 0; i < numLights; i++)
+                        {
+                            if(LightTable[i].status != 'C') //if not confirmed cleared
                             {
-                                if(LightTable[i].status != 'C') //if not confirmed cleared
-                                {
-                                    //send another clear request, and set check_variable
-                                    buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                    buffer[1] = LightTable[i].index; //load with retransmission request
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                    check_variable = 0;
-                                }
-                                //if all controllers and lights are confirmed, we can release internal lockout and return to requester 1
-                                if(check_variable == 1)
-                                {
-                                    lockout = 'C';
-                                    Requester = 0;
-                                }
-                                //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                                else // if something was transmitted, we need to reset the timer.
-                                {
-                                    GLOBAL_RetransmissionTimerSet = 0;
-                                    xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                                }
+                                //send another clear request, and set check_variable
+                                buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                buffer[1] = LightTable[i].index; //load with retransmission request
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                check_variable = 0;
                             }
+                        }
+                        //if all controllers and lights are confirmed, we can release internal lockout and return to requester 0
+                        //but there is a special case for blue, where we should return the lights to green after a delay.
+                        //this needs some more discussion
+                        if(check_variable == 1)
+                        {
+                            lockout = 'C';
+                            Requester = 0;
+                        }
+                        //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                        else // if something was transmitted, we need to reset the timer.
+                        {
+                            GLOBAL_RetransmissionTimerSet = 0;
+                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                        }
                     }
                     break;
                     

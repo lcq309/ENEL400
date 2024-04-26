@@ -4,3 +4,5 @@ Device Types:
 '2' Generic sector controller: wireless marshal controller
 '3' generic sector light: wired light
 '4' generic sector light: wireless light
+
+'S' Stop button card
