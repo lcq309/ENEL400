@@ -412,6 +412,7 @@ void prvWSCTask( void * parameters )
                                     buffer[0] = 'g';
                                     buffer[1] = ControllerTable[tablePos].index;
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    break;
                                     
                                 case 'G': //green lockout
                                     switch(Requester)
@@ -458,7 +459,7 @@ void prvWSCTask( void * parameters )
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     Requester = 2; //start helping with colour change
-                                    buffer[0] = 'g';
+                                    buffer[0] = 'y';
                                     buffer[1] = ControllerTable[tablePos].index;
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
@@ -472,6 +473,7 @@ void prvWSCTask( void * parameters )
                                     buffer[0] = 'y';
                                     buffer[1] = ControllerTable[tablePos].index;
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    break;
                                     
                                 case 'G': //green lockout will be overridden
                                     ControllerTable[tablePos].status = buffer[1];

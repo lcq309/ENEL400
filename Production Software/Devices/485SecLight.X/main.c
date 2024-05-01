@@ -1,12 +1,12 @@
 /* 
- * RS 485 Sector Controller
+ * RS 485 Sector Light
  * Author:  Michael King
  * 
- * Created on April 22, 2024
+ * Created on April 26, 2024
  * 
- * This is meant to be a generic Sector Light controller on the wired network
- * which means that it has 3 buttons (Blue, Yellow, Green) and controls 
- * a sector light with either 3 or 4 colours.
+ * This is meant to be a generic Sector Light on the wired network
+ * which means that it drives a light with either 3 or 4 colours
+ * there is a physical way to check which one this is.
  */
 
 #include <stdio.h>
@@ -30,17 +30,16 @@
  * - Device Specific Initialization
  */
 
-//define device tracking struct
+//define device tracking struct, only needs an index for lights
 struct DeviceTracker 
 {
     uint8_t index;
-    uint8_t status;
 };
 
 //define global variables
 uint8_t GLOBAL_DeviceID = 0;
 uint8_t GLOBAL_Channel = 0;
-uint8_t GLOBAL_DeviceType = '1';
+uint8_t GLOBAL_DeviceType = '3'; //Generic Sector Light: Wired Light
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
@@ -52,19 +51,7 @@ uint8_t GLOBAL_DeviceType = '1';
 //task pointers
 
 void prvWiredInitTask( void * parameters );
-void prvWSCTask( void * parameters );
-
-//retransmission timer
-
-TimerHandle_t xRetransmitTimer;
-
-//timer callback functions
-
-void vRetransmitTimerFunc( TimerHandle_t xTimer );
-
-//timer global
-
-uint8_t GLOBAL_RetransmissionTimerSet = 0;
+void prvWSLTask( void * parameters );
 
 int main(int argc, char** argv) {
     
@@ -167,23 +154,19 @@ void prvWiredInitTask( void * parameters )
     }
 }
 
-void prvWSCTask( void * parameters )
+void prvWSLTask( void * parameters )
 {
-    /* Wired Sector Controller
-     * maintain a table of controller and light indexes, with a confirmation marker
-     * communicate with other controllers on the same channel for coordination
-     * communicate with lights on the same channel for coordination
-     * lights and controllers will lockout when asked to turn yellow or red
-     * controller is responsible for releasing yellow lockout when all lights are yellow
-     * stop button is responsible for releasing red lockout at the director's discretion
-     * a controller will yield to a controller trying to send a higher priority
-     * a light will 'warn' a controller trying to send a lower priority before the lockout has released
+    /* Wired Sector light
+     * maintain a table of controller indexes to easily send replies
+     * doesn't need to store controller information
+     * reply when a controller tries to set colour
+     * Stop button has special power, can override any lockout at any time
+     * (i.e. Red to Yellow or off)
+     * 
      */
     struct DeviceTracker ControllerTable[20]; //maximum of 20 connected controlled devices (probably not a hard limit)
     uint8_t numControllers = 0;
     uint8_t tablePos = 0;
-    struct DeviceTracker LightTable[20]; //20 connected lights
-    uint8_t numLights = 0;
     struct DeviceTracker SpecialTable[10]; //10 connected special devices (stop button etc)
     uint8_t numSpecials = 0;
     struct DeviceTracker MenuTable[5]; //5 connected menu devices
@@ -194,7 +177,7 @@ void prvWSCTask( void * parameters )
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
-    uint8_t Requester = 0; //is this device currently requesting a colour change
+    uint8_t responded = 0; //track if we have responded or not
     
     /* High level overview
      * 1. check for any commands from pushbutton or other internal source.
@@ -211,67 +194,10 @@ void prvWSCTask( void * parameters )
         //internal source commands processing
         if(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
         {
-            //check message source
+            //check message source (light check message will come here)
             switch(buffer[0])
             {
-                case 'P': //pushbutton
-                    //check if the colour requested is of a higher priority than the current lockout
-                    //either allow it through, or flash the current lockout colour
-                    switch(lockout)
-                    {
-                        case 'C': //clear, allow colour change request
-                            colour_req = buffer[1];
-                            Requester = 1; //we are initiating this change
-                            updateIND = 1; //update the indicators
-                            break;
-                            
-                        case 'G': //green lockout, allow yellow through but not blue
-                            switch(buffer[1])
-                            {
-                                case'Y': //yellow light
-                                    colour_req = buffer[1];
-                                    Requester = 1; //we are initiating this change
-                                    updateIND = 1; //update the indicators
-                                    break;
-                                case'B': //blue light
-                                    //flash green for a short time
-                                    buffer[0] = 0xff;
-                                    buffer[1] = 'O'; //turn all off first
-                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                                    buffer[0] = 'G';
-                                    buffer[1] = 'F'; //green flash
-                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                                    vTaskDelay(200);
-                                    updateIND = 1;
-                                    break;
-                            }
-                        case 'Y': //yellow lockout, flash yellow for a short time
-                            buffer[0] = 0xff;
-                            buffer[1] = 'O'; //turn all off first
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            buffer[0] = 'Y';
-                            buffer[1] = 'F'; //yellow flash
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            vTaskDelay(200);
-                            updateIND = 1;
-                            //running code will fix indicators after this delay has passed.
-                            break;
-                            
-                        case 'R': //red lockout, flash all for a short time
-                            buffer[0] = 0xff;
-                            buffer[1] = 'O'; //turn all off first
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            buffer[0] = 0xff;
-                            buffer[1] = 'F'; //flash all
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            vTaskDelay(200);
-                            updateIND = 1;
-                            break;
-                    }
-                    break;
-                //space for other intertask commands here
             }
-            
         }
         //check for messages from COMMS, wait up to 200ms
         length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 200);
@@ -287,14 +213,6 @@ void prvWSCTask( void * parameters )
                     
                 case '2': //wireless sector controller
                     router = 'C';
-                    break;
-                    
-                case '3': //wired light
-                    router = 'L';
-                    break;
-                    
-                case '4': //wireless light
-                    router = 'L';
                     break;
                     
                 case 'S': //stop button card
@@ -334,114 +252,35 @@ void prvWSCTask( void * parameters )
                     switch(buffer[1]) //first byte of message
                     {
                         case 'B': //blue colour change request
-                            //if we are currently requesting blue, this device is also requesting blue at the same time
-                            //this should be responded to with a lowercase
-                            //if we are not currently requesting blue, this is a colour change request
+                            //if there is no lockout, try to change the colour blue and confirm blue with all controllers on the list.
                             switch(lockout)
                             {
-                                case 'C': //Clear, become a subordinate and respond
-                                    Requester = 2;
+                                case 'C': //Clear, try to change colour, response is handled later
                                     updateIND = 1;
                                     colour_req = 'B';
                                     lockout = 'B';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    buffer[0] = 'b'; //confirmation
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                     
-                                case 'B': //Blue lockout
-                                    switch(Requester)
-                                    {
-                                        case 1: //this is a requester one, update status and respond with confirmation
-                                            ControllerTable[tablePos].status = buffer[1];
-                                            buffer[0] = 'b'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                        case 2: //this is a subordinate requester, just respond with confirmation
-                                            buffer[0] = 'b'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                    }
-                                    break;
-                                    
-                                default: //if there is a lockout, respond with the lockout colour
-                                    buffer[0] = lockout;
-                                    buffer[1] = ControllerTable[tablePos].index; //respond with controller lockout colour
-                                    //this should set the controller as requester 2 with a lockout
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                default: //if there is a lockout, just ignore
                                     break;
                             }
                             break;
-                        case 'b': //blue confirmation
-                            //if we are requester 1 for a blue colour change, mark status as confirmed.
-                            //if lockout level is above blue, send a colour change request to the lockout level.
-                            switch(lockout)
-                            {
-                                case 'B': //blue lockout
-                                    if(Requester == 1)
-                                        ControllerTable[tablePos].status = 'B';
-                                    break;
-                                default: //other lockout level, just ignore
-                                    break;
-                            }
-                            break;
+                            
                         case 'G': //Green colour change request
                             //if we are requesting blue, green will override it
                             switch(lockout)
                             {
-                                case 'C': //no lockout, this is a green request from another controller
-                                    //set lockout and colour_req to green, update controller status, and reply
-                                    ControllerTable[tablePos].status = buffer[1];
+                                case 'C': //no lockout, this is a green request from a controller
+                                    //set lockout and colour_req to green, response is handled later
                                     updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
-                                    Requester = 2; //start helping with colour change
-                                    buffer[0] = 'g';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
-                                    ControllerTable[tablePos].status = buffer[1];
                                     updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
-                                    Requester = 2;
-                                    buffer[0] = 'g';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                    
-                                case 'G': //green lockout
-                                    switch(Requester)
-                                    {
-                                        case 1: //this is a requester one, update status and respond with confirmation
-                                            ControllerTable[tablePos].status = buffer[1];
-                                            buffer[0] = 'g'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                        case 2: //this is a subordinate requester, just respond with confirmation
-                                            buffer[0] = 'g'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                    }
-                                    break;
-                                default: //other lockout level, reply with lockout level
-                                    buffer[0] = lockout; 
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                    break;
-                            }
-                            break;
-                        case 'g': //green colour change confirmation
-                            switch(lockout)
-                            {
-                                case 'G': //green lockout, mark as confirmed if Requester 1
-                                    if(Requester == 1)
-                                        ControllerTable[tablePos].status = 'G';
                                     break;
                                 default: //other lockout level, just ignore
                                     break;
@@ -451,94 +290,39 @@ void prvWSCTask( void * parameters )
                         case 'Y': //yellow colour change request
                             switch(lockout)
                             {
-                                case 'C': //no lockout, this is a yellow request from another controller
-                                    //set lockout and colour_req to green, update controller status, and reply
-                                    ControllerTable[tablePos].status = buffer[1];
+                                case 'C': //Yellow colour request
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
-                                    Requester = 2; //start helping with colour change
-                                    buffer[0] = 'g';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
-                                    ControllerTable[tablePos].status = buffer[1];
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
-                                    Requester = 2;
-                                    buffer[0] = 'y';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     
                                 case 'G': //green lockout will be overridden
-                                    ControllerTable[tablePos].status = buffer[1];
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
-                                    Requester = 2;
-                                    buffer[0] = 'y';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                     
-                                case 'Y': //yellow lockout
-                                    switch(Requester)
-                                    {
-                                        case 1: //this is a requester one, update status and respond with confirmation
-                                            ControllerTable[tablePos].status = buffer[1];
-                                            buffer[0] = 'y'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                        case 2: //this is a subordinate requester, just respond with confirmation
-                                            buffer[0] = 'y'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                    }
-                                    break;
-                                default: //other lockout level, reply with lockout level
-                                    buffer[0] = lockout; 
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                    break;
-                            }
-                            break;
-                            
-                        case 'y': //confirm yellow 
-                            switch(lockout)
-                            {
-                                case 'Y': //green lockout, mark as confirmed if Requester 1
-                                    if(Requester == 1)
-                                        ControllerTable[tablePos].status = 'Y';
-                                    break;
                                 default: //other lockout level, just ignore
                                     break;
                             }
                             break;
                             
-                        case 'R': //red requested by default become a subordinate and confirm
-                            ControllerTable[tablePos].status = buffer[1];
+                        case 'R': //by default Red overrides all other lockouts.
                             lockout = 'R';
                             colour_req = 'R';
                             updateIND = 1;
-                            Requester = 2;
-                            buffer[0] = 'r';
-                            buffer[1] = ControllerTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                            break;
-                            
-                        case 'r': //red confirmation, shouldn't end up here normally, just ignore for now
                             break;
                             
                         //lockout clear requests go here
                         case 'C':
                             switch(buffer[2])
                             {
-                                case 'B': //clear blue lockout, clear and confirm by sending 'c' 'b' in response
+                                case 'B': //clear blue lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
                                         case 'C': //lockout already cleared, confirm
@@ -571,7 +355,7 @@ void prvWSCTask( void * parameters )
                                     }
                                     break;
                                     
-                                case 'Y': //clear yellow lockout, clear and confirm by sending 'c' 'y' in response
+                                case 'Y': //clear yellow lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
                                             case 'C': //lockout already cleared, confirm
@@ -605,7 +389,7 @@ void prvWSCTask( void * parameters )
                                     }
                                     break;
                                     
-                                case 'G': //clear green lockout, clear and confirm by sending 'c' 'g' in response
+                                case 'G': //clear green lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
                                         case 'C': //lockout already cleared, confirm
