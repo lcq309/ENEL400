@@ -392,24 +392,8 @@ void prvWSLTask( void * parameters )
                                 case 'G': //clear green lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
-                                        case 'C': //lockout already cleared, confirm
-                                            buffer[0] = 'c';
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                            
                                         case 'G': //clear the yellow lockout and confirm clearance.
-                                            if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                lockout = 'G';
-                                            else
-                                            {
-                                                lockout = 'C';
-                                                colour_cur = 'G';
-                                                updateIND = 1;
-                                            }
-                                            buffer[0] = 'c';
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            lockout = 'C';
                                             break;
                                             
                                         case 'g': //we are working on clearing lights, just confirm clearance.
@@ -425,46 +409,12 @@ void prvWSLTask( void * parameters )
                                     //red clearance not handled by this type of device.
                             }
                             break;
-                            
-                        case 'c': //clearance confirmation, only relevant to requester 1 devices update status.
-                            ControllerTable[tablePos].status = 'C'; //mark device as cleared
-                            break;
                         default: //can put an error message here, for incorrect command.
                             break;
                     }
                 }
                 break;
                 
-                case 'L': //light device, should only ever be confirming colours or giving an error response (not yet implemented)
-                    //just mark starus as confirmed
-                    //first check if on the table, add if not
-                    for(uint8_t i = 0; i < numLights; i++)
-                    {
-                        if(LightTable[i].index == buffer[0])
-                        {
-                            match = 1;
-                            tablePos = i;
-                            i = numLights;
-                        }
-                    }
-                    if(match != 1) //if no match found, add to table
-                    {
-                        LightTable[numLights].index = buffer[0];
-                        tablePos = numLights;
-                        numLights++;
-                    }
-                    //Light device should now be on the table
-                    switch(buffer[1])
-                    {
-                        case 'E': //Error messages?
-                            break;
-                            
-                        default: //anything else should just be state confirmations
-                            LightTable[tablePos].status = (buffer[1] - 32); //subtract 32 to get uppercase letter
-                            break;
-                    }
-                    break;
-                    
                 case 'S': //special device, stop button and etc. we are always subordinate
                     //check table and add if needed
                     for(uint8_t i = 0; i < numSpecials; i++)
@@ -487,11 +437,7 @@ void prvWSLTask( void * parameters )
                         case 'R': //red request, we are required to turn red
                             lockout = 'R'; //can only be released by Stop button
                             colour_req = 'R';
-                            Requester = 2;
                             updateIND = 1;
-                            buffer[0] = 'r'; //confirm red
-                            buffer[1] = SpecialTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;
                             
                         case 'Y': //will send yellow when the stop command has been cleared

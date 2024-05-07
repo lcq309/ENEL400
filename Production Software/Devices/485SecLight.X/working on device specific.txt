@@ -30,4 +30,8 @@ It will also send an error to any menu controllers to show the error, when this 
 The light should check light status on any changes, but also just periodically check when it is "idle".
 If it has an error while it is "idle" it should send a message out to any controllers on it's internal list.
 
-Lights should also have a timeout on responding, to prevent spamming responses to the network.
+Lights should also have a timeout on error messages, to prevent spamming responses to the network.
+
+The light should respond immediately to a request to change colour or release a lockout, with an error message coming later on after the check has completed.
+
+For the most basic version, only the initiating controller will control devices on the network. Eventually a device may be able to take over if the initiator is unable to complete the process for some reason.
