@@ -157,9 +157,9 @@ void prvWiredInitTask( void * parameters )
 void prvWSLTask( void * parameters )
 {
     /* Wired Sector light
-     * maintain a table of controller indexes to easily send replies
+     * maintain a table of controller indexes to easily send replies and send error messages
      * doesn't need to store controller information
-     * reply when a controller tries to set colour
+     * reply confirmation when a controller tries to set colour, and send a message if an error is detected
      * Stop button has special power, can override any lockout at any time
      * (i.e. Red to Yellow or off)
      * 
@@ -177,7 +177,6 @@ void prvWSLTask( void * parameters )
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
-    uint8_t responded = 0; //track if we have responded or not
     
     /* High level overview
      * 1. check for any commands from pushbutton or other internal source.
@@ -252,19 +251,30 @@ void prvWSLTask( void * parameters )
                     switch(buffer[1]) //first byte of message
                     {
                         case 'B': //blue colour change request
-                            //if there is no lockout, try to change the colour blue and confirm blue with all controllers on the list.
+                            //if we are currently requesting blue, this device is also requesting blue at the same time
+                            //this should be responded to with a lowercase
+                            //if we are not currently requesting blue, this is a colour change request
                             switch(lockout)
                             {
-                                case 'C': //Clear, try to change colour, response is handled later
+                                case 'C': //no lockout, update colour and send a response message
                                     updateIND = 1;
                                     colour_req = 'B';
                                     lockout = 'B';
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    buffer[0] = 'b'; //confirmation
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                     
-                                default: //if there is a lockout, just ignore
+                                case 'B': //Blue lockout, just reply and confirm
+                                            buffer[0] = 'b'; //confirmation
+                                            buffer[1] = ControllerTable[tablePos].index;
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            break;
+                                    break;
+                                    
+                                default: //if there is a lockout, just ignore the request
                                     break;
                             }
-                            break;
                             
                         case 'G': //Green colour change request
                             //if we are requesting blue, green will override it
@@ -275,12 +285,18 @@ void prvWSLTask( void * parameters )
                                     updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    buffer[0] = 'g'; //confirmation
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
                                     updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    buffer[0] = 'g'; //confirmation
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                 default: //other lockout level, just ignore
                                     break;
@@ -294,17 +310,26 @@ void prvWSLTask( void * parameters )
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    buffer[0] = 'y'; //confirmation
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    buffer[0] = 'y'; //confirmation
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     
                                 case 'G': //green lockout will be overridden
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    buffer[0] = 'y'; //confirmation
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                     
                                 default: //other lockout level, just ignore
@@ -316,6 +341,9 @@ void prvWSLTask( void * parameters )
                             lockout = 'R';
                             colour_req = 'R';
                             updateIND = 1;
+                            buffer[1] = ControllerTable[tablePos].index;
+                            buffer[0] = 'r'; //confirmation
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;
                             
                         //lockout clear requests go here
