@@ -359,14 +359,8 @@ void prvWSLTask( void * parameters )
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                         case 'B': //clear the blue lockout and confirm clearance.
-                                            if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                lockout = 'B';
-                                            else
-                                            {
-                                                lockout = 'C';
-                                                colour_cur = 'B';
-                                                updateIND = 1;
-                                            }
+                                            
+                                            lockout = 'C';
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -393,14 +387,7 @@ void prvWSLTask( void * parameters )
                                             break;
                                             
                                         case 'Y': //clear the yellow lockout and confirm clearance.
-                                            if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                lockout = 'Y';
-                                            else    //if we are not responsible for releasing lights, assume all lights are the correct colour
-                                            {
-                                                lockout = 'C';
-                                                colour_cur = 'Y';
-                                                updateIND = 1;
-                                            }
+                                            lockout = 'C';
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -472,8 +459,6 @@ void prvWSLTask( void * parameters )
                             //overrides any normal colour change logic, will be released by the stop button
                             lockout = 'Y';
                             colour_req = 'Y';
-                            Requester = 2;
-                            updateIND = 1;
                             buffer[0] = 'y'; //confirm yellow
                             buffer[1] = SpecialTable[tablePos].index;
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -482,9 +467,14 @@ void prvWSLTask( void * parameters )
                         case 'O': //off command, overrides any normal colour change logic
                             lockout = 'C';
                             colour_req = 'O';
-                            Requester = 2;
-                            updateIND = 1;
                             buffer[0] = 'o'; //confirm off
+                            buffer[1] = SpecialTable[tablePos].index;
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            break;
+                            
+                        case 'C': //Clear command, stop light is special and doesn't need to follow the same rules that a controller would
+                            lockout = 'C';
+                            buffer[0] = 'c'; //confirm clear
                             buffer[1] = SpecialTable[tablePos].index;
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;

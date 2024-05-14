@@ -732,6 +732,13 @@ void prvWSCTask( void * parameters )
                             buffer[1] = SpecialTable[tablePos].index;
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;
+                            
+                        case 'C': //Clear command, stop light is special and doesn't need to follow the same rules that a controller would
+                            lockout = 'C';
+                            buffer[0] = 'c'; //confirm clear
+                            buffer[1] = SpecialTable[tablePos].index;
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            break;
                     }
                     break;
                     
