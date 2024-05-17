@@ -6,3 +6,6 @@ Device Types:
 '4' generic sector light: wireless light
 
 'S' Stop button card
+
+'M' Menu device
+'C' Coordinator (may not be used)

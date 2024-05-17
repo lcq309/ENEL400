@@ -1,0 +1,25 @@
+The device specific main.c is responsible for providing the main running task, as well as the initialization task for devices that need to be initialized with the scheduler running.
+
+network initialization will involve a few steps:
+1. on boot, all devices perform their internal initialization and any diagnostics that they can
+2. after a short delay to allow all devices time to initialize, the coordinator sends out pings to all devices on the wired bus sequentially.
+3. the devices respond with the generic ping response and unlock any tasks waiting for initialization.
+4. after constructing the round robin table, the coordinator begins sending out sequential round robin pings to all devices that responded.
+
+the initialization task should do something to show that the device is on, like flashing an indicator.
+(for a coordinator, it could send a message to an attached menu device)
+
+The coordinator is unique, and will not use the standard communications tasks.
+During initialization, after running any potential internal diagnostic and identifying whether it has a menu or not.
+It will initalize any connected devices on the network, before moving into its normal running loop
+
+In general, the coordinator is responsible for giving permission to speak to devices on the wired network, and passing messages between the wired and wireless when necessary.
+
+Messages coming into the network should be considered a higher priority than those going out.
+
+The coordinator is also responsible for routing messages to an attached menu controller.
+
+In general, code for the coordinator should be optimized as much as possible, it will be a very busy device and must run smoothly to avoid being a bottleneck in the network.
+the coordinator should remain relatively simple in its message processing.
+
+As a device, the coordinator doesn't appear in the network map anywhere outside of potentially menu devices. It is transparent to most network devices and not possible to reach directly.
