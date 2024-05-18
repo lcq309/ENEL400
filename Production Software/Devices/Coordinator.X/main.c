@@ -191,6 +191,56 @@ void prvWiredInitTask( void * parameters )
     vTaskSuspend(NULL);
 }
 
+void prv485OUTTask( void * parameters )
+{
+    uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
+    uint8_t wired_leader[2] = {0x7e, 0};
+    uint8_t length = 0;  //message length
+    //this is fairly simple, just output the message buffer when the bus is available.
+    //message length should be taken directly from the stream receive.
+    for(;;)
+    {
+        //wait until a message arrives in the buffer
+        length = xMessageBufferReceive(xRS485_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
+        //acquire MUTEX after pulling message into internal buffer
+        xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+        xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
+        //load the length of the message into the wired leader
+        wired_leader[1] = length;
+        //add the message leader into the output buffer
+        xStreamBufferSend(xRS485_out_Stream, wired_leader, 2, portMAX_DELAY);
+        //pass message to the output buffer
+        xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
+        //set transmit mode
+        RS485TR{'T'};
+        //enable DRE interrupt to start transmission
+        USART0.CTRLA |= USART_DREIE_bm;
+        //wait for TXcomplete semaphore
+        xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
+        //release MUTEXes
+        xSemaphoreGive(xRoundRobin_MUTEX);
+        xSemaphoreGive(xUSART0_MUTEX);
+        //end of loop, start over by waiting for a new message in the buffer
+    }
+}
+
+void prv485INTask( void * parameters )
+{
+    /* listen for messages on bus
+     * - Grab the mutex when a message comes in on the bus
+     * - there may be multiple messages in a stream, process them appropriately based on destination
+     * = for messages with a wireless address, send them to the wireless task
+     * = for messages addressed to channel 0, send them to the menu task
+     * = for messages intended only for devices on the wired bus, no further action is needed
+     * = ping response should be passed to the round robin task, this also marks the end of a message stream
+     * 
+     * 1. wait until message start is received, start collecting and building messages
+     * 2. route messages to appropriate destination task
+     * 3. ping response marks the end of a stream
+     */
+    
+}
+
 void prvWSCTask( void * parameters )
 {
     /* Wired Sector Controller
