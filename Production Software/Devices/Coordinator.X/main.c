@@ -198,6 +198,8 @@ void prv485OUTTask( void * parameters )
     uint8_t length = 0;  //message length
     //this is fairly simple, just output the message buffer when the bus is available.
     //message length should be taken directly from the stream receive.
+    //wait for initialization
+    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
         //wait until a message arrives in the buffer
@@ -238,7 +240,71 @@ void prv485INTask( void * parameters )
      * 2. route messages to appropriate destination task
      * 3. ping response marks the end of a stream
      */
-    
+    uint8_t message_buffer[MAX_MESSAGE_SIZE];
+    uint8_t byte_buffer[1];
+    uint8_t length = 0; //message length from header
+    //wait for initialization
+    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
+    for(;;)
+    {
+        //wait for something to appear on the bus
+        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+        //check for start delimiter
+        if(byte_buffer[0] == 0x7e)
+        {
+            //take mutex
+            xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+            //next byte should be length
+            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            length = byte_buffer[0];
+        }
+        else
+            length = 0; //just ignore this message, something went wrong
+        
+        //now we hold the MUTEX and know the message length(if there is a message)
+        for(uint8_t i = 0; i < length; i++)
+        {
+            //assemble the message byte by byte until the length is reached
+            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            message_buffer[i] = byte_buffer[0];
+        }
+        //now the full message should be within the message buffer, perform routing
+        if(length != 0)
+        {
+            switch(message_buffer[0])
+            {
+                case 'R': //ping response
+                    //pass the target ID on to the round robin buffer
+                    byte_buffer[0] = message_buffer[1];
+                    xMessageBufferSend(xRoundRobin_Buffer, byte_buffer, 1, portMAX_DELAY);
+                    //release the mutex, this is the end of the message
+                    xSemaphoreGive(xUSART0_MUTEX);
+                    break;
+                case 'O': //outbound message, check for wireless address or channel 0
+                    //check for wireless address first, as there may be multiple menu controllers and we don't want to send it duplicate messages
+                    uint8_t wirelesscheck = 0;
+                    for(uint8_t i = 11; i >= 4; i--) //byte 4 to 11 are for xBee address, if there is anything in here then send it to the wireless task
+                    {   //reverse check should be faster than forwards in most cases
+                        if(message_buffer[i] != 0)
+                        {
+                            wirelesscheck = 1;
+                            i = 12;
+                        }
+                    }
+                    
+                    if(wirelesscheck != 0) //if there is a wireless address, route to the wireless task
+                    {
+                        //not yet set up, just ignore for now
+                    }
+                    else if(message_buffer[2] == 0) //send to menu controller (if attached)
+                    {
+                        //not yet set up, just ignore for now
+                    }
+                    break;
+            }
+        }
+        
+    }
 }
 
 void prvWSCTask( void * parameters )
