@@ -1,21 +1,27 @@
 /* 
- * RS 485 Sector Controller
+ * Coordinator
  * Author:  Michael King
  * 
- * Created on April 22, 2024
+ * Created on March 18, 2024
  * 
- * This is meant to be a generic Sector Light controller on the wired network
- * which means that it has 3 buttons (Blue, Yellow, Green) and controls 
- * a sector light with either 3 or 4 colours.
+ * This is meant to be a wired network coordinator device, this device is responsible
+ * for creating and driving the wired network.
+ * this is quite different from the function of other devices on the wired network,
+ * so the networking code for this device is unique and separate from all other devices.
  */
+
+#define F_CPU 24000000UL // cpu speed for delay utilities
+
+#define MAX_MESSAGE_SIZE 200 //maximum message size allowable
+#define LIST_LENGTH 255 //max length of device list
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <DSIO.h>
-#include <RS485TASKS.h>
 #include "USART.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
+#include <avr/ioavr128da28.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
@@ -37,55 +43,85 @@ struct DeviceTracker
     uint8_t status;
 };
 
-//define global variables
-uint8_t GLOBAL_DeviceID = 0;
-uint8_t GLOBAL_Channel = 0;
-uint8_t GLOBAL_DeviceType = '1';
+//define priorities
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-#define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainWSC_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define main485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define main485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+
+//helper function prototype
+ void RS485TR(uint8_t dir);
+
+//Event Groups
+    EventGroupHandle_t xEventInit;
 
 //task pointers
-
 void prvWiredInitTask( void * parameters );
-void prvWSCTask( void * parameters );
+void prv485OUTTask( void * parameters );
+void prv485INTask( void * parameters );
+void prvRoundRobinTask( void * parameters );
 
-//retransmission timer
+//stream handles
+static StreamBufferHandle_t xRS485_in_Stream = NULL;
+static StreamBufferHandle_t xRS485_out_Stream = NULL;
+static MessageBufferHandle_t xRS485_out_Buffer = NULL;
+static MessageBufferHandle_t xRoundRobin_Buffer = NULL;
 
-TimerHandle_t xRetransmitTimer;
+//Mutexes
+static SemaphoreHandle_t xUSART0_MUTEX = NULL;
+static SemaphoreHandle_t xRoundRobin_MUTEX = NULL;
 
-//timer callback functions
+//Semaphores
+static SemaphoreHandle_t xRS485TX_SEM = NULL;
 
-void vRetransmitTimerFunc( TimerHandle_t xTimer );
-
-//timer global
-
-uint8_t GLOBAL_RetransmissionTimerSet = 0;
+//Device Table
+static uint8_t GLOBAL_DEVICE_TABLE[LIST_LENGTH];
+static uint8_t table_length = 0; //keep track of how many devices initialize
 
 int main(int argc, char** argv) {
     
     //setup tasks
+    
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvWSCTask, "WSC", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
+    xTaskCreate(prv485OUTTask, "485O", 600, NULL, main485OUT_TASK_PRIORITY, NULL);
+    xTaskCreate(prv485INTask, "485I", 600, NULL, main485IN_TASK_PRIORITY, NULL);
+    xTaskCreate(prvRoundRobinTask, "RR", 600, NULL, main485IN_TASK_PRIORITY, NULL);
     
-    //setup modules
+    //setup modules (no modules for the coordinator)
     
-    COMMSetup();
-    DSIOSetup();
+    //setup event group
     
-    //setup timer
+    xEventInit = xEventGroupCreate();
     
-    xRetransmitTimer = xTimerCreate("ReTX", 500, pdFALSE, 0, vRetransmitTimerFunc);
+    //setup USART
     
-    //grab the channel and device ID
-    InitShiftIn(); //initialize shift register pins
-    LTCHIn(); //latch input register
-    GLOBAL_Channel = ShiftIn(); //grab channel
-    GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
+    USART0_init();
+    
+    //USART 485 control pin
+    
+    PORTD.DIRSET = PIN7_bm;
+    PORTD.DIRCLR = PIN7_bm;
+    
+    //setup buffers and streams
+    
+    xRS485_in_Stream = xStreamBufferCreate(20, 1); //size of 20 bytes, 1 byte trigger
+    xRS485_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1);
+    xRS485_out_Buffer = xMessageBufferCreate(400); //size of 400 bytes
+    xRoundRobin_Buffer = xMessageBufferCreate(20); //size of 20 bytes
+    
+    //setup mutex(es)
+    
+    xUSART0_MUTEX = xSemaphoreCreateMutex();
+    xRoundRobin_MUTEX = xSemaphoreCreateMutex();
+    
+    //setup semaphore
+    
+    xRS485TX_SEM = xSemaphoreCreateBinary();
+    
+    //wait half a second to ensure all wired devices are active
+    
+    _delay_ms(500);
     
     //done with pre-scheduler initialization, start scheduler
     vTaskStartScheduler();
@@ -96,32 +132,32 @@ void prvWiredInitTask( void * parameters )
 {
     /* Wired Init - Runs Once
      * 1. take USART mutex
-     * 2. flash indicators
-     * 3. listen and wait for correct ping
-     * 4. respond to ping with the generic ping response
-     * 5. wait for TXC semaphore
-     * 6. stop blinking lights
-     * 7. set the init event group
-     * 8. release the USART mutex
-     * 9. suspend permanently
+     * 2. Generate pings to the entire device list and send them
+     * 3. wait up to 2 cycles for a response to start, or else move on to the next device
+     * 4. confirm ping response is correct and add device to the list
+     * 5. after looping through the entire list, release all other tasks and suspend
      */
-    uint8_t PingResponse[4] = {0x7e, 0x02, 'R', GLOBAL_DeviceID};
-    
+    uint8_t Ping[4] = {0x7E, 0x02, 'P', 0};
+    uint8_t byte_buffer[1];
+    uint8_t length = 0;
+    uint8_t buffer[2];
     //take the mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    //start flashing indicators
-    uint8_t FlashAll[2] = {0xff, 'F'};
-    xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
     
-    //wait and listen for the correct ping
-    uint8_t byte_buffer[1];
-    uint8_t buffer[2];
-    uint8_t received = 0;
-    uint8_t length = 0;
-    while(received != 1)
+    //loop and send pings, wait up to 2 cycles for a response, and move to the next one.
+    
+    for(uint8_t i = 1; i < LIST_LENGTH; i++)
     {
-        //wait for start delimiter
-        xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
+        Ping[3] = i; //configure ping
+        xStreamBufferSend(xRS485_out_Stream, Ping, 4, portMAX_DELAY); //load output buffer with ping
+        RS485TR('T'); //set transmit mode
+        //start transmission by setting TXCIE, and DREIE
+        USART0.CTRLA |= USART_TXCIE_bm;
+        USART0.CTRLA |= USART_DREIE_bm;
+        //wait for semaphore
+        xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
+        //transmission is now complete, listen for the response for up to 2 cycles
+        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 2);
         if(byte_buffer[0] == 0x7E)
         {
             uint8_t pos = 0;
@@ -137,34 +173,22 @@ void prvWiredInitTask( void * parameters )
                 pos++;
             }
         }
-        //check for ping
-        if(buffer[0] == 'P')
+        //now check ping response for correct number
+        if(buffer[0] == 'R')
         {
-            if(buffer[1] == GLOBAL_DeviceID) //if pinging me, respond with ping response
+            if(buffer[1] == i) //if correct response, add to table
             {
-                //stop loop
-                received = 1;
-                //load output buffer
-                xStreamBufferSend(xCOMM_out_Stream, PingResponse, 4, portMAX_DELAY);
-                //enable transmitter
-                RS485TR('T');
-                //start transmission by setting TXCIE, and DREIE
-                USART0.CTRLA |= USART_TXCIE_bm;
-                USART0.CTRLA |= USART_DREIE_bm;
-                //wait for semaphore
-                xSemaphoreTake(xTXC, portMAX_DELAY);
-                //stop flashing lights
-                FlashAll[1] = 'O'; // O for Off
-                xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
-                //release MUTEX
-                xSemaphoreGive(xUSART0_MUTEX);
-                //set initialization flag
-                xEventGroupSetBits(xEventInit, 0x1);
-                //go to sleep until restart
-                vTaskSuspend(NULL);
+                GLOBAL_DEVICE_TABLE[table_length] = i;
+                table_length++;
             }
         }
+        //otherwise, just ensure that the buffer is cleared and go to next device ID.
+        buffer[0] = 0;
     }
+    //The device table and all connected devices should now be initialized.
+    //release the init group and suspend the task.
+    xEventGroupSetBits(xEventInit, 0x1);
+    vTaskSuspend(NULL);
 }
 
 void prvWSCTask( void * parameters )
@@ -930,7 +954,21 @@ void prvWSCTask( void * parameters )
     }
 }
 
-void vRetransmitTimerFunc( TimerHandle_t xTimer )
+//helper functions:
+
+//RS485 in/out
+void RS485TR(uint8_t dir)
 {
-    GLOBAL_RetransmissionTimerSet = 1;
+    //set transceiver direction
+    switch(dir)
+    {
+        case 'T': //transmit
+            PORTD.DIRSET = PIN72_bm;
+            break;
+        case 'R': //receive
+            PORTD.DIRCLR = PIN7_bm;
+            break;
+        default: //incorrect command
+            break;
+    }
 }

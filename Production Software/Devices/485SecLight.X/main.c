@@ -97,7 +97,7 @@ void prvWiredInitTask( void * parameters )
     //take the mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //start flashing indicators
-    uint8_t FlashAll[2] = {0xff, 'F'};
+    uint8_t FlashAll[2] = {'Y', 'F'};
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
     
     //wait and listen for the correct ping

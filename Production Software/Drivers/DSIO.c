@@ -23,7 +23,7 @@
 void DSIOSetup()
 {
     //485 R/W pin setup
-    PORTD.DIRSET = PIN7_bm;
+    PORTA.DIRSET = PIN2_bm;
     
     //setup Queues
     
@@ -200,10 +200,10 @@ void RS485TR(uint8_t dir)
     switch(dir)
     {
         case 'T': //transmit
-            PORTD.DIRSET = PIN7_bm;
+            PORTA.DIRSET = PIN2_bm;
             break;
         case 'R': //receive
-            PORTD.DIRCLR = PIN7_bm;
+            PORTA.DIRCLR = PIN2_bm;
             break;
         default: //incorrect command
             break;

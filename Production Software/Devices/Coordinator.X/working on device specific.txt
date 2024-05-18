@@ -23,3 +23,5 @@ In general, code for the coordinator should be optimized as much as possible, it
 the coordinator should remain relatively simple in its message processing.
 
 As a device, the coordinator doesn't appear in the network map anywhere outside of potentially menu devices. It is transparent to most network devices and not possible to reach directly.
+
+If the output buffers need to be split up to give one per message stream to avoid issues with blocking for the MUTEX, then the menu controller should be the buffer checked first for the two comms outputs. Because the coordinator does not need to store other devices in RAM, it should have enough space for multiple message buffers between tasks.
