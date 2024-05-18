@@ -194,7 +194,7 @@ void prvWiredInitTask( void * parameters )
 void prv485OUTTask( void * parameters )
 {
     uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
-    uint8_t wired_leader[2] = {0x7e, 0};
+    uint8_t wired_leader[3] = {0x7e, 0, 'I'};
     uint8_t length = 0;  //message length
     //this is fairly simple, just output the message buffer when the bus is available.
     //message length should be taken directly from the stream receive.
@@ -208,9 +208,9 @@ void prv485OUTTask( void * parameters )
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
         //load the length of the message into the wired leader
-        wired_leader[1] = length;
+        wired_leader[1] = length + 1; //including direction byte
         //add the message leader into the output buffer
-        xStreamBufferSend(xRS485_out_Stream, wired_leader, 2, portMAX_DELAY);
+        xStreamBufferSend(xRS485_out_Stream, wired_leader, 3, portMAX_DELAY);
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
         //set transmit mode
