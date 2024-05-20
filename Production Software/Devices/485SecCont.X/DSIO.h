@@ -1,9 +1,9 @@
 /* 
  * File:   DSIO.h
  * Author: Michael King
- * Device Specific I/O for the generic wired sector light
+ * Device Specific I/O for the generic wired sector controller
  * this file needs to define the RS485TR, as well as indicators and button interrupts
- * and I/O handling tasks. This code also needs to define the error checking routines
+ * and I/O handling tasks.
  * Created on April 23, 2024
  */
 
@@ -27,14 +27,17 @@ extern "C" {
     
     //timer globals
     
+    extern uint8_t xPBTimerSet;
     extern uint8_t xINDTimerSet;
     
     //timer handles
     
+    extern TimerHandle_t xPBTimer;
     extern TimerHandle_t xINDTimer;
     
     //queue handles
 
+    extern QueueHandle_t xPB_Queue;
     extern QueueHandle_t xIND_Queue;
     extern QueueHandle_t xDeviceIN_Queue;
     
@@ -42,12 +45,14 @@ extern "C" {
     extern EventGroupHandle_t xEventInit;
 
     //Task Definition
+    void dsIOInTask ( void * parameters );
     void dsIOOutTask ( void * parameters );
     
     //task setup function
     void DSIOSetup(void);
     
     //timer callback functions
+    void vPBTimerFunc( TimerHandle_t xTimer );
     void vINDTimerFunc( TimerHandle_t xTimer ); 
     
     /* RS 485 TR
@@ -68,10 +73,6 @@ extern "C" {
     void dsioYellowTGL(void);
     
     void dsioBlueOn(void);
-    void dsioBlueOff(void);
-    void dsioBlueTGL(void);
-    
-    void dsioRedOn(void);
     void dsioBlueOff(void);
     void dsioBlueTGL(void);
     
