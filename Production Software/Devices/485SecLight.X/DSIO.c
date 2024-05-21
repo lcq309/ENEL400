@@ -210,12 +210,6 @@ void RS485TR(uint8_t dir)
     }
 }
 
-//timer callback functions
-void vPBTimerFunc( TimerHandle_t xTimer )
-{
-    xPBTimerSet = 1;
-}
-
 void vINDTimerFunc( TimerHandle_t xTimer )
 {
     xINDTimerSet = 1;
@@ -223,53 +217,53 @@ void vINDTimerFunc( TimerHandle_t xTimer )
 
 void dsioGreenOn(void)
 {
-    PORTA.OUTSET = PIN7_bm;
+    PORTC.OUTSET = PIN3_bm;
 }
 void dsioGreenOff(void)
 {
-    PORTA.OUTCLR = PIN7_bm;
+    PORTC.OUTCLR = PIN3_bm;
 }
 void dsioGreenTGL(void)
 {
-    PORTA.OUTTGL = PIN7_bm;
+    PORTC.OUTTGL = PIN3_bm;
 }
     
 void dsioYellowOn(void)
 {
-    PORTC.OUTSET = PIN0_bm;
+    PORTD.OUTSET = PIN1_bm;
 }
 void dsioYellowOff(void)
 {
-    PORTC.OUTCLR = PIN0_bm;
+    PORTD.OUTCLR = PIN1_bm;
 }
 void dsioYellowTGL(void)
 {
-    PORTC.OUTTGL = PIN0_bm;
+    PORTD.OUTTGL = PIN1_bm;
 }
     
 void dsioBlueOn(void)
 {
-    PORTC.OUTSET = PIN1_bm;
+    PORTD.OUTSET = PIN0_bm;
 }
 void dsioBlueOff(void)
 {
-    PORTC.OUTCLR = PIN1_bm;
+    PORTD.OUTCLR = PIN0_bm;
 }
 void dsioBlueTGL(void)
 {
-    PORTC.OUTTGL = PIN1_bm;
+    PORTD.OUTTGL = PIN0_bm;
 }
 
 void dsioRedOn(void)
 {
-    
+    PORTC.OUTSET = PIN2_bm;
 }
 void dsioRedOff(void)
 {
-    
+    PORTC.OUTCLR = PIN2_bm;
 }
 void dsioRedTGL(void)
 {
-    
+    PORTC.OUTTGL = PIN2_bm;
 }
 //interrupts go here

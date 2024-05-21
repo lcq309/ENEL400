@@ -21,7 +21,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
-#include <avr/ioavr128da28.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
@@ -51,10 +50,10 @@ struct DeviceTracker
 #define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 //helper function prototype
- void RS485TR(uint8_t dir);
+void RS485TR(uint8_t dir);
 
 //Event Groups
-    EventGroupHandle_t xEventInit;
+EventGroupHandle_t xEventInit;
 
 //task pointers
 void prvWiredInitTask( void * parameters );
@@ -162,13 +161,13 @@ void prvWiredInitTask( void * parameters )
         {
             uint8_t pos = 0;
             //next byte is length, grab length for message construction loop
-            xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
             length = byte_buffer[0]; // load loop iterator
             //loop and assemble message until length = 0;
             while(length > 0)
             {
                 length--;
-                xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
                 buffer[pos] = byte_buffer[0];
                 pos++;
             }
@@ -214,7 +213,7 @@ void prv485OUTTask( void * parameters )
         //pass message to the output buffer
         xStreamBufferSend(xRS485_out_Stream, output_buffer, length, portMAX_DELAY);
         //set transmit mode
-        RS485TR{'T'};
+        RS485TR('T');
         //enable DRE interrupt to start transmission
         USART0.CTRLA |= USART_DREIE_bm;
         //wait for TXcomplete semaphore
@@ -271,6 +270,7 @@ void prv485INTask( void * parameters )
         //now the full message should be within the message buffer, perform routing
         if(length != 0)
         {
+            uint8_t wirelesscheck = 0;
             switch(message_buffer[0])
             {
                 case 'R': //ping response
@@ -282,7 +282,7 @@ void prv485INTask( void * parameters )
                     break;
                 case 'O': //outbound message, check for wireless address or channel 0
                     //check for wireless address first, as there may be multiple menu controllers and we don't want to send it duplicate messages
-                    uint8_t wirelesscheck = 0;
+                    wirelesscheck = 0;
                     for(uint8_t i = 11; i >= 4; i--) //byte 4 to 11 are for xBee address, if there is anything in here then send it to the wireless task
                     {   //reverse check should be faster than forwards in most cases
                         if(message_buffer[i] != 0)
@@ -356,7 +356,7 @@ void RS485TR(uint8_t dir)
     switch(dir)
     {
         case 'T': //transmit
-            PORTD.DIRSET = PIN72_bm;
+            PORTD.DIRSET = PIN7_bm;
             break;
         case 'R': //receive
             PORTD.DIRCLR = PIN7_bm;

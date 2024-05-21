@@ -62,8 +62,8 @@
       <itemPath>main.c</itemPath>
       <itemPath>FreeRTOSConfig/FreeRTOSConfig.h</itemPath>
       <itemPath>clk_config.h</itemPath>
-      <itemPath>../../Drivers/DSIO.h</itemPath>
-      <itemPath>../../Drivers/DSIO.c</itemPath>
+      <itemPath>DSIO.c</itemPath>
+      <itemPath>FreeRTOSConfig/DSIO.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -235,6 +235,8 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
         <property key="poweroptions.powerenable" value="true"/>
+        <property key="programmerToGoFilePath"
+                  value="F:/GitHub/ENEL400/Production Software/Devices/485SecCont.X/debug/default/485SecCont_ptg"/>
         <property key="programmerToGoImageName" value="485SecCont_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

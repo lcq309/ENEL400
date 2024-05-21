@@ -57,16 +57,12 @@ int main(int argc, char** argv) {
     
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvWSCTask, "WSC", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
+    xTaskCreate(prvWSLTask, "WSL", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
     
     //setup modules
     
     COMMSetup();
     DSIOSetup();
-    
-    //setup timer
-    
-    xRetransmitTimer = xTimerCreate("ReTX", 500, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
@@ -519,9 +515,4 @@ void prvWSLTask( void * parameters )
             //loop and restart
         }
     }
-}
-
-void vRetransmitTimerFunc( TimerHandle_t xTimer )
-{
-    GLOBAL_RetransmissionTimerSet = 1;
 }

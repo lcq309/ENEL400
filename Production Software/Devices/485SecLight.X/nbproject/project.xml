@@ -14,6 +14,7 @@
                 <sourceRootElem>../../FreeRTOS</sourceRootElem>
                 <sourceRootElem>../../ModularTasks/Communications</sourceRootElem>
                 <sourceRootElem>.</sourceRootElem>
+                <sourceRootElem>../485SecCont.X/FreeRTOSConfig</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

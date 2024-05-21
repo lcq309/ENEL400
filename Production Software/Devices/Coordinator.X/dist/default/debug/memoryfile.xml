@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/debug/485SecCont.X.debug.elf">                 
+  <executable name="dist/default/debug/Coordinator.X.debug.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>23434</used>                     
-      <free>107638</free>                     
+      <used>15287</used>                     
+      <free>115785</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 
       <length>16384</length>                 
-      <used>11112</used>                     
-      <free>5272</free>                     
+      <used>8599</used>                     
+      <free>7785</free>                     
     </memory>                              
   </executable>                            
 </project>                                 
