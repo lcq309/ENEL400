@@ -10,8 +10,6 @@
  * so the networking code for this device is unique and separate from all other devices.
  */
 
-#define F_CPU 24000000UL // cpu speed for delay utilities
-
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable
 #define LIST_LENGTH 255 //max length of device list
 
@@ -20,7 +18,6 @@
 #include "USART.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
@@ -45,8 +42,8 @@ struct DeviceTracker
 //define priorities
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define main485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-#define main485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define main485OUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define main485IN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 //helper function prototype
@@ -118,10 +115,6 @@ int main(int argc, char** argv) {
     
     xRS485TX_SEM = xSemaphoreCreateBinary();
     
-    //wait half a second to ensure all wired devices are active
-    
-    _delay_ms(500);
-    
     //done with pre-scheduler initialization, start scheduler
     vTaskStartScheduler();
     return (EXIT_SUCCESS);
@@ -140,8 +133,17 @@ void prvWiredInitTask( void * parameters )
     uint8_t byte_buffer[1];
     uint8_t length = 0;
     uint8_t buffer[2];
+    
+    //wait half a second to ensure all wired devices are active
+    
+    vTaskDelay(500);
+    
+    //enable transmit complete interrupt
+    USART0.CTRLA |= USART_TXCIE_bm;
+    
     //take the mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+    
     
     //loop and send pings, wait up to 2 cycles for a response, and move to the next one.
     
@@ -150,9 +152,7 @@ void prvWiredInitTask( void * parameters )
         Ping[3] = i; //configure ping
         xStreamBufferSend(xRS485_out_Stream, Ping, 4, portMAX_DELAY); //load output buffer with ping
         RS485TR('T'); //set transmit mode
-        //start transmission by setting TXCIE, and DREIE
-        USART0.CTRLA |= USART_TXCIE_bm;
-        USART0.CTRLA |= USART_DREIE_bm;
+        USART0.CTRLA |= USART_DREIE_bm; //start message transmission
         //wait for semaphore
         xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
         //transmission is now complete, listen for the response for up to 2 cycles
@@ -184,6 +184,8 @@ void prvWiredInitTask( void * parameters )
         //otherwise, just ensure that the buffer is cleared and go to next device ID.
         buffer[0] = 0;
     }
+    //release the MUTEX
+    xSemaphoreGive(xUSART0_MUTEX);
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
     xEventGroupSetBits(xEventInit, 0x1);

@@ -298,6 +298,8 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
         <property key="poweroptions.powerenable" value="true"/>
+        <property key="programmerToGoFilePath"
+                  value="F:/GitHub/ENEL400/Production Software/Devices/485SecCont.X/debug/default/485SecCont_ptg"/>
         <property key="programmerToGoImageName" value="485SecCont_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
