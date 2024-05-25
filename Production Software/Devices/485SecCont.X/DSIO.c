@@ -27,6 +27,7 @@ void DSIOSetup()
 {
     //485 R/W pin setup
     PORTD.DIRSET = PIN7_bm;
+    PORTD.OUTCLR = PIN7_bm;
     
     //setup Queues
     

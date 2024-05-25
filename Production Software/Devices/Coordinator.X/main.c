@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     //USART 485 control pin
     
     PORTD.DIRSET = PIN7_bm;
-    PORTD.DIRCLR = PIN7_bm;
+    PORTD.OUTCLR = PIN7_bm;
     
     //setup buffers and streams
     

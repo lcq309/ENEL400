@@ -24,6 +24,7 @@ void DSIOSetup()
 {
     //485 R/W pin setup
     PORTA.DIRSET = PIN2_bm;
+    PORTA.OUTCLR = PIN2_bm;
     
     //setup Queues
     
@@ -32,7 +33,7 @@ void DSIOSetup()
     
     //setup tasks
     
-    xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(dsIOOutTask, "INDOUT", 350, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
 

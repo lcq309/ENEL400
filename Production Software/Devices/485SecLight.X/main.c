@@ -69,7 +69,8 @@ int main(int argc, char** argv) {
     LTCHIn(); //latch input register
     GLOBAL_Channel = ShiftIn(); //grab channel
     GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
-    
+    //set TXCIE to enable transmission end interrupts
+    USART0.CTRLA |= USART_TXCIE_bm;
     //done with pre-scheduler initialization, start scheduler
     vTaskStartScheduler();
     return (EXIT_SUCCESS);
@@ -131,8 +132,7 @@ void prvWiredInitTask( void * parameters )
                 xStreamBufferSend(xCOMM_out_Stream, PingResponse, 4, portMAX_DELAY);
                 //enable transmitter
                 RS485TR('T');
-                //start transmission by setting TXCIE, and DREIE
-                USART0.CTRLA |= USART_TXCIE_bm;
+                //start transmission by setting DREIE
                 USART0.CTRLA |= USART_DREIE_bm;
                 //wait for semaphore
                 xSemaphoreTake(xTXC, portMAX_DELAY);
