@@ -200,10 +200,10 @@ void RS485TR(uint8_t dir)
     switch(dir)
     {
         case 'T': //transmit
-            PORTA.DIRSET = PIN2_bm;
+            PORTA.OUTSET = PIN2_bm;
             break;
         case 'R': //receive
-            PORTA.DIRCLR = PIN2_bm;
+            PORTA.OUTCLR = PIN2_bm;
             break;
         default: //incorrect command
             break;

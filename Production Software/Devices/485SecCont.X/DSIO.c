@@ -223,10 +223,10 @@ void RS485TR(uint8_t dir)
     switch(dir)
     {
         case 'T': //transmit
-            PORTD.DIRSET = PIN7_bm;
+            PORTD.OUTSET = PIN7_bm;
             break;
         case 'R': //receive
-            PORTD.DIRCLR = PIN7_bm;
+            PORTD.OUTCLR = PIN7_bm;
             break;
         default: //incorrect command
             break;

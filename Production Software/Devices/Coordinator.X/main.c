@@ -155,8 +155,8 @@ void prvWiredInitTask( void * parameters )
         USART0.CTRLA |= USART_DREIE_bm; //start message transmission
         //wait for semaphore
         xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
-        //transmission is now complete, listen for the response for up to 2 cycles
-        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 2);
+        //transmission is now complete, listen for the response for up to 5 cycles
+        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 5);
         if(byte_buffer[0] == 0x7E)
         {
             uint8_t pos = 0;
@@ -358,10 +358,10 @@ void RS485TR(uint8_t dir)
     switch(dir)
     {
         case 'T': //transmit
-            PORTD.DIRSET = PIN7_bm;
+            PORTD.OUTSET = PIN7_bm;
             break;
         case 'R': //receive
-            PORTD.DIRCLR = PIN7_bm;
+            PORTD.OUTCLR = PIN7_bm;
             break;
         default: //incorrect command
             break;
@@ -396,8 +396,8 @@ ISR(USART0_TXC_vect)
      * 2. clear interrupt flag
      * 3. return transceiver to receive mode
      */
-    xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
-    USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     //return transceiver to receive mode
     RS485TR('R');
+    USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
+    xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
 }
