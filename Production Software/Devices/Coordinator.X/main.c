@@ -266,8 +266,13 @@ void prv485INTask( void * parameters )
         for(uint8_t i = 0; i < length; i++)
         {
             //assemble the message byte by byte until the length is reached
-            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
-            message_buffer[i] = byte_buffer[0];
+            if(xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 5) != 0)
+                message_buffer[i] = byte_buffer[0];
+            //if nothing is received, cancel message receipt. Something went wrong
+            else
+                i = length;
+            //this if/else statement constitutes collision recovery code.
+            //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
         }
         //now the full message should be within the message buffer, perform routing
         if(length != 0)
@@ -341,7 +346,10 @@ void prvRoundRobinTask( void * parameters )
             xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 250);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
-            {xSemaphoreGive(xRoundRobin_MUTEX);} //break here for debug purposes
+            {
+                vTaskDelay(50);
+                xSemaphoreGive(xRoundRobin_MUTEX);
+            } //break here for debug purposes
             else
             xSemaphoreGive(xRoundRobin_MUTEX); //release round robin
             //end of loop, start again after incrementing

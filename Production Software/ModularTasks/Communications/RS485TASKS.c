@@ -405,8 +405,8 @@ ISR(USART0_TXC_vect)
      * 1. set semaphore
      * 2. clear interrupt flag
      */
-    xSemaphoreGiveFromISR(xTXC, NULL); //send notification to output task
-    USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     // set transceiver to receive mode
     RS485TR('R');
+    USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
+    xSemaphoreGiveFromISR(xTXC, NULL); //send notification to output task
 }
