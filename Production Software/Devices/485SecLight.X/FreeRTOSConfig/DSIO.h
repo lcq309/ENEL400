@@ -72,8 +72,8 @@ extern "C" {
     void dsioBlueTGL(void);
     
     void dsioRedOn(void);
-    void dsioBlueOff(void);
-    void dsioBlueTGL(void);
+    void dsioRedOff(void);
+    void dsioRedTGL(void);
     
 #ifdef	__cplusplus
 }

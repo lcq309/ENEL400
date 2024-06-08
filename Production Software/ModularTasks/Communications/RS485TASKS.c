@@ -162,29 +162,47 @@ void modCOMMInTask (void * parameters)
     uint8_t length = 0;
     uint8_t size = 0;
     uint8_t pos = 0;
+    uint8_t check = 0; //check for message failure
     
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
     
     for(;;)
     {
-        //wait for start delimiter
+        //wait for start delimiter, can wait forever
+        //(may implement a 'no activity' warning here later)
         xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
         if(byte_buffer[0] == 0x7E)
         {
             pos = 0;
             //next byte is length, grab length for message construction loop
-            xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
-            length = byte_buffer[0]; // load loop iterator
-            size = length; //save length for use later
-            //loop and assemble message until length = 0;
-            while(length > 0)
+            check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 5);
+            if(check > 0)
             {
-                length--;
-                xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
-                buffer[pos] = byte_buffer[0];
-                pos++;
+                length = byte_buffer[0]; // load loop iterator
+                size = length; //save length for use later
+                //loop and assemble message until length = 0;
+                while(length > 0)
+                {
+                    check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 5);
+                    if(check > 0)
+                    {
+                        buffer[pos] = byte_buffer[0];
+                        pos++;
+                        length--;
+                    }
+                    else //message receipt failure, discard message and stop waiting
+                    {
+                        length = 0;
+                        buffer[0] = 0;
+                    }
+                }
             }
+            else
+                buffer[0] = 0;
         }
+        else //if not 0x7E, then something broke and we should not run the rest of the process
+            buffer[0] = 0; //set buffer out of bounds to ensure nothing happens with a previous message.
+        
         //message should now be full assembled, check message type (should be index 0)
         //release hardware MUTEX
         xSemaphoreGive(xUSART0_MUTEX);
@@ -303,6 +321,8 @@ void modCOMMInTask (void * parameters)
                 //(confirm full match with device table, can ignore wireless address from message and just check to ensure is all zeroes)
                 //send message to DS with index
                 //release mutex
+                case 0: //message receipt failure, maybe an error here in the future, otherwise just do nothing
+                    break;
             }
             break;
         }

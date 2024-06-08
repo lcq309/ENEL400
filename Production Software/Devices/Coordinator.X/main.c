@@ -270,7 +270,7 @@ void prv485INTask( void * parameters )
                 message_buffer[i] = byte_buffer[0];
             //if nothing is received, cancel message receipt. Something went wrong
             else
-                i = length;
+                length = 0;
             //this if/else statement constitutes collision recovery code.
             //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
         }
