@@ -184,6 +184,9 @@ void prvWSLTask( void * parameters )
      * since this is the lowest priority task, it shouldn't need to block for anything on the input side.
      */
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
+    //send the network join message
+    uint8_t NetJoin[1] = {0xff};
+    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     for(;;)
     {
         //internal source commands processing

@@ -129,19 +129,19 @@ void modCOMMOutTask (void * parameters)
     // wait for notification (if not received then just go back to the start of the loop)
     if(xSemaphoreTake(xPermission, 500) == pdTRUE)
     {
-    // acquire hardware mutex
-    xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-    // load the ping response
-    xStreamBufferSend(xCOMM_out_Stream, PR, 4, portMAX_DELAY);
-    // set transceiver to transmit mode
-    RS485TR('T');
-    //enable DRE interrupt
-    USART0.CTRLA |= USART_DREIE_bm;
-    //wait for TXcomplete notification
-    xSemaphoreTake(xTXC, portMAX_DELAY);
-    //release USART MUTEX
-    xSemaphoreGive(xUSART0_MUTEX);
-    //end of message, wait until permission given again
+        // acquire hardware mutex
+        xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
+        // load the ping response
+        xStreamBufferSend(xCOMM_out_Stream, PR, 4, portMAX_DELAY);
+        // set transceiver to transmit mode
+        RS485TR('T');
+        //enable DRE interrupt
+        USART0.CTRLA |= USART_DREIE_bm;
+        //wait for TXcomplete notification
+        xSemaphoreTake(xTXC, portMAX_DELAY);
+        //release USART MUTEX
+        xSemaphoreGive(xUSART0_MUTEX);
+        //end of message, wait until permission given again
     }
     }
 }
