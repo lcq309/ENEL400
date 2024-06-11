@@ -155,8 +155,8 @@ void prvWiredInitTask( void * parameters )
         USART0.CTRLA |= USART_DREIE_bm; //start message transmission
         //wait for semaphore
         xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
-        //transmission is now complete, listen for the response for up to 5 cycles
-        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 5);
+        //transmission is now complete, listen for the response for up to 10 cycles
+        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 10);
         if(byte_buffer[0] == 0x7E)
         {
             uint8_t pos = 0;
@@ -188,6 +188,7 @@ void prvWiredInitTask( void * parameters )
     xSemaphoreGive(xUSART0_MUTEX);
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
+    vTaskDelay(100); //wait for 100ms to ensure that the  
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
@@ -249,14 +250,19 @@ void prv485INTask( void * parameters )
     for(;;)
     {
         //wait for something to appear on the bus
-        xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+        if(xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 200) == 0)
+            //timeout that releases the Mutex in case of a message failure
+        {
+            xSemaphoreGive(xUSART0_MUTEX);
+            byte_buffer[0] = 0x0;
+        }
         //check for start delimiter
         if(byte_buffer[0] == 0x7e)
         {
             //take mutex
             xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
             //next byte should be length
-            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 50); //at worst, this will collect garbage, but it shouldn't lock up
             length = byte_buffer[0];
         }
         else
@@ -266,7 +272,7 @@ void prv485INTask( void * parameters )
         for(uint8_t i = 0; i < length; i++)
         {
             //assemble the message byte by byte until the length is reached
-            if(xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 5) != 0)
+            if(xStreamBufferReceive(xRS485_in_Stream, byte_buffer, 1, 10) != 0)
                 message_buffer[i] = byte_buffer[0];
             //if nothing is received, cancel message receipt. Something went wrong
             else
@@ -295,7 +301,7 @@ void prv485INTask( void * parameters )
                         if(message_buffer[i] != 0)
                         {
                             wirelesscheck = 1;
-                            i = 12;
+                            i = 3;
                         }
                     }
                     
@@ -307,6 +313,7 @@ void prv485INTask( void * parameters )
                     {
                         //not yet set up, just ignore for now
                     }
+                    xSemaphoreGive(xUSART0_MUTEX);
                     break;
             }
         }
@@ -343,6 +350,7 @@ void prvRoundRobinTask( void * parameters )
             xSemaphoreGive(xUSART0_MUTEX);
             //wait for a response from the message stream
             //receives from round robin buffer, puts into acknowledge array, max length 1, waits max 250 cycles
+            acknowledge[0] = 0; //overwrite to prevent false allowance
             xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 250);
             //check response
             if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])

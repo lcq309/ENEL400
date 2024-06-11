@@ -129,10 +129,10 @@ void modCOMMOutTask (void * parameters)
     // wait for notification (if not received then just go back to the start of the loop)
     if(xSemaphoreTake(xPermission, 500) == pdTRUE)
     {
-        // acquire hardware mutex
-        xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         // load the ping response
         xStreamBufferSend(xCOMM_out_Stream, PR, 4, portMAX_DELAY);
+        // acquire hardware mutex
+        xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         // set transceiver to transmit mode
         RS485TR('T');
         //enable DRE interrupt
@@ -175,7 +175,7 @@ void modCOMMInTask (void * parameters)
         {
             pos = 0;
             //next byte is length, grab length for message construction loop
-            check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 5);
+            check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 10);
             if(check > 0)
             {
                 length = byte_buffer[0]; // load loop iterator
@@ -183,7 +183,7 @@ void modCOMMInTask (void * parameters)
                 //loop and assemble message until length = 0;
                 while(length > 0)
                 {
-                    check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 5);
+                    check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 10);
                     if(check > 0)
                     {
                         buffer[pos] = byte_buffer[0];

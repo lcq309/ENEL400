@@ -9,8 +9,8 @@
 #include "DSIO.h"
 //timer globals
     
-    uint8_t xPBTimerSet;
-    uint8_t xINDTimerSet;
+    uint8_t xPBTimerSet = 0;
+    uint8_t xINDTimerSet = 0;
     
     //timer handles
     
@@ -28,6 +28,10 @@ void DSIOSetup()
     //485 R/W pin setup
     PORTD.DIRSET = PIN7_bm;
     PORTD.OUTCLR = PIN7_bm;
+    
+    //Indicator pin setup
+    PORTA.DIRSET = PIN7_bm;
+    PORTC.DIRSET = PIN0_bm | PIN1_bm;
     
     //setup Queues
     
@@ -97,10 +101,14 @@ void dsIOOutTask (void * parameters)
     //blink should be somewhat slow, flash should be faster (mostly used for blue, initialization, and maybe errors)
     
     //indicator state buffers initialized to zero
-    uint8_t GREEN = 0; uint8_t YELLOW = 0; uint8_t BLUE = 0;
+    static uint8_t GREEN = 0; 
+    static uint8_t YELLOW = 0; 
+    static uint8_t BLUE = 0;
     
     //time buffers for flash and latches
-    uint8_t flash = 0; uint8_t blink = 0; uint8_t ms250 = 0;
+    static uint8_t flash = 0; 
+    static uint8_t blink = 0; 
+    static uint8_t ms250 = 0;
     
     //setup IO
     
@@ -247,41 +255,41 @@ void vINDTimerFunc( TimerHandle_t xTimer )
 
 void dsioGreenOn(void)
 {
-    PORTA.OUTSET = PIN7_bm;
+    PORTC.OUTSET = PIN0_bm;
 }
 void dsioGreenOff(void)
 {
-    PORTA.OUTCLR = PIN7_bm;
-}
-void dsioGreenTGL(void)
-{
-    PORTA.OUTTGL = PIN7_bm;
-}
-    
-void dsioYellowOn(void)
-{
-    PORTC.OUTSET = PIN0_bm;
-}
-void dsioYellowOff(void)
-{
     PORTC.OUTCLR = PIN0_bm;
 }
-void dsioYellowTGL(void)
+void dsioGreenTGL(void)
 {
     PORTC.OUTTGL = PIN0_bm;
 }
     
-void dsioBlueOn(void)
+void dsioYellowOn(void)
 {
     PORTC.OUTSET = PIN1_bm;
 }
-void dsioBlueOff(void)
+void dsioYellowOff(void)
 {
     PORTC.OUTCLR = PIN1_bm;
 }
-void dsioBlueTGL(void)
+void dsioYellowTGL(void)
 {
     PORTC.OUTTGL = PIN1_bm;
+}
+    
+void dsioBlueOn(void)
+{
+    PORTA.OUTSET = PIN7_bm;
+}
+void dsioBlueOff(void)
+{
+    PORTA.OUTCLR = PIN7_bm;
+}
+void dsioBlueTGL(void)
+{
+    PORTA.OUTTGL = PIN7_bm;
 }
 
 //interrupts go here
