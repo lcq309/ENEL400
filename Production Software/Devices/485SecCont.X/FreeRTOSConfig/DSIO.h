@@ -25,6 +25,10 @@ extern "C" {
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
     
+    //Semaphores
+    
+    extern SemaphoreHandle_t xNotify; //defined in the communications module
+    
     //timer globals
     
     extern uint8_t xPBTimerSet;

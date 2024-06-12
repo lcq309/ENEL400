@@ -110,7 +110,7 @@ void prvWiredInitTask( void * parameters )
     //take the mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //start flashing indicators
-    uint8_t FlashAll[2] = {'G', 'F'};
+    uint8_t FlashAll[2] = {0xff, 'F'};
     xQueueSendToFront(xIND_Queue, FlashAll, portMAX_DELAY);
     
     //wait and listen for the correct ping
@@ -212,6 +212,7 @@ void prvWSCTask( void * parameters )
     xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     for(;;)
     {
+        xSemaphoreTake(xNotify, 200); //wait for a message to come in from anywhere
         //internal source commands processing
         if(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
         {
@@ -225,6 +226,14 @@ void prvWSCTask( void * parameters )
                     {
                         case 'C': //clear, allow colour change request
                             colour_req = buffer[1];
+                            lockout = buffer[1];
+                            Requester = 1; //we are initiating this change
+                            updateIND = 1; //update the indicators
+                            break;
+                            
+                        case 'B': //blue lockout, allow any colour through
+                            colour_req = buffer[1];
+                            lockout = buffer[1];
                             Requester = 1; //we are initiating this change
                             updateIND = 1; //update the indicators
                             break;
@@ -232,12 +241,14 @@ void prvWSCTask( void * parameters )
                         case 'G': //green lockout, allow yellow through but not blue
                             switch(buffer[1])
                             {
-                                case'Y': //yellow light
+                                case 'Y': //yellow light
                                     colour_req = buffer[1];
+                                    lockout = buffer[1];
                                     Requester = 1; //we are initiating this change
                                     updateIND = 1; //update the indicators
                                     break;
-                                case'B': //blue light
+                                    
+                                case 'B': //blue light
                                     //flash green for a short time
                                     buffer[0] = 0xff;
                                     buffer[1] = 'O'; //turn all off first
@@ -249,6 +260,8 @@ void prvWSCTask( void * parameters )
                                     updateIND = 1;
                                     break;
                             }
+                            break;
+                            
                         case 'Y': //yellow lockout, flash yellow for a short time
                             buffer[0] = 0xff;
                             buffer[1] = 'O'; //turn all off first
@@ -755,7 +768,7 @@ void prvWSCTask( void * parameters )
         //message processing now complete, check the status of any colour change request
         //if all colours are matching colour_req, then change colour_cur into colour_req
         uint8_t check_variable = 1;
-        if(colour_cur != colour_req)
+        if((colour_cur != colour_req) || (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
             switch(Requester)
             //how this acts depends on if it is a requester 1 or 2
@@ -838,6 +851,7 @@ void prvWSCTask( void * parameters )
         check_variable = 1;
         //if we are requester 1, we should ensure that first the controller lockouts are released
         //as a requester 2, we can return to requester 0 once all lights have confirmed colour
+        //at this point, all lights and controllers have confirmed colour change, so we need to start releasing lockouts
         switch(Requester)
         {
             case 1:
@@ -885,6 +899,8 @@ void prvWSCTask( void * parameters )
                     if(check_variable == 1)
                     {
                         lockout = 'C';
+                        colour_req = colour_cur;
+                        updateIND = 1;
                         Requester = 0;
                     }
                     //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.

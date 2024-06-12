@@ -17,7 +17,8 @@
     
     //Semaphores
     SemaphoreHandle_t xPermission; //task notification replacement
-    SemaphoreHandle_t xTXC;
+    SemaphoreHandle_t xTXC; //transmission complete flag
+    SemaphoreHandle_t xNotify; //used to notify the device running task when something is received, alternative to task notification
     
     //Event Groups
     EventGroupHandle_t xEventInit;
@@ -45,6 +46,7 @@ void COMMSetup()
     
     xPermission = xSemaphoreCreateBinary();
     xTXC = xSemaphoreCreateBinary();
+    xNotify = xSemaphoreCreateBinary();
     
     //setup event group
     
@@ -252,6 +254,8 @@ void modCOMMInTask (void * parameters)
                                     for(uint8_t x = 0; x < size - 12; x++)
                                         buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                                     size = size - 12; //resize to remove the header
+                                    //notify the device
+                                    xSemaphoreGive(xNotify);
                                     //send to device buffer
                                     xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
                                     //end looping iterations
@@ -306,6 +310,8 @@ void modCOMMInTask (void * parameters)
                                     for(uint8_t x = 0; x < size - 12; x++)
                                         buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                                     size = size - 12; //resize to remove the header
+                                    //notify the device
+                                    xSemaphoreGive(xNotify);
                                     //send to device buffer
                                     xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
                                     //end looping iterations
@@ -353,6 +359,8 @@ void modCOMMInTask (void * parameters)
                 for(uint8_t x = 0; x < size - 12; x++)
                     buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                 size = size - 12; //resize to remove the header
+                //notify the device
+                xSemaphoreGive(xNotify);
                 //send to device buffer
                 xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
             }
@@ -382,6 +390,8 @@ void modCOMMInTask (void * parameters)
                 for(uint8_t x = 0; x < size - 12; x++)
                     buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                 size = size - 12; //resize to remove the header
+                //notify the device
+                xSemaphoreGive(xNotify);
                 //send to device buffer
                 xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
             }

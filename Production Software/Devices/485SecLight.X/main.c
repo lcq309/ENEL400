@@ -477,8 +477,6 @@ void prvWSLTask( void * parameters )
                     break;
             }
             //message processing now complete, check the status of any colour change request
-            //send an error if appropriate
-            uint8_t check_variable = 1;
             //update indicators if needed
             if(colour_cur != colour_req)
             {

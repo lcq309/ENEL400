@@ -53,6 +53,7 @@ extern "C" {
     //Semaphores
     extern SemaphoreHandle_t xPermission; //task notification replacement
     extern SemaphoreHandle_t xTXC;
+    extern SemaphoreHandle_t xNotify;
     
     //Event Groups
     extern EventGroupHandle_t xEventInit;

@@ -7,7 +7,11 @@
  */
 
 #include "DSIO.h"
-//timer globals
+    //Semaphores
+    
+    extern SemaphoreHandle_t xNotify;
+
+    //timer globals
     
     uint8_t xPBTimerSet = 0;
     uint8_t xINDTimerSet = 0;
@@ -67,7 +71,7 @@ void dsIOInTask (void * parameters)
     //block until a button press occurs, then check anti spam timer and reset timer
     //initialization complete, enter looping section.
     uint8_t input[1];
-    uint8_t output[2] = {'P',0}; //P for pushbutton in intertask messages
+    uint8_t output[2] = {'P', 0}; //P for pushbutton in intertask messages
     for(;;)
     {
         //wait for input
@@ -76,6 +80,7 @@ void dsIOInTask (void * parameters)
         if((last == input[0]) && (xPBTimerSet == 1))
         {
             output[1] = input[0];
+            xSemaphoreGive(xNotify);
             xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
             xPBTimerSet = 0;
             xTimerReset(xPBTimer, portMAX_DELAY);
@@ -84,6 +89,7 @@ void dsIOInTask (void * parameters)
         {
             last = input[0];
             output[1] = input[0];
+            xSemaphoreGive(xNotify);
             xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
             xPBTimerSet = 0;
             xTimerReset(xPBTimer, portMAX_DELAY);
@@ -307,15 +313,15 @@ ISR(PORTD_PORT_vect)
     {
         case PIN6_bm: //button 1
             PORTD.INTFLAGS = PIN6_bm; //reset interrupt
-            pb[0] = 'B';
+            pb[0] = 'Y';
             break;
         case PIN5_bm: //button 2
             PORTD.INTFLAGS = PIN5_bm; //reset interrupt
-            pb[0] = 'Y';
+            pb[0] = 'G';
             break;
         case PIN3_bm: //button 3
             PORTD.INTFLAGS = PIN3_bm; //reset interrupt
-            pb[0] = 'G';
+            pb[0] = 'B';
             break;
     }
     xQueueSendToFrontFromISR(xPB_Queue, pb, NULL);
