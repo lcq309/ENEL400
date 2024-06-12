@@ -170,7 +170,7 @@ void prvWSLTask( void * parameters )
     uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
-    uint8_t colour_req = 'O'; //requested colour
+    uint8_t colour_req = 'G'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
     
     /* High level overview
@@ -188,6 +188,7 @@ void prvWSLTask( void * parameters )
     xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     for(;;)
     {
+        xSemaphoreTake(xNotify, 200);
         //internal source commands processing
         if(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
         {
@@ -196,8 +197,8 @@ void prvWSLTask( void * parameters )
             {
             }
         }
-        //check for messages from COMMS, wait up to 200ms
-        length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 200);
+        //check for messages from COMMS
+        length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
             uint8_t router = 0; //byte used for routing from different sources
@@ -272,6 +273,7 @@ void prvWSLTask( void * parameters )
                                 default: //if there is a lockout, just ignore the request
                                     break;
                             }
+                            break;
                             
                         case 'G': //Green colour change request
                             //if we are requesting blue, green will override it
@@ -443,7 +445,6 @@ void prvWSLTask( void * parameters )
                         case 'R': //red request, we are required to turn red
                             lockout = 'R'; //can only be released by Stop button
                             colour_req = 'R';
-                            updateIND = 1;
                             break;
                             
                         case 'Y': //will send yellow when the stop command has been cleared

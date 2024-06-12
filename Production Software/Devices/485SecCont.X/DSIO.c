@@ -13,12 +13,10 @@
 
     //timer globals
     
-    uint8_t xPBTimerSet = 0;
     uint8_t xINDTimerSet = 0;
     
     //timer handles
     
-    TimerHandle_t xPBTimer;
     TimerHandle_t xINDTimer;
     
     //queue handles
@@ -49,7 +47,6 @@ void DSIOSetup()
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
-    xPBTimer = xTimerCreate("PBT", 5, pdFALSE, 0, vPBTimerFunc);
     xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
     
     //start the indicator timer
@@ -58,8 +55,6 @@ void DSIOSetup()
 
 void dsIOInTask (void * parameters)
 {
-    
-    uint8_t last = 0; //variable for software anti-spam
     //initialize inputs
     PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm;
     //Then I will set up the multi-configure register for port D.
@@ -76,25 +71,10 @@ void dsIOInTask (void * parameters)
     {
         //wait for input
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
-        //check timer if the button pressed was the same
-        if((last == input[0]) && (xPBTimerSet == 1))
-        {
-            output[1] = input[0];
-            xSemaphoreGive(xNotify);
-            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
-            xPBTimerSet = 0;
-            xTimerReset(xPBTimer, 0);
-        }
-        else if(last != input[0])
-        {
-            last = input[0];
-            output[1] = input[0];
-            xSemaphoreGive(xNotify);
-            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
-            xPBTimerSet = 0;
-            xTimerReset(xPBTimer, 0);
-        }
-        
+        output[1] = input[0];
+        vTaskDelay(1); //slight delay to ensure the prior input was processed
+        xSemaphoreGive(xNotify);
+        xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
         //send message to inter-task queue
     }
     
@@ -249,10 +229,6 @@ void RS485TR(uint8_t dir)
 }
 
 //timer callback functions
-void vPBTimerFunc( TimerHandle_t xTimer )
-{
-    xPBTimerSet = 1;
-}
 
 void vINDTimerFunc( TimerHandle_t xTimer )
 {
@@ -324,5 +300,5 @@ ISR(PORTD_PORT_vect)
             pb[0] = 'B';
             break;
     }
-    xQueueSendToFrontFromISR(xPB_Queue, pb, NULL);
+    xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
 }

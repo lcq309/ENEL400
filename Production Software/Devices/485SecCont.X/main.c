@@ -233,12 +233,19 @@ void prvWSCTask( void * parameters )
                             break;
                             
                         case 'B': //blue lockout, allow any colour through
-                            colour_req = buffer[1];
-                            lockout = buffer[1];
-                            Requester = 1; //we are initiating this change
-                            updateIND = 1; //update the indicators
-                            GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
-                            break;
+                            switch(buffer[1])
+                            {
+                                case 'B': //blue on blue, just do nothing
+                                    break;
+                                    
+                                default:
+                                    colour_req = buffer[1];
+                                    lockout = buffer[1];
+                                    Requester = 1; //we are initiating this change
+                                    updateIND = 1; //update the indicators
+                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                    break;  
+                            }
                             
                         case 'G': //green lockout, allow yellow through but not blue
                             switch(buffer[1])
