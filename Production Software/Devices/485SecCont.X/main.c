@@ -43,9 +43,9 @@ uint8_t GLOBAL_Channel = 0;
 uint8_t GLOBAL_DeviceType = '1';
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-#define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainWSC_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
@@ -64,7 +64,7 @@ void vRetransmitTimerFunc( TimerHandle_t xTimer );
 
 //timer global
 
-uint8_t GLOBAL_RetransmissionTimerSet = 0;
+uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never transmit
 
 int main(int argc, char** argv) {
     
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     
     //setup timer
     
-    xRetransmitTimer = xTimerCreate("ReTX", 500, pdFALSE, 0, vRetransmitTimerFunc);
+    xRetransmitTimer = xTimerCreate("ReTX", 250, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
@@ -229,6 +229,7 @@ void prvWSCTask( void * parameters )
                             lockout = buffer[1];
                             Requester = 1; //we are initiating this change
                             updateIND = 1; //update the indicators
+                            GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
                             
                         case 'B': //blue lockout, allow any colour through
@@ -236,6 +237,7 @@ void prvWSCTask( void * parameters )
                             lockout = buffer[1];
                             Requester = 1; //we are initiating this change
                             updateIND = 1; //update the indicators
+                            GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
                             
                         case 'G': //green lockout, allow yellow through but not blue
@@ -246,6 +248,7 @@ void prvWSCTask( void * parameters )
                                     lockout = buffer[1];
                                     Requester = 1; //we are initiating this change
                                     updateIND = 1; //update the indicators
+                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;
                                     
                                 case 'B': //blue light
@@ -258,6 +261,7 @@ void prvWSCTask( void * parameters )
                                     xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                                     vTaskDelay(200);
                                     updateIND = 1;
+                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;
                             }
                             break;
@@ -271,6 +275,7 @@ void prvWSCTask( void * parameters )
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             vTaskDelay(200);
                             updateIND = 1;
+                            GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             //running code will fix indicators after this delay has passed.
                             break;
                             
@@ -291,8 +296,7 @@ void prvWSCTask( void * parameters )
             
         }
         //check for messages from COMMS, wait up to 200ms
-        length = 0;
-        //length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 200);
+        length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
             uint8_t router = 0; //byte used for routing from different sources

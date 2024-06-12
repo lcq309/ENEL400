@@ -39,8 +39,8 @@ void DSIOSetup()
     
     //setup Queues
     
-    xPB_Queue = xQueueCreate(3, sizeof(uint8_t)); //up to 3 button presses held
-    xIND_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // up to 3 Indicator Commands held
+    xPB_Queue = xQueueCreate(3, sizeof(uint8_t)); //up to 2 button presses held
+    xIND_Queue = xQueueCreate(4, 2 * sizeof(uint8_t)); // up to 4 Indicator Commands held
     xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
     
     //setup tasks
@@ -49,7 +49,7 @@ void DSIOSetup()
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
-    xPBTimer = xTimerCreate("PBT", 500, pdFALSE, 0, vPBTimerFunc);
+    xPBTimer = xTimerCreate("PBT", 5, pdFALSE, 0, vPBTimerFunc);
     xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
     
     //start the indicator timer
@@ -81,18 +81,18 @@ void dsIOInTask (void * parameters)
         {
             output[1] = input[0];
             xSemaphoreGive(xNotify);
-            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
+            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
             xPBTimerSet = 0;
-            xTimerReset(xPBTimer, portMAX_DELAY);
+            xTimerReset(xPBTimer, 0);
         }
         else if(last != input[0])
         {
             last = input[0];
             output[1] = input[0];
             xSemaphoreGive(xNotify);
-            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
+            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
             xPBTimerSet = 0;
-            xTimerReset(xPBTimer, portMAX_DELAY);
+            xTimerReset(xPBTimer, 0);
         }
         
         //send message to inter-task queue
