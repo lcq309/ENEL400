@@ -802,8 +802,8 @@ void prvWSCTask( void * parameters )
                     }
                     break;
                         
-                case 2: //Subordinate Requester
-                    if(GLOBAL_RetransmissionTimerSet == 1)
+                case 2: //Subordinate Requester, not yet implemented
+                    /*if(GLOBAL_RetransmissionTimerSet == 1)
                     {
                         //check lights
                         for(uint8_t i = 0; i < numLights; i++)
@@ -828,7 +828,7 @@ void prvWSCTask( void * parameters )
                             GLOBAL_RetransmissionTimerSet = 0;
                             xTimerReset(xRetransmitTimer, portMAX_DELAY);
                         }
-                    }
+                    }*/
                     break;
                         
                 case 0: //just do nothing if we are not set to request anything

@@ -170,7 +170,6 @@ void prvWSLTask( void * parameters )
     uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
-    uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
     
@@ -256,7 +255,6 @@ void prvWSLTask( void * parameters )
                             switch(lockout)
                             {
                                 case 'C': //no lockout, update colour and send a response message
-                                    updateIND = 1;
                                     colour_req = 'B';
                                     lockout = 'B';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -281,7 +279,6 @@ void prvWSLTask( void * parameters )
                             {
                                 case 'C': //no lockout, this is a green request from a controller
                                     //set lockout and colour_req to green, response is handled later
-                                    updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -290,7 +287,6 @@ void prvWSLTask( void * parameters )
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
-                                    updateIND = 1;
                                     lockout = 'G';
                                     colour_req = 'G';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -306,7 +302,6 @@ void prvWSLTask( void * parameters )
                             switch(lockout)
                             {
                                 case 'C': //Yellow colour request
-                                    updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -315,7 +310,6 @@ void prvWSLTask( void * parameters )
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
-                                    updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -323,7 +317,6 @@ void prvWSLTask( void * parameters )
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     
                                 case 'G': //green lockout will be overridden
-                                    updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -339,7 +332,6 @@ void prvWSLTask( void * parameters )
                         case 'R': //by default Red overrides all other lockouts.
                             lockout = 'R';
                             colour_req = 'R';
-                            updateIND = 1;
                             buffer[1] = ControllerTable[tablePos].index;
                             buffer[0] = 'r'; //confirmation
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
@@ -488,32 +480,60 @@ void prvWSLTask( void * parameters )
             //send an error if appropriate
             uint8_t check_variable = 1;
             //update indicators if needed
-            if(updateIND == 1)
+            if(colour_cur != colour_req)
             {
-                if(colour_cur != colour_req)
+                switch(colour_req)
                 {
-                    //set both to flash
-                    buffer[0] = 0xff; //all indicators
-                    buffer[1] = 'O'; //off
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    buffer[0] = colour_cur;
-                    buffer[1] = 'F'; //flash
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    buffer[0] = colour_req;
-                    buffer[1] = 'F'; //flash
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    case 'B': //blue, flash implied
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        buffer[0] = 'B'; //blue
+                        buffer[1] = 'F'; //flash
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                        break;
+                    
+                    case 'G': //Green, solid colour
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        buffer[0] = 'G'; //green
+                        buffer[1] = 'S'; //Solid
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                        break;
+                     
+                    case 'Y': //Yellow, solid colour
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        buffer[0] = 'Y'; //yellow
+                        buffer[1] = 'S'; //Solid
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                        break;
+                        
+                    case 'R': //Red, solid colour
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        buffer[0] = 'R'; //yellow
+                        buffer[1] = 'S'; //Solid
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                        break;
+                        
+                    case 'O': //Off
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                        break;
+                        
+                    default: //something went wrong with a command, just do nothing
+                        break;
                 }
-                else if(colour_cur == colour_req)
-                {
-                    //set solid
-                    buffer[0] = 0xff; //all indicators
-                    buffer[1] = 'O'; //off
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    buffer[0] = colour_cur;
-                    buffer[1] = 'S'; //solid
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                }
-                //error case should blink lights slowly.
             }
             //loop and restart
         }

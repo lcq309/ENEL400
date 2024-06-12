@@ -89,6 +89,7 @@ void dsIOOutTask (void * parameters)
                 GREEN = received[1];
                 YELLOW = received[1];
                 BLUE = received[1];
+                RED = received[1];
                 break;
         }
         }
