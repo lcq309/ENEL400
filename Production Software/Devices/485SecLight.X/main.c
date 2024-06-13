@@ -170,7 +170,7 @@ void prvWSLTask( void * parameters )
     uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
-    uint8_t colour_req = 'G'; //requested colour
+    uint8_t colour_req = 'B'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
     
     /* High level overview
@@ -198,7 +198,8 @@ void prvWSLTask( void * parameters )
             }
         }
         //check for messages from COMMS
-        length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
+        length = 0;
+        //length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
             uint8_t router = 0; //byte used for routing from different sources
@@ -264,10 +265,9 @@ void prvWSLTask( void * parameters )
                                     break;
                                     
                                 case 'B': //Blue lockout, just reply and confirm
-                                            buffer[0] = 'b'; //confirmation
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
+                                    buffer[0] = 'b'; //confirmation
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                     
                                 default: //if there is a lockout, just ignore the request
@@ -317,6 +317,7 @@ void prvWSLTask( void * parameters )
                                     buffer[1] = ControllerTable[tablePos].index;
                                     buffer[0] = 'y'; //confirmation
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    break;
                                     
                                 case 'G': //green lockout will be overridden
                                     lockout = 'Y';
@@ -351,8 +352,8 @@ void prvWSLTask( void * parameters )
                                             buffer[1] = ControllerTable[tablePos].index;
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
-                                        case 'B': //clear the blue lockout and confirm clearance.
                                             
+                                        case 'B': //clear the blue lockout and confirm clearance.
                                             lockout = 'C';
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
@@ -424,6 +425,7 @@ void prvWSLTask( void * parameters )
                 break;
                 
                 case 'S': //special device, stop button and etc. we are always subordinate
+                {
                     //check table and add if needed
                     for(uint8_t i = 0; i < numSpecials; i++)
                     {
@@ -471,70 +473,72 @@ void prvWSLTask( void * parameters )
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;
                     }
-                    break;
+                }
+                break;
                     
                 case 'M': //menu (to be implemented)
+                {
                     
+                }    
                     break;
             }
-            //message processing now complete, check the status of any colour change request
-            //update indicators if needed
-            if(colour_cur != colour_req)
-            {
-                switch(colour_req)
-                {
-                    case 'B': //blue, flash implied
-                        buffer[0] = 0xff; //all indicators
-                        buffer[1] = 'O'; //off
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        buffer[0] = 'B'; //blue
-                        buffer[1] = 'F'; //flash
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        colour_cur = colour_req;
-                        break;
-                    
-                    case 'G': //Green, solid colour
-                        buffer[0] = 0xff; //all indicators
-                        buffer[1] = 'O'; //off
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        buffer[0] = 'G'; //green
-                        buffer[1] = 'S'; //Solid
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        colour_cur = colour_req;
-                        break;
-                     
-                    case 'Y': //Yellow, solid colour
-                        buffer[0] = 0xff; //all indicators
-                        buffer[1] = 'O'; //off
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        buffer[0] = 'Y'; //yellow
-                        buffer[1] = 'S'; //Solid
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        colour_cur = colour_req;
-                        break;
-                        
-                    case 'R': //Red, solid colour
-                        buffer[0] = 0xff; //all indicators
-                        buffer[1] = 'O'; //off
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        buffer[0] = 'R'; //yellow
-                        buffer[1] = 'S'; //Solid
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        colour_cur = colour_req;
-                        break;
-                        
-                    case 'O': //Off
-                        buffer[0] = 0xff; //all indicators
-                        buffer[1] = 'O'; //off
-                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                        colour_cur = colour_req;
-                        break;
-                        
-                    default: //something went wrong with a command, just do nothing
-                        break;
-                }
-            }
-            //loop and restart
         }
+        //message processing now complete, check the status of any colour change request
+        //update indicators if needed
+        if(colour_cur != colour_req)
+        {
+            switch(colour_req)
+            {
+                case 'B': //blue, flash implied
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = 'B'; //blue
+                    buffer[1] = 'F'; //flash
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    colour_cur = colour_req;
+                    break;
+                    
+                case 'G': //Green, solid colour
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = 'G'; //green
+                    buffer[1] = 'S'; //Solid
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    colour_cur = colour_req;
+                    break;
+                     
+                case 'Y': //Yellow, solid colour
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = 'Y'; //yellow
+                    buffer[1] = 'S'; //Solid
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    colour_cur = colour_req;
+                    break;
+                        
+                case 'R': //Red, solid colour
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = 'R'; //yellow
+                    buffer[1] = 'S'; //Solid
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    colour_cur = colour_req;
+                    break;
+                    
+                case 'O': //Off
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    colour_cur = colour_req;
+                    break;
+                        
+                default: //something went wrong with a command, just do nothing
+                    break;
+            }
+        }            //loop and restart
     }
 }

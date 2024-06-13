@@ -302,7 +302,8 @@ void prvWSCTask( void * parameters )
             }
             
         }
-        //check for messages from COMMS, wait up to 200ms
+        //check for messages from COMMS
+        length = 0;
         length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
