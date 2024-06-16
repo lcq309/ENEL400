@@ -126,7 +126,7 @@ void modCOMMOutTask (void * parameters)
             //load output header
             xStreamBufferSend(xCOMM_out_Stream, header_buffer, 14, portMAX_DELAY);
             //load output message
-            xStreamBufferSend(xCOMM_out_Stream, header_buffer, size - 1, portMAX_DELAY);
+            xStreamBufferSend(xCOMM_out_Stream, buffer, size - 1, portMAX_DELAY);
         }
         } while(size != 0);
     // wait for notification (if not received then just go back to the start of the loop)

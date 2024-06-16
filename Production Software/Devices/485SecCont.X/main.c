@@ -194,7 +194,7 @@ void prvWSCTask( void * parameters )
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
-    uint8_t colour_cur = 'O'; //current confirmed colour
+    volatile uint8_t colour_cur = 'O'; //current confirmed colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     
     /* High level overview
@@ -708,7 +708,7 @@ void prvWSCTask( void * parameters )
                             break;
                             
                         default: //anything else should just be state confirmations
-                            LightTable[tablePos].status = buffer[1]; //subtract 32 to get uppercase letter
+                            LightTable[tablePos].status = (buffer[1] - 32); //subtract 32 to get uppercase letter
                             break;
                     }
                     break;
@@ -892,7 +892,7 @@ void prvWSCTask( void * parameters )
                         xTimerReset(xRetransmitTimer, portMAX_DELAY);
                     }
                 }
-                else if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1))) //at this point, all controllers have confirmed lockout release
+                if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1))) //at this point, all controllers have confirmed lockout release
                 {//we can begin releasing the lights
                     for(uint8_t i = 0; i < numLights; i++)
                     {
