@@ -11,6 +11,10 @@
     
     uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
     
+    //Timer Counters
+    
+    volatile uint16_t TimerCounter = 0;
+    
     //MUTEXes
     
     SemaphoreHandle_t xUSART0_MUTEX;
@@ -29,6 +33,12 @@
     StreamBufferHandle_t xCOMM_out_Stream;
     MessageBufferHandle_t xCOMM_out_Buffer;
     MessageBufferHandle_t xDevice_Buffer;
+    
+    //timer handles
+    
+    TimerHandle_t xOFFSETTimer;
+    TimerHandle_t xPeriodicJoinTimer;
+    
 
 void COMMSetup()
 {
@@ -57,6 +67,10 @@ void COMMSetup()
     
     xTaskCreate(modCOMMOutTask, "COMMOUT", (MAX_MESSAGE_SIZE + 300), NULL, mainCOMMOUT_TASK_PRIORITY, NULL);
     xTaskCreate(modCOMMInTask, "COMMIN", 400, NULL, mainCOMMIN_TASK_PRIORITY, NULL);
+    
+    //setup timers
+    xOFFSETTimer = xTimerCreate("OFFS", 32, pdTRUE, 0, vOFFSETTimerFunc);
+    xPeriodicJoinTimer = xTimerCreate("JOIN", 50, pdTRUE, 0, vPeriodicJoinTimerFunc);
     
     //initialize USART0
     
@@ -168,6 +182,12 @@ void modCOMMInTask (void * parameters)
     uint8_t check = 0; //check for message failure
     
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
+    //start periodic join offset timer
+    xTimerStart(xOFFSETTimer, portMAX_DELAY);
+    uint8_t output[2] = {'T', 'J'}; //send network join messages
+    xQueueSendToBack(xDeviceIN_Queue, output, 15);
+    //notify the device
+    xSemaphoreGive(xNotify);
     
     for(;;)
     {
@@ -407,6 +427,36 @@ void modCOMMInTask (void * parameters)
     }
 }
 
+
+//timer functions
+void vOFFSETTimerFunc( TimerHandle_t xTimer )
+{
+    //if current offset is greater than or equal to device ID
+    if(TimerCounter >= GLOBAL_DeviceID)
+    {
+        //start periodical timer
+        TimerCounter = 0xff;
+       xTimerStart(xPeriodicJoinTimer, portMAX_DELAY);
+       xTimerStop(xOFFSETTimer, portMAX_DELAY);
+    }
+    else
+        TimerCounter++;
+}
+
+void vPeriodicJoinTimerFunc( TimerHandle_t xTimer )
+{
+    if(TimerCounter >= 120)
+    {
+        //send 3x net join to comms out stream
+        uint8_t output[2] = {'T', 'J'};
+        xQueueSendToBack(xDeviceIN_Queue, output, 15);
+        //notify the device
+        xSemaphoreGive(xNotify);
+        TimerCounter = 0;
+    }
+    else
+        TimerCounter++;
+}
 //interrupts go here
 
 ISR(USART0_RXC_vect)

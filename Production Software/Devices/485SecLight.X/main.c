@@ -56,19 +56,22 @@ void prvWSLTask( void * parameters );
 int main(int argc, char** argv) {
     
     //setup tasks
+    
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvWSLTask, "WSL", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
+    
+    //grab the channel and device ID
+    
+    InitShiftIn(); //initialize shift register pins
+    LTCHIn(); //latch input register
+    GLOBAL_Channel = ShiftIn(); //grab channel
+    GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
     
     //setup modules
     
     COMMSetup();
     DSIOSetup();
     
-    //grab the channel and device ID
-    InitShiftIn(); //initialize shift register pins
-    LTCHIn(); //latch input register
-    GLOBAL_Channel = ShiftIn(); //grab channel
-    GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
     //set TXCIE to enable transmission end interrupts
     USART0.CTRLA |= USART_TXCIE_bm;
     //done with pre-scheduler initialization, start scheduler
@@ -183,11 +186,7 @@ void prvWSLTask( void * parameters )
      * since this is the lowest priority task, it shouldn't need to block for anything on the input side.
      */
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
-    //send the network join message
-    uint8_t NetJoin[1] = {0xff};
-    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+    
     for(;;)
     {
         xSemaphoreTake(xNotify, 200);
@@ -197,6 +196,22 @@ void prvWSLTask( void * parameters )
             //check message source (light check message will come here)
             switch(buffer[0])
             {
+                case 'T': //timers
+                {
+                    switch(buffer[1])
+                    {
+                        case 'J': //network join
+                            //send the network join message
+                            ; //this needs to be here or an error is thrown for the next line.
+                            uint8_t NetJoin[1] = {0xff};
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            break;
+                    }
+                }
+                break;
+                
                 default:
                     break;
             }
@@ -372,11 +387,14 @@ void prvWSLTask( void * parameters )
                                 case 'Y': //clear yellow lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
-                                            case 'C': //lockout already cleared, confirm
+                                        case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
+                                            
+                                        case 'G': //Green lockout is in error, Set colour to yellow and confirm lockout release
+                                            colour_req = 'Y';
                                             
                                         case 'Y': //clear the yellow lockout and confirm clearance.
                                             lockout = 'C';

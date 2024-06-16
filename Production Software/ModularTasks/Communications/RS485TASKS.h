@@ -15,6 +15,7 @@
 #include "event_groups.h"
 #include "stream_buffer.h"
 #include "message_buffer.h"
+#include "timers.h"
 #include "USART.h"
 
 #ifndef RS485TASKS_H
@@ -42,6 +43,7 @@ extern "C" {
     extern struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device table
     
     //External Globals
+    
     extern uint8_t GLOBAL_DeviceID;
     extern uint8_t GLOBAL_Channel;
     extern uint8_t GLOBAL_DeviceType;
@@ -58,16 +60,29 @@ extern "C" {
     //Event Groups
     extern EventGroupHandle_t xEventInit;
     
-    //stream handles (note device buffer is externally defined in device specific)
+    //stream handles
 
     extern StreamBufferHandle_t xCOMM_in_Stream;
     extern StreamBufferHandle_t xCOMM_out_Stream;
     extern MessageBufferHandle_t xCOMM_out_Buffer;
     extern MessageBufferHandle_t xDevice_Buffer;
     
+    //Queues
+    
+    extern QueueHandle_t xDeviceIN_Queue;
+    
+    //timer handles
+    
+    extern TimerHandle_t xOFFSETTimer;
+    extern TimerHandle_t xPeriodicJoinTimer;
+    
     //task definition
     void modCOMMOutTask ( void *parameters );
     void modCOMMInTask ( void *parameters );
+    
+    //timer functions;
+    void vOFFSETTimerFunc( TimerHandle_t xTimer );
+    void vPeriodicJoinTimerFunc( TimerHandle_t xTimer );
     
     //task setup function
     void COMMSetup(void);

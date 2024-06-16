@@ -72,11 +72,6 @@ int main(int argc, char** argv) {
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvWSCTask, "WSC", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
     
-    //setup modules
-    
-    COMMSetup();
-    DSIOSetup();
-    
     //setup timer
     
     xRetransmitTimer = xTimerCreate("ReTX", 125, pdFALSE, 0, vRetransmitTimerFunc);
@@ -86,6 +81,12 @@ int main(int argc, char** argv) {
     LTCHIn(); //latch input register
     GLOBAL_Channel = ShiftIn(); //grab channel
     GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
+    
+    
+    //setup modules
+    
+    COMMSetup();
+    DSIOSetup();
     
     //done with pre-scheduler initialization, start scheduler
     vTaskStartScheduler();
@@ -207,11 +208,6 @@ void prvWSCTask( void * parameters )
      * since this is the lowest priority task, it shouldn't need to block for anything on the input side.
      */
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
-    //send the network join message
-    uint8_t NetJoin[1] = {0xff};
-    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     for(;;)
     {
         xSemaphoreTake(xNotify, 200); //wait for a message to come in from anywhere
@@ -249,6 +245,7 @@ void prvWSCTask( void * parameters )
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;  
                             }
+                            break;
                             
                         case 'g': //green lockout clearing
                         case 'G': //green lockout, allow yellow through but not blue
@@ -303,6 +300,25 @@ void prvWSCTask( void * parameters )
                             updateIND = 1;
                             break;
                     }
+                    break;
+                    
+                case 'T': //timers
+                {
+                    switch(buffer[1])
+                    {
+                        case 'J': //network join
+                            //send the network join message
+                            ; //this needs to be here to avoid an error on NetJoin.
+                            uint8_t NetJoin[1] = {0xff};
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            break;
+                    }
+                }
+                break;
+                
+                default:
                     break;
                 //space for other intertask commands here
             }
