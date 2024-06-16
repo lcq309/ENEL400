@@ -170,7 +170,7 @@ void prvWSLTask( void * parameters )
     uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
-    uint8_t colour_req = 'B'; //requested colour
+    uint8_t colour_req = 'O'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
     
     /* High level overview
@@ -195,11 +195,13 @@ void prvWSLTask( void * parameters )
             //check message source (light check message will come here)
             switch(buffer[0])
             {
+                default:
+                    break;
             }
         }
         //check for messages from COMMS
         length = 0;
-        //length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
+        length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
             uint8_t router = 0; //byte used for routing from different sources
@@ -224,6 +226,7 @@ void prvWSLTask( void * parameters )
                     
                 default: //not programmed device type
                     //could put an error here in the future
+                    router = 0;
                     break;
             }
             //confirm if device is present on table
@@ -231,7 +234,6 @@ void prvWSLTask( void * parameters )
             switch(router)
             {
                 case 'C': //controlling device, check if it is on the internal table, add if not
-                {
                     for(uint8_t i = 0; i < numControllers; i++)
                     {
                         if(ControllerTable[i].index == buffer[0])
@@ -416,16 +418,17 @@ void prvWSLTask( void * parameters )
                                     }
                                     break;
                                     //red clearance not handled by this type of device.
+                                default:
+                                    break;
                             }
                             break;
+                            
                         default: //can put an error message here, for incorrect command.
                             break;
                     }
-                }
                 break;
                 
                 case 'S': //special device, stop button and etc. we are always subordinate
-                {
                     //check table and add if needed
                     for(uint8_t i = 0; i < numSpecials; i++)
                     {
@@ -473,13 +476,12 @@ void prvWSLTask( void * parameters )
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;
                     }
-                }
                 break;
                     
                 case 'M': //menu (to be implemented)
-                {
+                    break;
                     
-                }    
+                default: //just do nothing
                     break;
             }
         }

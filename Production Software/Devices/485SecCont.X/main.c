@@ -708,7 +708,7 @@ void prvWSCTask( void * parameters )
                             break;
                             
                         default: //anything else should just be state confirmations
-                            LightTable[tablePos].status = (buffer[1] - 32); //subtract 32 to get uppercase letter
+                            LightTable[tablePos].status = buffer[1]; //subtract 32 to get uppercase letter
                             break;
                     }
                     break;
@@ -780,7 +780,7 @@ void prvWSCTask( void * parameters )
         //message processing now complete, check the status of any colour change request
         //if all colours are matching colour_req, then change colour_cur into colour_req
         uint8_t check_variable = 1;
-        if((colour_cur != colour_req) || (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
+        if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
             switch(Requester)
             //how this acts depends on if it is a requester 1 or 2

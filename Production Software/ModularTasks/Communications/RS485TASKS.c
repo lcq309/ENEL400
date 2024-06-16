@@ -41,6 +41,7 @@ void COMMSetup()
     xCOMM_in_Stream = xStreamBufferCreate(50,1); //50 bytes, triggers when a byte is added
     xCOMM_out_Stream = xStreamBufferCreate(2 * MAX_MESSAGE_SIZE, 1); //output buffer
     xCOMM_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE);
+    xDevice_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE);
     
     //setup semaphore
     
@@ -127,7 +128,7 @@ void modCOMMOutTask (void * parameters)
             //load output message
             xStreamBufferSend(xCOMM_out_Stream, header_buffer, size - 1, portMAX_DELAY);
         }
-        } while(length != 0);
+        } while(size != 0);
     // wait for notification (if not received then just go back to the start of the loop)
     if(xSemaphoreTake(xPermission, 500) == pdTRUE)
     {
@@ -309,7 +310,7 @@ void modCOMMInTask (void * parameters)
                                     buffer[0] = i;
                                     for(uint8_t x = 0; x < size - 12; x++)
                                         buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
-                                    size = size - 12; //resize to remove the header
+                                    size = size - 11; //resize to remove the header
                                     //notify the device
                                     xSemaphoreGive(xNotify);
                                     //send to device buffer
