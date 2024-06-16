@@ -231,7 +231,8 @@ void prvWSCTask( void * parameters )
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
-                            
+                        
+                        case 'b': //blue lockout clearing
                         case 'B': //blue lockout, allow any colour through
                             switch(buffer[1])
                             {
@@ -247,6 +248,7 @@ void prvWSCTask( void * parameters )
                                     break;  
                             }
                             
+                        case 'g': //green lockout clearing
                         case 'G': //green lockout, allow yellow through but not blue
                             switch(buffer[1])
                             {
@@ -273,6 +275,7 @@ void prvWSCTask( void * parameters )
                             }
                             break;
                             
+                        case 'y': //yellow lockout clearing
                         case 'Y': //yellow lockout, flash yellow for a short time
                             buffer[0] = 0xff;
                             buffer[1] = 'O'; //turn all off first
@@ -286,6 +289,7 @@ void prvWSCTask( void * parameters )
                             //running code will fix indicators after this delay has passed.
                             break;
                             
+                        case 'r': //red lockout clearing
                         case 'R': //red lockout, flash all for a short time
                             buffer[0] = 0xff;
                             buffer[1] = 'O'; //turn all off first
@@ -874,9 +878,10 @@ void prvWSCTask( void * parameters )
                             if(ControllerTable[i].status != 'C') //if not confirmed cleared
                             {
                             //send another clear request, and set check_variable
-                                buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                buffer[1] = ControllerTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                buffer[0] = 'C';
+                                buffer[1] = colour_req; //colour_req is the colour we are requesting
+                                buffer[2] = ControllerTable[i].index; //load with retransmission request
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
                                 check_variable = 0;
                             }
                         }
@@ -899,9 +904,10 @@ void prvWSCTask( void * parameters )
                         if(LightTable[i].status != 'C') //if not confirmed cleared
                         {
                             //send another clear request, and set check_variable
-                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                            buffer[1] = LightTable[i].index; //load with retransmission request
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            buffer[0] = 'C';
+                            buffer[1] = colour_req; //colour_req is the colour we are requesting
+                            buffer[2] = LightTable[i].index; //load with retransmission request
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
                             check_variable = 0;
                         }
                     }
