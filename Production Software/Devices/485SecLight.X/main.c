@@ -186,6 +186,8 @@ void prvWSLTask( void * parameters )
     //send the network join message
     uint8_t NetJoin[1] = {0xff};
     xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     for(;;)
     {
         xSemaphoreTake(xNotify, 200);
@@ -362,12 +364,6 @@ void prvWSLTask( void * parameters )
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                             
-                                        case 'b': //we are working on clearing lights, just confirm clearance.
-                                            buffer[0] = 'c';
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                            
                                         default: //just ignore anything else for now
                                             break;
                                     }
@@ -389,12 +385,6 @@ void prvWSLTask( void * parameters )
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                             
-                                        case 'y': //we are working on clearing lights, just confirm clearance.
-                                            buffer[0] = 'c';
-                                            buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                            break;
-                                            
                                         default: //just ignore anything else for now
                                             break;
                                     }
@@ -405,9 +395,6 @@ void prvWSLTask( void * parameters )
                                     {
                                         case 'G': //clear the yellow lockout and confirm clearance.
                                             lockout = 'C';
-                                            break;
-                                            
-                                        case 'g': //we are working on clearing lights, just confirm clearance.
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);

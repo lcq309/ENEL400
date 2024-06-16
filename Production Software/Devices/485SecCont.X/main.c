@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     
     //setup timer
     
-    xRetransmitTimer = xTimerCreate("ReTX", 250, pdFALSE, 0, vRetransmitTimerFunc);
+    xRetransmitTimer = xTimerCreate("ReTX", 125, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
@@ -209,6 +209,8 @@ void prvWSCTask( void * parameters )
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
     //send the network join message
     uint8_t NetJoin[1] = {0xff};
+    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+    xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
     for(;;)
     {
