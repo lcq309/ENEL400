@@ -49,7 +49,7 @@ void COMMSetup()
     //setup buffers
     
     xCOMM_in_Stream = xStreamBufferCreate(50,1); //50 bytes, triggers when a byte is added
-    xCOMM_out_Stream = xStreamBufferCreate(2 * MAX_MESSAGE_SIZE, 1); //output buffer
+    xCOMM_out_Stream = xStreamBufferCreate(4 * MAX_MESSAGE_SIZE, 1); //output buffer
     xCOMM_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE);
     xDevice_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE);
     
@@ -115,7 +115,7 @@ void modCOMMOutTask (void * parameters)
         if((buffer[0] == 0xff) && (size != 0)) //if network generation message requested, load the join message into the output stream
         {
             //load join message into output
-            xStreamBufferSend(xCOMM_out_Stream, netmessage, 14, portMAX_DELAY);
+            xStreamBufferSend(xCOMM_out_Stream, netmessage, 14, 0);
         }
         else if(size != 0) //generate header based on the information at the index, and load into the output stream with the message
         {
@@ -138,16 +138,16 @@ void modCOMMOutTask (void * parameters)
             header_buffer[12] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[6];
             header_buffer[13] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[7];
             //load output header
-            xStreamBufferSend(xCOMM_out_Stream, header_buffer, 14, portMAX_DELAY);
+            xStreamBufferSend(xCOMM_out_Stream, header_buffer, 14, 0);
             //load output message
-            xStreamBufferSend(xCOMM_out_Stream, buffer, size - 1, portMAX_DELAY);
+            xStreamBufferSend(xCOMM_out_Stream, buffer, size - 1, 0);
         }
         } while(size != 0);
     // wait for notification (if not received then just go back to the start of the loop)
     if(xSemaphoreTake(xPermission, 500) == pdTRUE)
     {
         // load the ping response
-        xStreamBufferSend(xCOMM_out_Stream, PR, 4, portMAX_DELAY);
+        xStreamBufferSend(xCOMM_out_Stream, PR, 4, 0);
         // acquire hardware mutex
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
         // set transceiver to transmit mode
@@ -275,10 +275,10 @@ void modCOMMInTask (void * parameters)
                                     for(uint8_t x = 0; x < size - 12; x++)
                                         buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                                     size = size - 12; //resize to remove the header
+                                    //send to device buffer
+                                    xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                                     //notify the device
                                     xSemaphoreGive(xNotify);
-                                    //send to device buffer
-                                    xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
                                     //end looping iterations
                                     i = GLOBAL_TableLength;
                                 }
@@ -331,10 +331,10 @@ void modCOMMInTask (void * parameters)
                                     for(uint8_t x = 0; x < size - 12; x++)
                                         buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                                     size = size - 11; //resize to remove the header
+                                    //send to device buffer
+                                    xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                                     //notify the device
                                     xSemaphoreGive(xNotify);
-                                    //send to device buffer
-                                    xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
                                     //end looping iterations
                                     i = GLOBAL_TableLength;
                                 }
@@ -380,10 +380,10 @@ void modCOMMInTask (void * parameters)
                 for(uint8_t x = 0; x < size - 12; x++)
                     buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                 size = size - 12; //resize to remove the header
+                //send to device buffer
+                xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                 //notify the device
                 xSemaphoreGive(xNotify);
-                //send to device buffer
-                xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
             }
             break;
             
@@ -411,10 +411,10 @@ void modCOMMInTask (void * parameters)
                 for(uint8_t x = 0; x < size - 12; x++)
                     buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
                 size = size - 12; //resize to remove the header
+                //send to device buffer
+                xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                 //notify the device
                 xSemaphoreGive(xNotify);
-                //send to device buffer
-                xMessageBufferSend(xDevice_Buffer, buffer, size, portMAX_DELAY);
             }
             break;
             

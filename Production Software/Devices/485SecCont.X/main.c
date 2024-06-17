@@ -402,7 +402,7 @@ void prvWSCTask( void * parameters )
                                     lockout = 'B';
                                     buffer[1] = ControllerTable[tablePos].index;
                                     buffer[0] = 'b'; //confirmation
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                                     
                                 case 'B': //Blue lockout
@@ -412,12 +412,12 @@ void prvWSCTask( void * parameters )
                                             ControllerTable[tablePos].status = buffer[1];
                                             buffer[0] = 'b'; //confirmation
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                         case 2: //this is a subordinate requester, just respond with confirmation
                                             buffer[0] = 'b'; //confirmation
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                     }
                                     break;
@@ -426,7 +426,7 @@ void prvWSCTask( void * parameters )
                                     buffer[0] = lockout;
                                     buffer[1] = ControllerTable[tablePos].index; //respond with controller lockout colour
                                     //this should set the controller as requester 2 with a lockout
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                             }
                             break;
@@ -456,7 +456,7 @@ void prvWSCTask( void * parameters )
                                     Requester = 2; //start helping with colour change
                                     buffer[0] = 'g';
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                                 
                                 case 'B': //blue lockout will be overridden
@@ -467,7 +467,7 @@ void prvWSCTask( void * parameters )
                                     Requester = 2;
                                     buffer[0] = 'g';
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                                     
                                 case 'G': //green lockout
@@ -477,19 +477,19 @@ void prvWSCTask( void * parameters )
                                             ControllerTable[tablePos].status = buffer[1];
                                             buffer[0] = 'g'; //confirmation
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                         case 2: //this is a subordinate requester, just respond with confirmation
                                             buffer[0] = 'g'; //confirmation
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                     }
                                     break;
                                 default: //other lockout level, reply with lockout level
                                     buffer[0] = lockout; 
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                             }
                             break;
@@ -517,9 +517,10 @@ void prvWSCTask( void * parameters )
                                     Requester = 2; //start helping with colour change
                                     buffer[0] = 'y';
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                                 
+                                case'b': //blue lockout release will be overridden
                                 case 'B': //blue lockout will be overridden
                                     ControllerTable[tablePos].status = buffer[1];
                                     updateIND = 1;
@@ -528,9 +529,10 @@ void prvWSCTask( void * parameters )
                                     Requester = 2;
                                     buffer[0] = 'y';
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                                     
+                                case 'g': //green lockout release will be overridden
                                 case 'G': //green lockout will be overridden
                                     ControllerTable[tablePos].status = buffer[1];
                                     updateIND = 1;
@@ -539,9 +541,10 @@ void prvWSCTask( void * parameters )
                                     Requester = 2;
                                     buffer[0] = 'y';
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                                     
+                                case 'y': //yellow lockout release will be overridden
                                 case 'Y': //yellow lockout
                                     switch(Requester)
                                     {
@@ -549,19 +552,19 @@ void prvWSCTask( void * parameters )
                                             ControllerTable[tablePos].status = buffer[1];
                                             buffer[0] = 'y'; //confirmation
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                         case 2: //this is a subordinate requester, just respond with confirmation
                                             buffer[0] = 'y'; //confirmation
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                     }
                                     break;
                                 default: //other lockout level, reply with lockout level
                                     buffer[0] = lockout; 
                                     buffer[1] = ControllerTable[tablePos].index;
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     break;
                             }
                             break;
@@ -586,7 +589,7 @@ void prvWSCTask( void * parameters )
                             Requester = 2;
                             buffer[0] = 'r';
                             buffer[1] = ControllerTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                             break;
                             
                         case 'r': //red confirmation, shouldn't end up here normally, just ignore for now
@@ -596,13 +599,13 @@ void prvWSCTask( void * parameters )
                         case 'C':
                             switch(buffer[2])
                             {
-                                case 'B': //clear blue lockout, clear and confirm by sending 'c' 'b' in response
+                                case 'B': //clear blue lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
                                         case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                         case 'B': //clear the blue lockout and confirm clearance.
                                             if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
@@ -615,13 +618,13 @@ void prvWSCTask( void * parameters )
                                             }
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         case 'b': //we are working on clearing lights, just confirm clearance.
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         default: //just ignore anything else for now
@@ -635,7 +638,7 @@ void prvWSCTask( void * parameters )
                                             case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         case 'Y': //clear the yellow lockout and confirm clearance.
@@ -649,13 +652,13 @@ void prvWSCTask( void * parameters )
                                             }
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         case 'y': //we are working on clearing lights, just confirm clearance.
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         default: //just ignore anything else for now
@@ -669,7 +672,7 @@ void prvWSCTask( void * parameters )
                                         case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         case 'G': //clear the yellow lockout and confirm clearance.
@@ -683,13 +686,13 @@ void prvWSCTask( void * parameters )
                                             }
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         case 'g': //we are working on clearing lights, just confirm clearance.
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                             break;
                                             
                                         default: //just ignore anything else for now
@@ -765,7 +768,7 @@ void prvWSCTask( void * parameters )
                             updateIND = 1;
                             buffer[0] = 'r'; //confirm red
                             buffer[1] = SpecialTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                             break;
                             
                         case 'Y': //will send yellow when the stop command has been cleared
@@ -776,7 +779,7 @@ void prvWSCTask( void * parameters )
                             updateIND = 1;
                             buffer[0] = 'y'; //confirm yellow
                             buffer[1] = SpecialTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                             break;
                             
                         case 'O': //off command, overrides any normal colour change logic
@@ -786,14 +789,14 @@ void prvWSCTask( void * parameters )
                             updateIND = 1;
                             buffer[0] = 'o'; //confirm off
                             buffer[1] = SpecialTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                             break;
                             
                         case 'C': //Clear command, stop light is special and doesn't need to follow the same rules that a controller would
                             lockout = 'C';
                             buffer[0] = 'c'; //confirm clear
                             buffer[1] = SpecialTable[tablePos].index;
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                             break;
                     }
                     break;
@@ -823,7 +826,7 @@ void prvWSCTask( void * parameters )
                                 //send another colour change request, and set check_variable
                                 buffer[0] = colour_req; //colour_req is the colour we are requesting
                                 buffer[1] = ControllerTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                 check_variable = 0;
                             }
                         }
@@ -835,7 +838,7 @@ void prvWSCTask( void * parameters )
                                 //send another colour change request, and set check_variable
                                 buffer[0] = colour_req; //colour_req is the colour we are requesting
                                 buffer[1] = LightTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                 check_variable = 0;
                             }
                         }
@@ -904,7 +907,7 @@ void prvWSCTask( void * parameters )
                                 buffer[0] = 'C';
                                 buffer[1] = colour_req; //colour_req is the colour we are requesting
                                 buffer[2] = ControllerTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
                                 check_variable = 0;
                             }
                         }
@@ -931,7 +934,7 @@ void prvWSCTask( void * parameters )
                             buffer[0] = 'C';
                             buffer[1] = colour_req; //colour_req is the colour we are requesting
                             buffer[2] = LightTable[i].index; //load with retransmission request
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
                             check_variable = 0;
                         }
                     }
