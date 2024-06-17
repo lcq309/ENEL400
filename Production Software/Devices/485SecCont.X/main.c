@@ -49,6 +49,8 @@ uint8_t GLOBAL_DeviceType = '1';
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainWSC_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
+#define MaxNets 40
+
 //task pointers
 
 void prvWiredInitTask( void * parameters );
@@ -74,7 +76,7 @@ int main(int argc, char** argv) {
     
     //setup timer
     
-    xRetransmitTimer = xTimerCreate("ReTX", 100, pdFALSE, 0, vRetransmitTimerFunc);
+    xRetransmitTimer = xTimerCreate("ReTX", 250, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
@@ -380,7 +382,7 @@ void prvWSCTask( void * parameters )
                             i = numControllers;
                         }
                     }
-                    if(match != 1) //if no match found, add to table
+                    if(match != 1) //if no match found, add to table and check if the wireless address is matching anything
                     {
                         ControllerTable[numControllers].index = buffer[0];
                         tablePos = numControllers;
@@ -538,6 +540,7 @@ void prvWSCTask( void * parameters )
                                     updateIND = 1;
                                     lockout = 'Y';
                                     colour_req = 'Y';
+                                    colour_cur = 'G';
                                     Requester = 2;
                                     buffer[0] = 'y';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -632,10 +635,10 @@ void prvWSCTask( void * parameters )
                                     }
                                     break;
                                     
-                                case 'Y': //clear yellow lockout, clear and confirm by sending 'c' 'y' in response
+                                case 'Y': //clear yellow lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
-                                            case 'C': //lockout already cleared, confirm
+                                        case 'C': //lockout already cleared, confirm
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
@@ -809,25 +812,44 @@ void prvWSCTask( void * parameters )
         //message processing now complete, check the status of any colour change request
         //if all colours are matching colour_req, then change colour_cur into colour_req
         uint8_t check_variable = 1;
+        volatile uint8_t NetSent[MaxNets];
+        for(uint8_t i = 0; i < MaxNets; i++)
+        {
+            NetSent[i] = 0;
+        }
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
             switch(Requester)
             //how this acts depends on if it is a requester 1 or 2
             {
+                
                 case 1: //Lead Requester
                 //check retransmission timers and retransmit if needed
-                    if(GLOBAL_RetransmissionTimerSet == 1)
+                    if(GLOBAL_RetransmissionTimerSet == 1 && GLOBAL_MessageSent == 1)
                     {
                         //check other controllers
                         for(uint8_t i = 0; i < numControllers; i++)
                         {
                             if(ControllerTable[i].status != colour_req)
                             {
-                                //send another colour change request, and set check_variable
-                                buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                buffer[1] = ControllerTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                check_variable = 0;
+                                for(uint8_t y = 0; y < MaxNets; y++)
+                                {
+                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    {
+                                        y = MaxNets;
+                                        //send another colour change request, and set check_variable
+                                        buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                        buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                        check_variable = 0;
+                                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    }
+                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                    {
+                                        //just end loop and move on to next device in table
+                                        y = MaxNets;
+                                    }
+                                }
                             }
                         }
                         //check lights
@@ -835,11 +857,24 @@ void prvWSCTask( void * parameters )
                         {
                             if(LightTable[i].status != colour_req)
                             {
-                                //send another colour change request, and set check_variable
-                                buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                buffer[1] = LightTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                check_variable = 0;
+                                for(uint8_t y = 0; y < MaxNets; y++)
+                                {
+                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    {
+                                        y = MaxNets;
+                                        //send another colour change request, and set check_variable
+                                        buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                        buffer[1] = LightTable[i].index; //load with retransmission request
+                                        check_variable = 0;
+                                        NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    }
+                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
+                                    {
+                                        //just end loop and move on to next device in table
+                                        y = MaxNets;
+                                    }
+                                }
                             }
                         }
                         //if all colours are matching, we can set colour_cur to colour_req
@@ -897,18 +932,31 @@ void prvWSCTask( void * parameters )
         switch(Requester)
         {
             case 1:
-                if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
+                if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
                 {
                     for(uint8_t i = 0; i < numControllers; i++)
                         {
-                            if(ControllerTable[i].status != 'C') //if not confirmed cleared
+                            if(ControllerTable[i].status != 'C')
                             {
-                            //send another clear request, and set check_variable
-                                buffer[0] = 'C';
-                                buffer[1] = colour_req; //colour_req is the colour we are requesting
-                                buffer[2] = ControllerTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                                check_variable = 0;
+                                for(uint8_t y = 0; y < MaxNets; y++)
+                                {
+                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    {
+                                        //send another clear request, and set check_variable
+                                        buffer[0] = 'C';
+                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
+                                        buffer[2] = ControllerTable[i].index; //load with retransmission request
+                                        check_variable = 0;
+                                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
+                                        y = MaxNets;
+                                    }
+                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                    {
+                                        //just end loop and move on to next device in table
+                                        y = MaxNets;
+                                    }
+                                }
                             }
                         }
                     //if all controllers are confirmed, we can move on to releasing lights
@@ -924,18 +972,32 @@ void prvWSCTask( void * parameters )
                         xTimerReset(xRetransmitTimer, portMAX_DELAY);
                     }
                 }
-                if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1))) //at this point, all controllers have confirmed lockout release
-                {//we can begin releasing the lights
+                if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))) //at this point, all controllers have confirmed lockout release
+                {
+                    //we can begin releasing the lights
                     for(uint8_t i = 0; i < numLights; i++)
                     {
                         if(LightTable[i].status != 'C') //if not confirmed cleared
                         {
-                            //send another clear request, and set check_variable
-                            buffer[0] = 'C';
-                            buffer[1] = colour_req; //colour_req is the colour we are requesting
-                            buffer[2] = LightTable[i].index; //load with retransmission request
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                            check_variable = 0;
+                                for(uint8_t y = 0; y < MaxNets; y++)
+                                {
+                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    {
+                                        //send another clear request, and set check_variable
+                                        buffer[0] = 'C';
+                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
+                                        buffer[2] = LightTable[i].index; //load with retransmission request
+                                        check_variable = 0;
+                                        NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
+                                        y = MaxNets;
+                                    }
+                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
+                                    {
+                                        //just end loop and move on to next device in table
+                                        y = MaxNets;
+                                    }
+                                }
                         }
                     }
                     //if all controllers and lights are confirmed, we can release internal lockout and return to requester 0

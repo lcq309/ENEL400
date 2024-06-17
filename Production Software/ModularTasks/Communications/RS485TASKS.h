@@ -32,12 +32,15 @@ extern "C" {
     #define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
     
     extern uint8_t GLOBAL_TableLength; //increments as new entries are added to the table
-
+    extern uint8_t GLOBAL_NetNum; //track number of networks
+    extern uint8_t GLOBAL_MessageSent; //track whether or not a message has been sent yet to avoid loading the buffer with repeat transmissions
+    
     struct Device {
     uint8_t XBeeADD[8];
     uint8_t WiredADD;
     uint8_t Channel;
     uint8_t Type;
+    uint8_t Net; //net number for internal tracking of different wired networks
 };
 
     extern struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE]; //create device table

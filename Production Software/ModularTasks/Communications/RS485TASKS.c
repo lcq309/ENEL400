@@ -10,6 +10,8 @@
     struct Device GLOBAL_DEVICE_TABLE[DEVICE_TABLE_SIZE];
     
     uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
+    uint8_t GLOBAL_NetNum = 1; //always at least one net for a wired device (our own)
+    uint8_t GLOBAL_MessageSent = 0; //track whether a message has been sent or not
     
     //Timer Counters
     
@@ -49,7 +51,7 @@ void COMMSetup()
     //setup buffers
     
     xCOMM_in_Stream = xStreamBufferCreate(50,1); //50 bytes, triggers when a byte is added
-    xCOMM_out_Stream = xStreamBufferCreate(4 * MAX_MESSAGE_SIZE, 1); //output buffer
+    xCOMM_out_Stream = xStreamBufferCreate(2 * MAX_MESSAGE_SIZE, 1); //output buffer
     xCOMM_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE);
     xDevice_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE);
     
@@ -156,6 +158,7 @@ void modCOMMOutTask (void * parameters)
         USART0.CTRLA |= USART_DREIE_bm;
         //wait for TXcomplete notification
         xSemaphoreTake(xTXC, portMAX_DELAY);
+        GLOBAL_MessageSent = 1;
         //release USART MUTEX
         xSemaphoreGive(xUSART0_MUTEX);
         //end of message, wait until permission given again
@@ -230,6 +233,7 @@ void modCOMMInTask (void * parameters)
         //release hardware MUTEX
         xSemaphoreGive(xUSART0_MUTEX);
         uint8_t matched = 0; //device table checks against this to add a new device
+        uint8_t netmatch = 0; //track if a device is on the same wireless address as another to avoid redundant messages.
         switch(buffer[0])
         {
             case 'P': //ping
@@ -260,7 +264,11 @@ void modCOMMInTask (void * parameters)
                                 matched = 'I'; //not a match
                             }
                             else
+                            {
                                 matched = 1;
+                                netmatch = GLOBAL_DEVICE_TABLE[i].Net;
+                            }
+                           
                         }
                         if(matched == 1) //if the wireless address matches, perform rest of checks
                         {
@@ -373,6 +381,7 @@ void modCOMMInTask (void * parameters)
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[5] = 0x0;
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[6] = 0x0;
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[7] = 0x0;
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Net = 1; //same wired network is always net 1
                 //increment length
                 GLOBAL_TableLength++;
                 //send message to the device, with the index entry at the front
@@ -404,6 +413,14 @@ void modCOMMInTask (void * parameters)
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[5] = buffer[9];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[6] = buffer[10];
                 GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[7] = buffer[11];
+                //netmatch check here
+                if(netmatch == 0)
+                {
+                    GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Net = (GLOBAL_NetNum + 1);
+                    GLOBAL_NetNum++;
+                }
+                else
+                    GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Net = netmatch;
                 //increment length
                 GLOBAL_TableLength++;
                 //send message to the device, with the index entry at the front
