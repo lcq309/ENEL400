@@ -122,6 +122,15 @@ void dsIOOutTask (void * parameters)
                 dsioGreenOn();
             break;
             
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioGreenTGL();
+                    vTaskDelay(25);
+                    dsioGreenTGL();
+                }
+                break;
+            
             case 'O': //off
                 dsioGreenOff();
             break;
@@ -138,6 +147,15 @@ void dsIOOutTask (void * parameters)
                 if(flash == 0)
                     dsioBlueTGL();
             break;
+            
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioBlueTGL();
+                    vTaskDelay(25);
+                    dsioBlueTGL();
+                }
+                break;
             
             case 'S': //solid
                 dsioBlueOn();
@@ -160,6 +178,15 @@ void dsIOOutTask (void * parameters)
                     dsioYellowTGL();
             break;
             
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioYellowTGL();
+                    vTaskDelay(25);
+                    dsioYellowTGL();
+                }
+                break;
+            
             case 'S': //solid
                 dsioYellowOn();
             break;
@@ -180,6 +207,15 @@ void dsIOOutTask (void * parameters)
                 if(flash == 0)
                     dsioRedTGL();
             break;
+            
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioRedTGL();
+                    vTaskDelay(25);
+                    dsioRedTGL();
+                }
+                break;
             
             case 'S': //solid
                 dsioRedOn();

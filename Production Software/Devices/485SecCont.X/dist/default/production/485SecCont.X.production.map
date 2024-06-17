@@ -694,7 +694,7 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000    0x1034d
+.debug_info     0x0000000000000000    0x105f1
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000     0x2504 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_info    0x0000000000002504      0x7bd build/default/production/_ext/83377035/USART.o
@@ -708,10 +708,10 @@ END GROUP
  .debug_info    0x0000000000008965     0x26c7 build/default/production/_ext/1644529106/tasks.o
  .debug_info    0x000000000000b02c     0x15c3 build/default/production/_ext/1644529106/timers.o
  .debug_info    0x000000000000c5ef     0x152e build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_info    0x000000000000db1d     0x1bd4 build/default/production/main.o
- .debug_info    0x000000000000f6f1      0xc5c build/default/production/DSIO.o
+ .debug_info    0x000000000000db1d     0x1bb3 build/default/production/main.o
+ .debug_info    0x000000000000f6d0      0xf21 build/default/production/DSIO.o
 
-.debug_abbrev   0x0000000000000000     0x3d4d
+.debug_abbrev   0x0000000000000000     0x3d5a
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000     0x230e C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_abbrev  0x000000000000230e       0xea build/default/production/_ext/83377035/USART.o
@@ -726,9 +726,9 @@ END GROUP
  .debug_abbrev  0x000000000000339c      0x32f build/default/production/_ext/1644529106/timers.o
  .debug_abbrev  0x00000000000036cb      0x22f build/default/production/_ext/2083278984/RS485TASKS.o
  .debug_abbrev  0x00000000000038fa      0x276 build/default/production/main.o
- .debug_abbrev  0x0000000000003b70      0x1dd build/default/production/DSIO.o
+ .debug_abbrev  0x0000000000003b70      0x1ea build/default/production/DSIO.o
 
-.debug_line     0x0000000000000000     0x53fa
+.debug_line     0x0000000000000000     0x550c
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000      0x190 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_line    0x0000000000000190      0x113 build/default/production/_ext/83377035/USART.o
@@ -742,8 +742,8 @@ END GROUP
  .debug_line    0x00000000000022ca     0x1191 build/default/production/_ext/1644529106/tasks.o
  .debug_line    0x000000000000345b      0x5a4 build/default/production/_ext/1644529106/timers.o
  .debug_line    0x00000000000039ff      0x763 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_line    0x0000000000004162      0xdba build/default/production/main.o
- .debug_line    0x0000000000004f1c      0x4de build/default/production/DSIO.o
+ .debug_line    0x0000000000004162      0xdc1 build/default/production/main.o
+ .debug_line    0x0000000000004f23      0x5e9 build/default/production/DSIO.o
 
 .debug_frame    0x0000000000000000     0x17f0
  *(.debug_frame)
@@ -775,10 +775,10 @@ END GROUP
  .debug_str     0x00000000000016fd      0x26a build/default/production/_ext/1644529106/tasks.o
  .debug_str     0x0000000000001967      0x1fc build/default/production/_ext/1644529106/timers.o
  .debug_str     0x0000000000001b63      0x152 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_str     0x0000000000001cb5      0x119 build/default/production/main.o
- .debug_str     0x0000000000001dce       0x98 build/default/production/DSIO.o
+ .debug_str     0x0000000000001cb5      0x10e build/default/production/main.o
+ .debug_str     0x0000000000001dc3       0xa3 build/default/production/DSIO.o
 
-.debug_loc      0x0000000000000000     0x75e3
+.debug_loc      0x0000000000000000     0x769e
  *(.debug_loc)
  .debug_loc     0x0000000000000000      0x311 build/default/production/_ext/83377035/ShiftReg.o
  .debug_loc     0x0000000000000311       0xc8 build/default/production/_ext/1347852338/port.o
@@ -790,8 +790,8 @@ END GROUP
  .debug_loc     0x0000000000003ce6     0x1abd build/default/production/_ext/1644529106/tasks.o
  .debug_loc     0x00000000000057a3      0xa9b build/default/production/_ext/1644529106/timers.o
  .debug_loc     0x000000000000623e      0x523 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_loc     0x0000000000006761      0xdd6 build/default/production/main.o
- .debug_loc     0x0000000000007537       0xac build/default/production/DSIO.o
+ .debug_loc     0x0000000000006761      0xe91 build/default/production/main.o
+ .debug_loc     0x00000000000075f2       0xac build/default/production/DSIO.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -811,7 +811,7 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x830
+.debug_ranges   0x0000000000000000      0x860
  *(.debug_ranges)
  .debug_ranges  0x0000000000000000       0x10 build/default/production/_ext/83377035/USART.o
  .debug_ranges  0x0000000000000010       0x40 build/default/production/_ext/83377035/ShiftReg.o
@@ -824,8 +824,8 @@ END GROUP
  .debug_ranges  0x0000000000000338      0x1c8 build/default/production/_ext/1644529106/tasks.o
  .debug_ranges  0x0000000000000500       0xf0 build/default/production/_ext/1644529106/timers.o
  .debug_ranges  0x00000000000005f0       0xe8 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_ranges  0x00000000000006d8       0x90 build/default/production/main.o
- .debug_ranges  0x0000000000000768       0xc8 build/default/production/DSIO.o
+ .debug_ranges  0x00000000000006d8       0xc0 build/default/production/main.o
+ .debug_ranges  0x0000000000000798       0xc8 build/default/production/DSIO.o
 
 .debug_macro
  *(.debug_macro)
@@ -1177,698 +1177,698 @@ LOAD data_init
                 0x0000000000806c6b                GLOBAL_NetNum
 
 .text.prvWSCTask
-                0x00000000000002c8     0x17c4
+                0x00000000000002c8     0x1a48
  .text.prvWSCTask
-                0x00000000000002c8     0x17c4 build/default/production/main.o
+                0x00000000000002c8     0x1a48 build/default/production/main.o
                 0x00000000000002c8                prvWSCTask
 
 .text.modCOMMInTask
-                0x0000000000001a8c      0x62c
+                0x0000000000001d10      0x62c
  .text.modCOMMInTask
-                0x0000000000001a8c      0x62c build/default/production/_ext/2083278984/RS485TASKS.o
-                0x0000000000001a8c                modCOMMInTask
-
-.text.modCOMMOutTask
-                0x00000000000020b8      0x2fc
- .text.modCOMMOutTask
-                0x00000000000020b8      0x2fc build/default/production/_ext/2083278984/RS485TASKS.o
-                0x00000000000020b8                modCOMMOutTask
+                0x0000000000001d10      0x62c build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000001d10                modCOMMInTask
 
 .text.dsIOOutTask
-                0x00000000000023b4      0x2b8
+                0x000000000000233c      0x416
  .text.dsIOOutTask
-                0x00000000000023b4      0x2b8 build/default/production/DSIO.o
-                0x00000000000023b4                dsIOOutTask
+                0x000000000000233c      0x416 build/default/production/DSIO.o
+                0x000000000000233c                dsIOOutTask
+
+.text.modCOMMOutTask
+                0x0000000000002752      0x2fc
+ .text.modCOMMOutTask
+                0x0000000000002752      0x2fc build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000002752                modCOMMOutTask
 
 .text.xTaskCreate
-                0x000000000000266c      0x288
+                0x0000000000002a4e      0x288
  .text.xTaskCreate
-                0x000000000000266c      0x288 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000266c                xTaskCreate
+                0x0000000000002a4e      0x288 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000002a4e                xTaskCreate
 
 .text.xTaskGenericNotifyFromISR
-                0x00000000000028f4      0x258
+                0x0000000000002cd6      0x258
  .text.xTaskGenericNotifyFromISR
-                0x00000000000028f4      0x258 build/default/production/_ext/1644529106/tasks.o
-                0x00000000000028f4                xTaskGenericNotifyFromISR
+                0x0000000000002cd6      0x258 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000002cd6                xTaskGenericNotifyFromISR
 
 .text.xTaskIncrementTick
-                0x0000000000002b4c      0x232
+                0x0000000000002f2e      0x232
  .text.xTaskIncrementTick
-                0x0000000000002b4c      0x232 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000002b4c                xTaskIncrementTick
+                0x0000000000002f2e      0x232 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000002f2e                xTaskIncrementTick
 
 .text.xTaskGenericNotify
-                0x0000000000002d7e      0x204
+                0x0000000000003160      0x204
  .text.xTaskGenericNotify
-                0x0000000000002d7e      0x204 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000002d7e                xTaskGenericNotify
+                0x0000000000003160      0x204 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000003160                xTaskGenericNotify
 
 .text.xTaskResumeAll
-                0x0000000000002f82      0x1bc
+                0x0000000000003364      0x1bc
  .text.xTaskResumeAll
-                0x0000000000002f82      0x1bc build/default/production/_ext/1644529106/tasks.o
-                0x0000000000002f82                xTaskResumeAll
+                0x0000000000003364      0x1bc build/default/production/_ext/1644529106/tasks.o
+                0x0000000000003364                xTaskResumeAll
 
 .text.xQueueSemaphoreTake
-                0x000000000000313e      0x1ba
+                0x0000000000003520      0x1ba
  .text.xQueueSemaphoreTake
-                0x000000000000313e      0x1ba build/default/production/_ext/1644529106/queue.o
-                0x000000000000313e                xQueueSemaphoreTake
+                0x0000000000003520      0x1ba build/default/production/_ext/1644529106/queue.o
+                0x0000000000003520                xQueueSemaphoreTake
 
 .text.prvTimerTask
-                0x00000000000032f8      0x1b6
+                0x00000000000036da      0x1b6
  .text.prvTimerTask
-                0x00000000000032f8      0x1b6 build/default/production/_ext/1644529106/timers.o
+                0x00000000000036da      0x1b6 build/default/production/_ext/1644529106/timers.o
 
 .text.prvWiredInitTask
-                0x00000000000034ae      0x18e
+                0x0000000000003890      0x18e
  .text.prvWiredInitTask
-                0x00000000000034ae      0x18e build/default/production/main.o
-                0x00000000000034ae                prvWiredInitTask
+                0x0000000000003890      0x18e build/default/production/main.o
+                0x0000000000003890                prvWiredInitTask
 
 .text.xTaskRemoveFromEventList
-                0x000000000000363c      0x186
+                0x0000000000003a1e      0x186
  .text.xTaskRemoveFromEventList
-                0x000000000000363c      0x186 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000363c                xTaskRemoveFromEventList
+                0x0000000000003a1e      0x186 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000003a1e                xTaskRemoveFromEventList
 
 .text.xQueueGenericSend
-                0x00000000000037c2      0x176
+                0x0000000000003ba4      0x176
  .text.xQueueGenericSend
-                0x00000000000037c2      0x176 build/default/production/_ext/1644529106/queue.o
-                0x00000000000037c2                xQueueGenericSend
+                0x0000000000003ba4      0x176 build/default/production/_ext/1644529106/queue.o
+                0x0000000000003ba4                xQueueGenericSend
 
 .text.xStreamBufferSend
-                0x0000000000003938      0x16c
+                0x0000000000003d1a      0x16c
  .text.xStreamBufferSend
-                0x0000000000003938      0x16c build/default/production/_ext/1644529106/stream_buffer.o
-                0x0000000000003938                xStreamBufferSend
+                0x0000000000003d1a      0x16c build/default/production/_ext/1644529106/stream_buffer.o
+                0x0000000000003d1a                xStreamBufferSend
 
 .text.COMMSetup
-                0x0000000000003aa4      0x158
+                0x0000000000003e86      0x158
  .text.COMMSetup
-                0x0000000000003aa4      0x158 build/default/production/_ext/2083278984/RS485TASKS.o
-                0x0000000000003aa4                COMMSetup
+                0x0000000000003e86      0x158 build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000003e86                COMMSetup
 
 .text.vTaskRemoveFromUnorderedEventList
-                0x0000000000003bfc      0x14e
+                0x0000000000003fde      0x14e
  .text.vTaskRemoveFromUnorderedEventList
-                0x0000000000003bfc      0x14e build/default/production/_ext/1644529106/tasks.o
-                0x0000000000003bfc                vTaskRemoveFromUnorderedEventList
+                0x0000000000003fde      0x14e build/default/production/_ext/1644529106/tasks.o
+                0x0000000000003fde                vTaskRemoveFromUnorderedEventList
 
 .text.xQueueReceive
-                0x0000000000003d4a      0x142
+                0x000000000000412c      0x142
  .text.xQueueReceive
-                0x0000000000003d4a      0x142 build/default/production/_ext/1644529106/queue.o
-                0x0000000000003d4a                xQueueReceive
+                0x000000000000412c      0x142 build/default/production/_ext/1644529106/queue.o
+                0x000000000000412c                xQueueReceive
 
 .text.xTaskGenericNotifyWait
-                0x0000000000003e8c      0x142
+                0x000000000000426e      0x142
  .text.xTaskGenericNotifyWait
-                0x0000000000003e8c      0x142 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000003e8c                xTaskGenericNotifyWait
+                0x000000000000426e      0x142 build/default/production/_ext/1644529106/tasks.o
+                0x000000000000426e                xTaskGenericNotifyWait
 
 .text.xTaskPriorityInherit
-                0x0000000000003fce      0x128
+                0x00000000000043b0      0x128
  .text.xTaskPriorityInherit
-                0x0000000000003fce      0x128 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000003fce                xTaskPriorityInherit
+                0x00000000000043b0      0x128 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000043b0                xTaskPriorityInherit
 
 .text.xStreamBufferReceive
-                0x00000000000040f6      0x11a
+                0x00000000000044d8      0x11a
  .text.xStreamBufferReceive
-                0x00000000000040f6      0x11a build/default/production/_ext/1644529106/stream_buffer.o
-                0x00000000000040f6                xStreamBufferReceive
+                0x00000000000044d8      0x11a build/default/production/_ext/1644529106/stream_buffer.o
+                0x00000000000044d8                xStreamBufferReceive
 
 .text.xEventGroupWaitBits
-                0x0000000000004210      0x110
+                0x00000000000045f2      0x110
  .text.xEventGroupWaitBits
-                0x0000000000004210      0x110 build/default/production/_ext/1644529106/event_groups.o
-                0x0000000000004210                xEventGroupWaitBits
+                0x00000000000045f2      0x110 build/default/production/_ext/1644529106/event_groups.o
+                0x00000000000045f2                xEventGroupWaitBits
 
 .text.prvAddCurrentTaskToDelayedList
-                0x0000000000004320      0x102
+                0x0000000000004702      0x102
  .text.prvAddCurrentTaskToDelayedList
-                0x0000000000004320      0x102 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000004702      0x102 build/default/production/_ext/1644529106/tasks.o
 
 .text.xEventGroupSetBits
-                0x0000000000004422       0xea
+                0x0000000000004804       0xea
  .text.xEventGroupSetBits
-                0x0000000000004422       0xea build/default/production/_ext/1644529106/event_groups.o
-                0x0000000000004422                xEventGroupSetBits
+                0x0000000000004804       0xea build/default/production/_ext/1644529106/event_groups.o
+                0x0000000000004804                xEventGroupSetBits
 
 .text.vTaskPriorityDisinheritAfterTimeout
-                0x000000000000450c       0xe6
+                0x00000000000048ee       0xe6
  .text.vTaskPriorityDisinheritAfterTimeout
-                0x000000000000450c       0xe6 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000450c                vTaskPriorityDisinheritAfterTimeout
+                0x00000000000048ee       0xe6 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000048ee                vTaskPriorityDisinheritAfterTimeout
 
 .text.DSIOSetup
-                0x00000000000045f2       0xd2
+                0x00000000000049d4       0xd2
  .text.DSIOSetup
-                0x00000000000045f2       0xd2 build/default/production/DSIO.o
-                0x00000000000045f2                DSIOSetup
+                0x00000000000049d4       0xd2 build/default/production/DSIO.o
+                0x00000000000049d4                DSIOSetup
 
 .text.vTaskSwitchContext
-                0x00000000000046c4       0xcc
+                0x0000000000004aa6       0xcc
  .text.vTaskSwitchContext
-                0x00000000000046c4       0xcc build/default/production/_ext/1644529106/tasks.o
-                0x00000000000046c4                vTaskSwitchContext
+                0x0000000000004aa6       0xcc build/default/production/_ext/1644529106/tasks.o
+                0x0000000000004aa6                vTaskSwitchContext
 
 .text.xQueueGenericReset
-                0x0000000000004790       0xc8
+                0x0000000000004b72       0xc8
  .text.xQueueGenericReset
-                0x0000000000004790       0xc8 build/default/production/_ext/1644529106/queue.o
-                0x0000000000004790                xQueueGenericReset
+                0x0000000000004b72       0xc8 build/default/production/_ext/1644529106/queue.o
+                0x0000000000004b72                xQueueGenericReset
 
 .text.xTaskPriorityDisinherit
-                0x0000000000004858       0xc6
+                0x0000000000004c3a       0xc6
  .text.xTaskPriorityDisinherit
-                0x0000000000004858       0xc6 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000004858                xTaskPriorityDisinherit
+                0x0000000000004c3a       0xc6 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000004c3a                xTaskPriorityDisinherit
 
 .text.vPortYieldFromTick
-                0x000000000000491e       0xc0
+                0x0000000000004d00       0xc0
  .text.vPortYieldFromTick
-                0x000000000000491e       0xc0 build/default/production/_ext/1347852338/port.o
-                0x000000000000491e                vPortYieldFromTick
+                0x0000000000004d00       0xc0 build/default/production/_ext/1347852338/port.o
+                0x0000000000004d00                vPortYieldFromTick
 
 .text.prvCopyDataToQueue
-                0x00000000000049de       0xbe
+                0x0000000000004dc0       0xbe
  .text.prvCopyDataToQueue
-                0x00000000000049de       0xbe build/default/production/_ext/1644529106/queue.o
+                0x0000000000004dc0       0xbe build/default/production/_ext/1644529106/queue.o
 
 .text.vPortYield
-                0x0000000000004a9c       0xba
+                0x0000000000004e7e       0xba
  .text.vPortYield
-                0x0000000000004a9c       0xba build/default/production/_ext/1347852338/port.o
-                0x0000000000004a9c                vPortYield
+                0x0000000000004e7e       0xba build/default/production/_ext/1347852338/port.o
+                0x0000000000004e7e                vPortYield
 
 .text.__vector_22
-                0x0000000000004b56       0xb0
+                0x0000000000004f38       0xb0
  .text.__vector_22
-                0x0000000000004b56       0xb0 build/default/production/DSIO.o
-                0x0000000000004b56                __vector_22
+                0x0000000000004f38       0xb0 build/default/production/DSIO.o
+                0x0000000000004f38                __vector_22
 
 .text.vQueueAddToRegistry
-                0x0000000000004c06       0xac
+                0x0000000000004fe8       0xac
  .text.vQueueAddToRegistry
-                0x0000000000004c06       0xac build/default/production/_ext/1644529106/queue.o
-                0x0000000000004c06                vQueueAddToRegistry
+                0x0000000000004fe8       0xac build/default/production/_ext/1644529106/queue.o
+                0x0000000000004fe8                vQueueAddToRegistry
 
 .text.vTaskSuspend
-                0x0000000000004cb2       0xac
+                0x0000000000005094       0xac
  .text.vTaskSuspend
-                0x0000000000004cb2       0xac build/default/production/_ext/1644529106/tasks.o
-                0x0000000000004cb2                vTaskSuspend
+                0x0000000000005094       0xac build/default/production/_ext/1644529106/tasks.o
+                0x0000000000005094                vTaskSuspend
 
 .text.prvUnlockQueue
-                0x0000000000004d5e       0xaa
+                0x0000000000005140       0xaa
  .text.prvUnlockQueue
-                0x0000000000004d5e       0xaa build/default/production/_ext/1644529106/queue.o
+                0x0000000000005140       0xaa build/default/production/_ext/1644529106/queue.o
 
 .text.xStreamBufferSendFromISR
-                0x0000000000004e08       0xa2
+                0x00000000000051ea       0xa2
  .text.xStreamBufferSendFromISR
-                0x0000000000004e08       0xa2 build/default/production/_ext/1644529106/stream_buffer.o
-                0x0000000000004e08                xStreamBufferSendFromISR
+                0x00000000000051ea       0xa2 build/default/production/_ext/1644529106/stream_buffer.o
+                0x00000000000051ea                xStreamBufferSendFromISR
 
 .text.prvWriteMessageToBuffer
-                0x0000000000004eaa       0xa0
+                0x000000000000528c       0xa0
  .text.prvWriteMessageToBuffer
-                0x0000000000004eaa       0xa0 build/default/production/_ext/1644529106/stream_buffer.o
+                0x000000000000528c       0xa0 build/default/production/_ext/1644529106/stream_buffer.o
 
 .text.xTimerGenericCommand
-                0x0000000000004f4a       0x98
+                0x000000000000532c       0x98
  .text.xTimerGenericCommand
-                0x0000000000004f4a       0x98 build/default/production/_ext/1644529106/timers.o
-                0x0000000000004f4a                xTimerGenericCommand
+                0x000000000000532c       0x98 build/default/production/_ext/1644529106/timers.o
+                0x000000000000532c                xTimerGenericCommand
 
 .text.prvWriteBytesToBuffer
-                0x0000000000004fe2       0x96
+                0x00000000000053c4       0x96
  .text.prvWriteBytesToBuffer
-                0x0000000000004fe2       0x96 build/default/production/_ext/1644529106/stream_buffer.o
+                0x00000000000053c4       0x96 build/default/production/_ext/1644529106/stream_buffer.o
 
-.text.main      0x0000000000005078       0x96
- .text.main     0x0000000000005078       0x96 build/default/production/main.o
-                0x0000000000005078                main
+.text.main      0x000000000000545a       0x96
+ .text.main     0x000000000000545a       0x96 build/default/production/main.o
+                0x000000000000545a                main
 
 .text.vTaskPlaceOnEventListRestricted
-                0x000000000000510e       0x92
+                0x00000000000054f0       0x92
  .text.vTaskPlaceOnEventListRestricted
-                0x000000000000510e       0x92 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000510e                vTaskPlaceOnEventListRestricted
+                0x00000000000054f0       0x92 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000054f0                vTaskPlaceOnEventListRestricted
 
 .text.dsIOInTask
-                0x00000000000051a0       0x92
+                0x0000000000005582       0x92
  .text.dsIOInTask
-                0x00000000000051a0       0x92 build/default/production/DSIO.o
-                0x00000000000051a0                dsIOInTask
+                0x0000000000005582       0x92 build/default/production/DSIO.o
+                0x0000000000005582                dsIOInTask
 
 .text.prvReadMessageFromBuffer
-                0x0000000000005232       0x90
+                0x0000000000005614       0x90
  .text.prvReadMessageFromBuffer
-                0x0000000000005232       0x90 build/default/production/_ext/1644529106/stream_buffer.o
+                0x0000000000005614       0x90 build/default/production/_ext/1644529106/stream_buffer.o
 
 .text.prvReadBytesFromBuffer
-                0x00000000000052c2       0x8c
+                0x00000000000056a4       0x8c
  .text.prvReadBytesFromBuffer
-                0x00000000000052c2       0x8c build/default/production/_ext/1644529106/stream_buffer.o
+                0x00000000000056a4       0x8c build/default/production/_ext/1644529106/stream_buffer.o
 
 .text.xStreamBufferReceiveFromISR
-                0x000000000000534e       0x8c
+                0x0000000000005730       0x8c
  .text.xStreamBufferReceiveFromISR
-                0x000000000000534e       0x8c build/default/production/_ext/1644529106/stream_buffer.o
-                0x000000000000534e                xStreamBufferReceiveFromISR
+                0x0000000000005730       0x8c build/default/production/_ext/1644529106/stream_buffer.o
+                0x0000000000005730                xStreamBufferReceiveFromISR
 
 .text.vTaskPlaceOnUnorderedEventList
-                0x00000000000053da       0x8c
+                0x00000000000057bc       0x8c
  .text.vTaskPlaceOnUnorderedEventList
-                0x00000000000053da       0x8c build/default/production/_ext/1644529106/tasks.o
-                0x00000000000053da                vTaskPlaceOnUnorderedEventList
+                0x00000000000057bc       0x8c build/default/production/_ext/1644529106/tasks.o
+                0x00000000000057bc                vTaskPlaceOnUnorderedEventList
 
 .text.__vector_20
-                0x0000000000005466       0x8c
+                0x0000000000005848       0x8c
  .text.__vector_20
-                0x0000000000005466       0x8c build/default/production/_ext/2083278984/RS485TASKS.o
-                0x0000000000005466                __vector_20
+                0x0000000000005848       0x8c build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000005848                __vector_20
 
 .text.__vector_19
-                0x00000000000054f2       0x86
+                0x00000000000058d4       0x86
  .text.__vector_19
-                0x00000000000054f2       0x86 build/default/production/_ext/2083278984/RS485TASKS.o
-                0x00000000000054f2                __vector_19
+                0x00000000000058d4       0x86 build/default/production/_ext/2083278984/RS485TASKS.o
+                0x00000000000058d4                __vector_19
 
 .text.xQueueGenericCreate
-                0x0000000000005578       0x84
+                0x000000000000595a       0x84
  .text.xQueueGenericCreate
-                0x0000000000005578       0x84 build/default/production/_ext/1644529106/queue.o
-                0x0000000000005578                xQueueGenericCreate
+                0x000000000000595a       0x84 build/default/production/_ext/1644529106/queue.o
+                0x000000000000595a                xQueueGenericCreate
 
 .text.prvSampleTimeNow
-                0x00000000000055fc       0x84
+                0x00000000000059de       0x84
  .text.prvSampleTimeNow
-                0x00000000000055fc       0x84 build/default/production/_ext/1644529106/timers.o
+                0x00000000000059de       0x84 build/default/production/_ext/1644529106/timers.o
 
 .text.xQueueGenericSendFromISR
-                0x0000000000005680       0x80
+                0x0000000000005a62       0x80
  .text.xQueueGenericSendFromISR
-                0x0000000000005680       0x80 build/default/production/_ext/1644529106/queue.o
-                0x0000000000005680                xQueueGenericSendFromISR
+                0x0000000000005a62       0x80 build/default/production/_ext/1644529106/queue.o
+                0x0000000000005a62                xQueueGenericSendFromISR
 
 .text.xStreamBufferSpacesAvailable
-                0x0000000000005700       0x80
+                0x0000000000005ae2       0x80
  .text.xStreamBufferSpacesAvailable
-                0x0000000000005700       0x80 build/default/production/_ext/1644529106/stream_buffer.o
-                0x0000000000005700                xStreamBufferSpacesAvailable
+                0x0000000000005ae2       0x80 build/default/production/_ext/1644529106/stream_buffer.o
+                0x0000000000005ae2                xStreamBufferSpacesAvailable
 
 .text.vPeriodicJoinTimerFunc
-                0x0000000000005780       0x7a
+                0x0000000000005b62       0x7a
  .text.vPeriodicJoinTimerFunc
-                0x0000000000005780       0x7a build/default/production/_ext/2083278984/RS485TASKS.o
-                0x0000000000005780                vPeriodicJoinTimerFunc
+                0x0000000000005b62       0x7a build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000005b62                vPeriodicJoinTimerFunc
 
 .text.xQueueGiveFromISR
-                0x00000000000057fa       0x78
+                0x0000000000005bdc       0x78
  .text.xQueueGiveFromISR
-                0x00000000000057fa       0x78 build/default/production/_ext/1644529106/queue.o
-                0x00000000000057fa                xQueueGiveFromISR
+                0x0000000000005bdc       0x78 build/default/production/_ext/1644529106/queue.o
+                0x0000000000005bdc                xQueueGiveFromISR
 
 .text.pvPortMalloc
-                0x0000000000005872       0x74
+                0x0000000000005c54       0x74
  .text.pvPortMalloc
-                0x0000000000005872       0x74 build/default/production/_ext/1644529106/heap_1.o
-                0x0000000000005872                pvPortMalloc
+                0x0000000000005c54       0x74 build/default/production/_ext/1644529106/heap_1.o
+                0x0000000000005c54                pvPortMalloc
 
 .text.xTimerCreate
-                0x00000000000058e6       0x74
+                0x0000000000005cc8       0x74
  .text.xTimerCreate
-                0x00000000000058e6       0x74 build/default/production/_ext/1644529106/timers.o
-                0x00000000000058e6                xTimerCreate
+                0x0000000000005cc8       0x74 build/default/production/_ext/1644529106/timers.o
+                0x0000000000005cc8                xTimerCreate
 
 .text.xTaskCheckForTimeOut
-                0x000000000000595a       0x72
+                0x0000000000005d3c       0x72
  .text.xTaskCheckForTimeOut
-                0x000000000000595a       0x72 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000595a                xTaskCheckForTimeOut
+                0x0000000000005d3c       0x72 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000005d3c                xTaskCheckForTimeOut
 
 .text.vOFFSETTimerFunc
-                0x00000000000059cc       0x70
+                0x0000000000005dae       0x70
  .text.vOFFSETTimerFunc
-                0x00000000000059cc       0x70 build/default/production/_ext/2083278984/RS485TASKS.o
-                0x00000000000059cc                vOFFSETTimerFunc
+                0x0000000000005dae       0x70 build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000005dae                vOFFSETTimerFunc
 
 .text.xPortStartScheduler
-                0x0000000000005a3c       0x6e
+                0x0000000000005e1e       0x6e
  .text.xPortStartScheduler
-                0x0000000000005a3c       0x6e build/default/production/_ext/1347852338/port.o
-                0x0000000000005a3c                xPortStartScheduler
+                0x0000000000005e1e       0x6e build/default/production/_ext/1347852338/port.o
+                0x0000000000005e1e                xPortStartScheduler
 
 .text.xStreamBufferGenericCreate
-                0x0000000000005aaa       0x6c
+                0x0000000000005e8c       0x6c
  .text.xStreamBufferGenericCreate
-                0x0000000000005aaa       0x6c build/default/production/_ext/1644529106/stream_buffer.o
-                0x0000000000005aaa                xStreamBufferGenericCreate
+                0x0000000000005e8c       0x6c build/default/production/_ext/1644529106/stream_buffer.o
+                0x0000000000005e8c                xStreamBufferGenericCreate
 
 .text.__vector_21
-                0x0000000000005b16       0x6c
+                0x0000000000005ef8       0x6c
  .text.__vector_21
-                0x0000000000005b16       0x6c build/default/production/_ext/2083278984/RS485TASKS.o
-                0x0000000000005b16                __vector_21
+                0x0000000000005ef8       0x6c build/default/production/_ext/2083278984/RS485TASKS.o
+                0x0000000000005ef8                __vector_21
 
 .text.vTaskStartScheduler
-                0x0000000000005b82       0x66
+                0x0000000000005f64       0x66
  .text.vTaskStartScheduler
-                0x0000000000005b82       0x66 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000005b82                vTaskStartScheduler
+                0x0000000000005f64       0x66 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000005f64                vTaskStartScheduler
 
 .text.vListInsert
-                0x0000000000005be8       0x62
+                0x0000000000005fca       0x62
  .text.vListInsert
-                0x0000000000005be8       0x62 build/default/production/_ext/1644529106/list.o
-                0x0000000000005be8                vListInsert
+                0x0000000000005fca       0x62 build/default/production/_ext/1644529106/list.o
+                0x0000000000005fca                vListInsert
 
 .text.prvCheckForValidListAndQueue
-                0x0000000000005c4a       0x60
+                0x000000000000602c       0x60
  .text.prvCheckForValidListAndQueue
-                0x0000000000005c4a       0x60 build/default/production/_ext/1644529106/timers.o
+                0x000000000000602c       0x60 build/default/production/_ext/1644529106/timers.o
 
 .text.prvInsertTimerInActiveList
-                0x0000000000005caa       0x5e
+                0x000000000000608c       0x5e
  .text.prvInsertTimerInActiveList
-                0x0000000000005caa       0x5e build/default/production/_ext/1644529106/timers.o
+                0x000000000000608c       0x5e build/default/production/_ext/1644529106/timers.o
 
 .text.prvProcessExpiredTimer
-                0x0000000000005d08       0x56
+                0x00000000000060ea       0x56
  .text.prvProcessExpiredTimer
-                0x0000000000005d08       0x56 build/default/production/_ext/1644529106/timers.o
+                0x00000000000060ea       0x56 build/default/production/_ext/1644529106/timers.o
 
 .text.prvBytesInBuffer
-                0x0000000000005d5e       0x54
+                0x0000000000006140       0x54
  .text.prvBytesInBuffer
-                0x0000000000005d5e       0x54 build/default/production/_ext/1644529106/stream_buffer.o
+                0x0000000000006140       0x54 build/default/production/_ext/1644529106/stream_buffer.o
 
-.text.ShiftIn   0x0000000000005db2       0x52
- .text.ShiftIn  0x0000000000005db2       0x52 build/default/production/_ext/83377035/ShiftReg.o
-                0x0000000000005db2                ShiftIn
+.text.ShiftIn   0x0000000000006194       0x52
+ .text.ShiftIn  0x0000000000006194       0x52 build/default/production/_ext/83377035/ShiftReg.o
+                0x0000000000006194                ShiftIn
 
 .text.xTimerCreateTimerTask
-                0x0000000000005e04       0x52
+                0x00000000000061e6       0x52
  .text.xTimerCreateTimerTask
-                0x0000000000005e04       0x52 build/default/production/_ext/1644529106/timers.o
-                0x0000000000005e04                xTimerCreateTimerTask
+                0x00000000000061e6       0x52 build/default/production/_ext/1644529106/timers.o
+                0x00000000000061e6                xTimerCreateTimerTask
 
 .text.uxListRemove
-                0x0000000000005e56       0x4e
+                0x0000000000006238       0x4e
  .text.uxListRemove
-                0x0000000000005e56       0x4e build/default/production/_ext/1644529106/list.o
-                0x0000000000005e56                uxListRemove
+                0x0000000000006238       0x4e build/default/production/_ext/1644529106/list.o
+                0x0000000000006238                uxListRemove
 
 .text.prvReloadTimer
-                0x0000000000005ea4       0x48
+                0x0000000000006286       0x48
  .text.prvReloadTimer
-                0x0000000000005ea4       0x48 build/default/production/_ext/1644529106/timers.o
+                0x0000000000006286       0x48 build/default/production/_ext/1644529106/timers.o
 
 .text.vListInsertEnd
-                0x0000000000005eec       0x42
+                0x00000000000062ce       0x42
  .text.vListInsertEnd
-                0x0000000000005eec       0x42 build/default/production/_ext/1644529106/list.o
-                0x0000000000005eec                vListInsertEnd
+                0x00000000000062ce       0x42 build/default/production/_ext/1644529106/list.o
+                0x00000000000062ce                vListInsertEnd
 
 .text.xQueueCreateMutex
-                0x0000000000005f2e       0x3a
+                0x0000000000006310       0x3a
  .text.xQueueCreateMutex
-                0x0000000000005f2e       0x3a build/default/production/_ext/1644529106/queue.o
-                0x0000000000005f2e                xQueueCreateMutex
+                0x0000000000006310       0x3a build/default/production/_ext/1644529106/queue.o
+                0x0000000000006310                xQueueCreateMutex
 
 .text.vQueueWaitForMessageRestricted
-                0x0000000000005f68       0x3a
+                0x000000000000634a       0x3a
  .text.vQueueWaitForMessageRestricted
-                0x0000000000005f68       0x3a build/default/production/_ext/1644529106/queue.o
-                0x0000000000005f68                vQueueWaitForMessageRestricted
+                0x000000000000634a       0x3a build/default/production/_ext/1644529106/queue.o
+                0x000000000000634a                vQueueWaitForMessageRestricted
 
 .text.prvResetNextTaskUnblockTime
-                0x0000000000005fa2       0x38
+                0x0000000000006384       0x38
  .text.prvResetNextTaskUnblockTime
-                0x0000000000005fa2       0x38 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000006384       0x38 build/default/production/_ext/1644529106/tasks.o
 
 .text.prvCopyDataFromQueue
-                0x0000000000005fda       0x36
+                0x00000000000063bc       0x36
  .text.prvCopyDataFromQueue
-                0x0000000000005fda       0x36 build/default/production/_ext/1644529106/queue.o
+                0x00000000000063bc       0x36 build/default/production/_ext/1644529106/queue.o
 
 .text.xTaskGenericNotifyStateClear
-                0x0000000000006010       0x34
+                0x00000000000063f2       0x34
  .text.xTaskGenericNotifyStateClear
-                0x0000000000006010       0x34 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000006010                xTaskGenericNotifyStateClear
+                0x00000000000063f2       0x34 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000063f2                xTaskGenericNotifyStateClear
 
-.text.memcpy    0x0000000000006044       0x32
- .text.memcpy   0x0000000000006044       0x32 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(memcpy.o)
-                0x0000000000006044                memcpy
+.text.memcpy    0x0000000000006426       0x32
+ .text.memcpy   0x0000000000006426       0x32 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(memcpy.o)
+                0x0000000000006426                memcpy
 
 .text.uxTaskResetEventItemValue
-                0x0000000000006076       0x2e
+                0x0000000000006458       0x2e
  .text.uxTaskResetEventItemValue
-                0x0000000000006076       0x2e build/default/production/_ext/1644529106/tasks.o
-                0x0000000000006076                uxTaskResetEventItemValue
+                0x0000000000006458       0x2e build/default/production/_ext/1644529106/tasks.o
+                0x0000000000006458                uxTaskResetEventItemValue
 
 .text.USART0_init
-                0x00000000000060a4       0x2c
+                0x0000000000006486       0x2c
  .text.USART0_init
-                0x00000000000060a4       0x2c build/default/production/_ext/83377035/USART.o
-                0x00000000000060a4                USART0_init
+                0x0000000000006486       0x2c build/default/production/_ext/83377035/USART.o
+                0x0000000000006486                USART0_init
 
 .text.vTaskDelay
-                0x00000000000060d0       0x28
+                0x00000000000064b2       0x28
  .text.vTaskDelay
-                0x00000000000060d0       0x28 build/default/production/_ext/1644529106/tasks.o
-                0x00000000000060d0                vTaskDelay
+                0x00000000000064b2       0x28 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000064b2                vTaskDelay
 
 .text.libgcc.div
-                0x00000000000060f8       0x28
+                0x00000000000064da       0x28
  .text.libgcc.div
-                0x00000000000060f8       0x28 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_udivmodhi4.o)
-                0x00000000000060f8                __udivmodhi4
+                0x00000000000064da       0x28 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_udivmodhi4.o)
+                0x00000000000064da                __udivmodhi4
 
 .text.pxPortInitialiseStack
-                0x0000000000006120       0x26
+                0x0000000000006502       0x26
  .text.pxPortInitialiseStack
-                0x0000000000006120       0x26 build/default/production/_ext/1347852338/port.o
-                0x0000000000006120                pxPortInitialiseStack
+                0x0000000000006502       0x26 build/default/production/_ext/1347852338/port.o
+                0x0000000000006502                pxPortInitialiseStack
 
 .text.xEventGroupCreate
-                0x0000000000006146       0x26
+                0x0000000000006528       0x26
  .text.xEventGroupCreate
-                0x0000000000006146       0x26 build/default/production/_ext/1644529106/event_groups.o
-                0x0000000000006146                xEventGroupCreate
+                0x0000000000006528       0x26 build/default/production/_ext/1644529106/event_groups.o
+                0x0000000000006528                xEventGroupCreate
 
 .text.vTaskPlaceOnEventList
-                0x000000000000616c       0x24
+                0x000000000000654e       0x24
  .text.vTaskPlaceOnEventList
-                0x000000000000616c       0x24 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000616c                vTaskPlaceOnEventList
+                0x000000000000654e       0x24 build/default/production/_ext/1644529106/tasks.o
+                0x000000000000654e                vTaskPlaceOnEventList
 
 .text.pvTaskIncrementMutexHeldCount
-                0x0000000000006190       0x24
+                0x0000000000006572       0x24
  .text.pvTaskIncrementMutexHeldCount
-                0x0000000000006190       0x24 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000006190                pvTaskIncrementMutexHeldCount
+                0x0000000000006572       0x24 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000006572                pvTaskIncrementMutexHeldCount
 
 .text.prvIsQueueEmpty
-                0x00000000000061b4       0x22
+                0x0000000000006596       0x22
  .text.prvIsQueueEmpty
-                0x00000000000061b4       0x22 build/default/production/_ext/1644529106/queue.o
+                0x0000000000006596       0x22 build/default/production/_ext/1644529106/queue.o
 
 .text.vTaskSetTimeOutState
-                0x00000000000061d6       0x20
+                0x00000000000065b8       0x20
  .text.vTaskSetTimeOutState
-                0x00000000000061d6       0x20 build/default/production/_ext/1644529106/tasks.o
-                0x00000000000061d6                vTaskSetTimeOutState
+                0x00000000000065b8       0x20 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000065b8                vTaskSetTimeOutState
 
 .text.vListInitialise
-                0x00000000000061f6       0x1c
+                0x00000000000065d8       0x1c
  .text.vListInitialise
-                0x00000000000061f6       0x1c build/default/production/_ext/1644529106/list.o
-                0x00000000000061f6                vListInitialise
+                0x00000000000065d8       0x1c build/default/production/_ext/1644529106/list.o
+                0x00000000000065d8                vListInitialise
 
 .text.xTaskGetSchedulerState
-                0x0000000000006212       0x1c
+                0x00000000000065f4       0x1c
  .text.xTaskGetSchedulerState
-                0x0000000000006212       0x1c build/default/production/_ext/1644529106/tasks.o
-                0x0000000000006212                xTaskGetSchedulerState
+                0x00000000000065f4       0x1c build/default/production/_ext/1644529106/tasks.o
+                0x00000000000065f4                xTaskGetSchedulerState
 
-.text.LTCHIn    0x000000000000622e       0x18
- .text.LTCHIn   0x000000000000622e       0x18 build/default/production/_ext/83377035/ShiftReg.o
-                0x000000000000622e                LTCHIn
+.text.LTCHIn    0x0000000000006610       0x18
+ .text.LTCHIn   0x0000000000006610       0x18 build/default/production/_ext/83377035/ShiftReg.o
+                0x0000000000006610                LTCHIn
 
-.text.RS485TR   0x0000000000006246       0x18
- .text.RS485TR  0x0000000000006246       0x18 build/default/production/DSIO.o
-                0x0000000000006246                RS485TR
+.text.RS485TR   0x0000000000006628       0x18
+ .text.RS485TR  0x0000000000006628       0x18 build/default/production/DSIO.o
+                0x0000000000006628                RS485TR
 
 .text.vTaskInternalSetTimeOutState
-                0x000000000000625e       0x16
+                0x0000000000006640       0x16
  .text.vTaskInternalSetTimeOutState
-                0x000000000000625e       0x16 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000625e                vTaskInternalSetTimeOutState
+                0x0000000000006640       0x16 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000006640                vTaskInternalSetTimeOutState
 
-.text.exit      0x0000000000006274       0x16
- .text.exit     0x0000000000006274       0x16 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
-                0x0000000000006274                exit
+.text.exit      0x0000000000006656       0x16
+ .text.exit     0x0000000000006656       0x16 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
+                0x0000000000006656                exit
 
 .text.xTaskGetTickCount
-                0x000000000000628a       0x14
+                0x000000000000666c       0x14
  .text.xTaskGetTickCount
-                0x000000000000628a       0x14 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000628a                xTaskGetTickCount
+                0x000000000000666c       0x14 build/default/production/_ext/1644529106/tasks.o
+                0x000000000000666c                xTaskGetTickCount
 
-.text.libgcc    0x000000000000629e       0x12
- .text.libgcc   0x000000000000629e       0x12 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_tablejump2.o)
-                0x000000000000629e                __tablejump2__
+.text.libgcc    0x0000000000006680       0x12
+ .text.libgcc   0x0000000000006680       0x12 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_tablejump2.o)
+                0x0000000000006680                __tablejump2__
 
-.text.libgcc    0x00000000000062b0       0x12
- .text.libgcc   0x00000000000062b0       0x12 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_xload_2.o)
-                0x00000000000062b0                __xload_2
+.text.libgcc    0x0000000000006692       0x12
+ .text.libgcc   0x0000000000006692       0x12 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_xload_2.o)
+                0x0000000000006692                __xload_2
 
 .text.__vector_12
-                0x00000000000062c2       0x10
+                0x00000000000066a4       0x10
  .text.__vector_12
-                0x00000000000062c2       0x10 build/default/production/_ext/1347852338/port.o
-                0x00000000000062c2                __vector_12
+                0x00000000000066a4       0x10 build/default/production/_ext/1347852338/port.o
+                0x00000000000066a4                __vector_12
 
 .text.prvIdleTask
-                0x00000000000062d2       0x10
+                0x00000000000066b4       0x10
  .text.prvIdleTask
-                0x00000000000062d2       0x10 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000066b4       0x10 build/default/production/_ext/1644529106/tasks.o
 
 .text.InitShiftIn
-                0x00000000000062e2        0xe
+                0x00000000000066c4        0xe
  .text.InitShiftIn
-                0x00000000000062e2        0xe build/default/production/_ext/83377035/ShiftReg.o
-                0x00000000000062e2                InitShiftIn
+                0x00000000000066c4        0xe build/default/production/_ext/83377035/ShiftReg.o
+                0x00000000000066c4                InitShiftIn
 
-.text.libgcc    0x00000000000062f0        0xe
- .text.libgcc   0x00000000000062f0        0xe c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_xload_1.o)
-                0x00000000000062f0                __xload_1
+.text.libgcc    0x00000000000066d2        0xe
+ .text.libgcc   0x00000000000066d2        0xe c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/avrxmega4/memx-const\libgcc.a(_xload_1.o)
+                0x00000000000066d2                __xload_1
 
 .text.vTaskSuspendAll
-                0x00000000000062fe        0xc
+                0x00000000000066e0        0xc
  .text.vTaskSuspendAll
-                0x00000000000062fe        0xc build/default/production/_ext/1644529106/tasks.o
-                0x00000000000062fe                vTaskSuspendAll
+                0x00000000000066e0        0xc build/default/production/_ext/1644529106/tasks.o
+                0x00000000000066e0                vTaskSuspendAll
 
 .text.xTaskGetCurrentTaskHandle
-                0x000000000000630a        0xa
+                0x00000000000066ec        0xa
  .text.xTaskGetCurrentTaskHandle
-                0x000000000000630a        0xa build/default/production/_ext/1644529106/tasks.o
-                0x000000000000630a                xTaskGetCurrentTaskHandle
+                0x00000000000066ec        0xa build/default/production/_ext/1644529106/tasks.o
+                0x00000000000066ec                xTaskGetCurrentTaskHandle
 
 .text.vListInitialiseItem
-                0x0000000000006314        0x8
+                0x00000000000066f6        0x8
  .text.vListInitialiseItem
-                0x0000000000006314        0x8 build/default/production/_ext/1644529106/list.o
-                0x0000000000006314                vListInitialiseItem
+                0x00000000000066f6        0x8 build/default/production/_ext/1644529106/list.o
+                0x00000000000066f6                vListInitialiseItem
 
 .text.vTaskMissedYield
-                0x000000000000631c        0x8
+                0x00000000000066fe        0x8
  .text.vTaskMissedYield
-                0x000000000000631c        0x8 build/default/production/_ext/1644529106/tasks.o
-                0x000000000000631c                vTaskMissedYield
+                0x00000000000066fe        0x8 build/default/production/_ext/1644529106/tasks.o
+                0x00000000000066fe                vTaskMissedYield
 
 .text.vRetransmitTimerFunc
-                0x0000000000006324        0x8
+                0x0000000000006706        0x8
  .text.vRetransmitTimerFunc
-                0x0000000000006324        0x8 build/default/production/main.o
-                0x0000000000006324                vRetransmitTimerFunc
+                0x0000000000006706        0x8 build/default/production/main.o
+                0x0000000000006706                vRetransmitTimerFunc
 
 .text.vINDTimerFunc
-                0x000000000000632c        0x8
+                0x000000000000670e        0x8
  .text.vINDTimerFunc
-                0x000000000000632c        0x8 build/default/production/DSIO.o
-                0x000000000000632c                vINDTimerFunc
+                0x000000000000670e        0x8 build/default/production/DSIO.o
+                0x000000000000670e                vINDTimerFunc
 
 .text.uxTaskGetNumberOfTasks
-                0x0000000000006334        0x6
+                0x0000000000006716        0x6
  .text.uxTaskGetNumberOfTasks
-                0x0000000000006334        0x6 build/default/production/_ext/1644529106/tasks.o
-                0x0000000000006334                uxTaskGetNumberOfTasks
+                0x0000000000006716        0x6 build/default/production/_ext/1644529106/tasks.o
+                0x0000000000006716                uxTaskGetNumberOfTasks
 
-.text           0x000000000000633a        0x4
- .text          0x000000000000633a        0x4 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
-                0x000000000000633a                __vector_38
-                0x000000000000633a                __vector_28
-                0x000000000000633a                __vector_1
-                0x000000000000633a                __vector_32
-                0x000000000000633a                __vector_34
-                0x000000000000633a                __vector_24
-                0x000000000000633a                __bad_interrupt
-                0x000000000000633a                __vector_6
-                0x000000000000633a                __vector_31
-                0x000000000000633a                __vector_35
-                0x000000000000633a                __vector_39
-                0x000000000000633a                __vector_3
-                0x000000000000633a                __vector_23
-                0x000000000000633a                __vector_30
-                0x000000000000633a                __vector_25
-                0x000000000000633a                __vector_11
-                0x000000000000633a                __vector_13
-                0x000000000000633a                __vector_17
-                0x000000000000633a                __vector_7
-                0x000000000000633a                __vector_27
-                0x000000000000633a                __vector_5
-                0x000000000000633a                __vector_33
-                0x000000000000633a                __vector_37
-                0x000000000000633a                __vector_4
-                0x000000000000633a                __vector_9
-                0x000000000000633a                __vector_2
-                0x000000000000633a                __vector_15
-                0x000000000000633a                __vector_36
-                0x000000000000633a                __vector_29
-                0x000000000000633a                __vector_40
-                0x000000000000633a                __vector_8
-                0x000000000000633a                __vector_26
-                0x000000000000633a                __vector_14
-                0x000000000000633a                __vector_10
-                0x000000000000633a                __vector_16
-                0x000000000000633a                __vector_18
+.text           0x000000000000671c        0x4
+ .text          0x000000000000671c        0x4 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
+                0x000000000000671c                __vector_38
+                0x000000000000671c                __vector_28
+                0x000000000000671c                __vector_1
+                0x000000000000671c                __vector_32
+                0x000000000000671c                __vector_34
+                0x000000000000671c                __vector_24
+                0x000000000000671c                __bad_interrupt
+                0x000000000000671c                __vector_6
+                0x000000000000671c                __vector_31
+                0x000000000000671c                __vector_35
+                0x000000000000671c                __vector_39
+                0x000000000000671c                __vector_3
+                0x000000000000671c                __vector_23
+                0x000000000000671c                __vector_30
+                0x000000000000671c                __vector_25
+                0x000000000000671c                __vector_11
+                0x000000000000671c                __vector_13
+                0x000000000000671c                __vector_17
+                0x000000000000671c                __vector_7
+                0x000000000000671c                __vector_27
+                0x000000000000671c                __vector_5
+                0x000000000000671c                __vector_33
+                0x000000000000671c                __vector_37
+                0x000000000000671c                __vector_4
+                0x000000000000671c                __vector_9
+                0x000000000000671c                __vector_2
+                0x000000000000671c                __vector_15
+                0x000000000000671c                __vector_36
+                0x000000000000671c                __vector_29
+                0x000000000000671c                __vector_40
+                0x000000000000671c                __vector_8
+                0x000000000000671c                __vector_26
+                0x000000000000671c                __vector_14
+                0x000000000000671c                __vector_10
+                0x000000000000671c                __vector_16
+                0x000000000000671c                __vector_18
 
-.text._Exit     0x000000000000633e        0x4
- .text._Exit    0x000000000000633e        0x4 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(_Exit.o)
-                0x000000000000633e                _Exit
+.text._Exit     0x0000000000006720        0x4
+ .text._Exit    0x0000000000006720        0x4 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(_Exit.o)
+                0x0000000000006720                _Exit
 
 .text.vPortFree
-                0x0000000000006342        0x2
+                0x0000000000006724        0x2
  .text.vPortFree
-                0x0000000000006342        0x2 build/default/production/_ext/1644529106/heap_1.o
-                0x0000000000006342                vPortFree
+                0x0000000000006724        0x2 build/default/production/_ext/1644529106/heap_1.o
+                0x0000000000006724                vPortFree
 
 .text.__dummy_fini
-                0x0000000000006344        0x2
+                0x0000000000006726        0x2
  .text.__dummy_fini
-                0x0000000000006344        0x2 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
-                0x0000000000006344                _fini
+                0x0000000000006726        0x2 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
+                0x0000000000006726                _fini
 
 .text.__dummy_funcs_on_exit
-                0x0000000000006346        0x2
+                0x0000000000006728        0x2
  .text.__dummy_funcs_on_exit
-                0x0000000000006346        0x2 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
-                0x0000000000006346                __funcs_on_exit
+                0x0000000000006728        0x2 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
+                0x0000000000006728                __funcs_on_exit
 
 .text.__dummy_simulator_exit
-                0x0000000000006348        0x2
+                0x000000000000672a        0x2
  .text.__dummy_simulator_exit
-                0x0000000000006348        0x2 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
-                0x0000000000006348                __simulator_exit
+                0x000000000000672a        0x2 c:/program files/microchip/xc8/v2.45/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega4/memx-const\libc.a(exit.o)
+                0x000000000000672a                __simulator_exit
 
 .data.GLOBAL_RetransmissionTimerSet
-                0x0000000000806c6d        0x1 load address 0x000000000000634a
+                0x0000000000806c6d        0x1 load address 0x000000000000672c
  .data.GLOBAL_RetransmissionTimerSet
                 0x0000000000806c6d        0x1 build/default/production/main.o
                 0x0000000000806c6d                GLOBAL_RetransmissionTimerSet
 
 .data.GLOBAL_DeviceType
-                0x0000000000806c6e        0x1 load address 0x000000000000634b
+                0x0000000000806c6e        0x1 load address 0x000000000000672d
  .data.GLOBAL_DeviceType
                 0x0000000000806c6e        0x1 build/default/production/main.o
                 0x0000000000806c6e                GLOBAL_DeviceType

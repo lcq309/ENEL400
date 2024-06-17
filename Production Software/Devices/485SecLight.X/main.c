@@ -415,7 +415,8 @@ void prvWSLTask( void * parameters )
                                 case 'G': //clear green lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
-                                        case 'G': //clear the yellow lockout and confirm clearance.
+                                        case 'C': //lockout already cleared, confirm
+                                        case 'G': //clear the green lockout and confirm clearance.
                                             lockout = 'C';
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
@@ -505,7 +506,7 @@ void prvWSLTask( void * parameters )
                     buffer[1] = 'O'; //off
                     xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
                     buffer[0] = 'B'; //blue
-                    buffer[1] = 'F'; //flash
+                    buffer[1] = 'D'; //double flash
                     xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
                     colour_cur = colour_req;
                     break;

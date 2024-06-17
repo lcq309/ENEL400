@@ -157,6 +157,38 @@ void dsIOOutTask (void * parameters)
                     dsioGreenTGL();
             break;
             
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioGreenOn();
+                    vTaskDelay(5);
+                    dsioGreenTGL();
+                    vTaskDelay(5);
+                    dsioGreenTGL();
+                    vTaskDelay(5);
+                    dsioGreenOff();
+                }
+                break;
+                
+            case 'W': //warning flash (used for lockout warning)
+                dsioGreenOn();
+                vTaskDelay(5);
+                dsioGreenTGL();
+                vTaskDelay(5);
+                dsioGreenTGL();
+                vTaskDelay(5);
+                dsioGreenTGL();
+                vTaskDelay(5);
+                dsioGreenTGL();
+                vTaskDelay(5);
+                dsioGreenTGL();
+                vTaskDelay(5);
+                dsioGreenTGL();
+                vTaskDelay(5);
+                dsioGreenOff();
+                break;
+                
+                            
             case 'S': //solid
                 dsioGreenOn();
             break;
@@ -178,6 +210,19 @@ void dsIOOutTask (void * parameters)
                     dsioBlueTGL();
             break;
             
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioBlueOn();
+                    vTaskDelay(5);
+                    dsioBlueTGL();
+                    vTaskDelay(5);
+                    dsioBlueTGL();
+                    vTaskDelay(5);
+                    dsioBlueOff();
+                }
+                break;
+                
             case 'S': //solid
                 dsioBlueOn();
             break;
@@ -198,6 +243,19 @@ void dsIOOutTask (void * parameters)
                 if(flash == 0)
                     dsioYellowTGL();
             break;
+            
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioYellowOn();
+                    vTaskDelay(5);
+                    dsioYellowTGL();
+                    vTaskDelay(5);
+                    dsioYellowTGL();
+                    vTaskDelay(5);
+                    dsioYellowOff();
+                }
+                break;
             
             case 'S': //solid
                 dsioYellowOn();

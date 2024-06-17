@@ -267,9 +267,8 @@ void prvWSCTask( void * parameters )
                                     buffer[1] = 'O'; //turn all off first
                                     xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                                     buffer[0] = 'G';
-                                    buffer[1] = 'F'; //green flash
+                                    buffer[1] = 'W'; //green warn flash
                                     xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                                    vTaskDelay(200);
                                     updateIND = 1;
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;
@@ -285,9 +284,8 @@ void prvWSCTask( void * parameters )
                             buffer[1] = 'O'; //turn all off first
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             buffer[0] = 'Y';
-                            buffer[1] = 'F'; //yellow flash
+                            buffer[1] = 'W'; //yellow warn flash
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            vTaskDelay(200);
                             updateIND = 1;
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             breakloop = 1; //break the loop so this command can be processed right away.
@@ -300,9 +298,8 @@ void prvWSCTask( void * parameters )
                             buffer[1] = 'O'; //turn all off first
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             buffer[0] = 0xff;
-                            buffer[1] = 'F'; //flash all
+                            buffer[1] = 'W'; //warn flash all
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            vTaskDelay(200);
                             updateIND = 1;
                             break;
                     }
@@ -316,9 +313,9 @@ void prvWSCTask( void * parameters )
                             //send the network join message
                             ; //this needs to be here to avoid an error on NetJoin.
                             uint8_t NetJoin[1] = {0xff};
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
                     }
                 }
@@ -716,7 +713,7 @@ void prvWSCTask( void * parameters )
                 break;
                 
                 case 'L': //light device, should only ever be confirming colours or giving an error response (not yet implemented)
-                    //just mark starus as confirmed
+                    //just mark status as confirmed
                     //first check if on the table, add if not
                     for(uint8_t i = 0; i < numLights; i++)
                     {
@@ -812,7 +809,7 @@ void prvWSCTask( void * parameters )
         //message processing now complete, check the status of any colour change request
         //if all colours are matching colour_req, then change colour_cur into colour_req
         uint8_t check_variable = 1;
-        volatile uint8_t NetSent[MaxNets];
+        uint8_t NetSent[MaxNets];
         for(uint8_t i = 0; i < MaxNets; i++)
         {
             NetSent[i] = 0;
@@ -1042,16 +1039,25 @@ void prvWSCTask( void * parameters )
                 buffer[1] = 'F'; //flash
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
             }
-            else if((lockout == colour_cur) || (lockout == (colour_cur + 32)))
+            else if(lockout == colour_cur)
             {
-                //set single light flash to show all devices have confirmed change but are still releasing
+                //set single light flash to show all devices have confirmed change but are still releasing controllers
                 buffer[0] = 0xff; //all indicators
                 buffer[1] = 'O'; //off
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
                 buffer[0] = colour_cur;
                 buffer[1] = 'F'; //flash
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                vTaskDelay(200);
+            }
+            else if(lockout == (colour_cur + 32))
+            {
+                //set single light flash to show all devices have confirmed change but are still releasing lights
+                buffer[0] = 0xff; //all indicators
+                buffer[1] = 'O'; //off
+                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                buffer[0] = colour_cur;
+                buffer[1] = 'D'; //double flash
+                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
             }
             else if(colour_cur == colour_req)
             {
