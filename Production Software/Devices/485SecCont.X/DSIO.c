@@ -37,7 +37,7 @@ void DSIOSetup()
     
     //setup Queues
     
-    xPB_Queue = xQueueCreate(3, sizeof(uint8_t)); //up to 2 button presses held
+    xPB_Queue = xQueueCreate(1, sizeof(uint8_t)); //up to 1 button presses held
     xIND_Queue = xQueueCreate(4, 2 * sizeof(uint8_t)); // up to 4 Indicator Commands held
     xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
     
@@ -72,9 +72,11 @@ void dsIOInTask (void * parameters)
         //wait for input
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
         output[1] = input[0];
-        vTaskDelay(1); //slight delay to ensure the prior input was processed
+        if(input[0] == 'Y') //if yellow, send to front
+            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
+        else
+            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
         xSemaphoreGive(xNotify);
-        xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
         //send message to inter-task queue
     }
     
@@ -108,7 +110,7 @@ void dsIOOutTask (void * parameters)
     for(;;)
     {
         //first, check for commands from other tasks (hold for 50ms)
-        if(xQueueReceive(xIND_Queue, received, 25) == pdTRUE)
+        if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
         {
         switch(received[0]) //first check the intended target
         {

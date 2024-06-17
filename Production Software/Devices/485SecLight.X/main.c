@@ -307,6 +307,8 @@ void prvWSLTask( void * parameters )
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
                                 
+                                case 'G': //Green light confirmation
+                                    
                                 case 'B': //blue lockout will be overridden
                                     lockout = 'G';
                                     colour_req = 'G';
@@ -337,6 +339,8 @@ void prvWSLTask( void * parameters )
                                     buffer[0] = 'y'; //confirmation
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
+                                    
+                                case 'Y': //yellow lockout will be repeated
                                     
                                 case 'G': //green lockout will be overridden
                                     lockout = 'Y';

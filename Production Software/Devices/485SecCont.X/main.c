@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     
     //setup timer
     
-    xRetransmitTimer = xTimerCreate("ReTX", 125, pdFALSE, 0, vRetransmitTimerFunc);
+    xRetransmitTimer = xTimerCreate("ReTX", 100, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
@@ -119,7 +119,6 @@ void prvWiredInitTask( void * parameters )
     uint8_t buffer[2];
     uint8_t received = 0;
     uint8_t length = 0;
-    vTaskDelay(50); //short delay before the device starts listening to ensure it is properly initialized
     while(received != 1)
     {
         //wait for start delimiter
@@ -212,7 +211,8 @@ void prvWSCTask( void * parameters )
     {
         xSemaphoreTake(xNotify, 200); //wait for a message to come in from anywhere
         //internal source commands processing
-        if(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
+        uint8_t breakloop = 0; //used to break the loop when yellow lockout is set
+        while((xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE) && (breakloop == 0))
         {
             //check message source
             switch(buffer[0])
@@ -276,6 +276,9 @@ void prvWSCTask( void * parameters )
                             
                         case 'y': //yellow lockout clearing
                         case 'Y': //yellow lockout, flash yellow for a short time
+                            colour_req = 'Y'; //reset processing
+                            colour_cur = 'O'; //reset processing
+                            lockout = 'Y'; //reset processing
                             buffer[0] = 0xff;
                             buffer[1] = 'O'; //turn all off first
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
@@ -285,6 +288,7 @@ void prvWSCTask( void * parameters )
                             vTaskDelay(200);
                             updateIND = 1;
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            breakloop = 1; //break the loop so this command can be processed right away.
                             //running code will fix indicators after this delay has passed.
                             break;
                             
@@ -839,6 +843,7 @@ void prvWSCTask( void * parameters )
                         if(check_variable == 1)
                         {
                             colour_cur = colour_req;
+                            updateIND = 1;
                         }
                         //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                         else // if something was transmitted, we need to reset the timer.
@@ -907,6 +912,7 @@ void prvWSCTask( void * parameters )
                     if(check_variable == 1)
                     {
                         lockout = lockout + 32; //switch to lowercase lockout letter
+                        updateIND = 1;
                     }
                     //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                     else // if something was transmitted, we need to reset the timer.
@@ -970,6 +976,17 @@ void prvWSCTask( void * parameters )
                 buffer[0] = colour_req;
                 buffer[1] = 'F'; //flash
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+            }
+            else if((lockout == colour_cur) || (lockout == (colour_cur + 32)))
+            {
+                //set single light flash to show all devices have confirmed change but are still releasing
+                buffer[0] = 0xff; //all indicators
+                buffer[1] = 'O'; //off
+                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                buffer[0] = colour_cur;
+                buffer[1] = 'F'; //flash
+                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                vTaskDelay(200);
             }
             else if(colour_cur == colour_req)
             {
