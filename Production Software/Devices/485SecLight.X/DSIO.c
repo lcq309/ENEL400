@@ -19,6 +19,7 @@
 
     QueueHandle_t xIND_Queue;
     QueueHandle_t xDeviceIN_Queue;
+    QueueHandle_t xSTAT_Queue;
     
 void DSIOSetup()
 {
@@ -30,10 +31,12 @@ void DSIOSetup()
     
     xIND_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // up to 3 Indicator Commands held
     xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
+    xSTAT_Queue = xQueueCreate(1, 1 * sizeof(uint16_t)); // messages from RESRDY
     
     //setup tasks
     
     xTaskCreate(dsIOOutTask, "INDOUT", 350, NULL, mainINDOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(dsIOSTATUS, "STAT", 150, NULL, mainSTAT_TASK_PRIORITY, NULL);
     
     //setup timers
 
@@ -231,6 +234,25 @@ void dsIOOutTask (void * parameters)
     }
 }
 
+
+void dsIOSTATUS (void * parameters)
+{
+    for(;;)
+    {
+    //start check, wait until done, then wait half a second
+    uint16_t received[1];
+    LightCheck();
+    xQueueReceive(xSTAT_Queue, received, portMAX_DELAY);
+    //check against reference value
+    
+    //send on/off to main task
+    
+    //wait half a second
+    vTaskDelay(500);
+    //the more complex ones will need more than this, but this should be good enough for testing for now.
+    }
+}
+
 //RS485 in/out
 void RS485TR(uint8_t dir)
 {
@@ -246,6 +268,12 @@ void RS485TR(uint8_t dir)
         default: //incorrect command
             break;
     }
+}
+
+void LightCheck(void)
+{
+    ADC0.MUXPOS = ADC_MUXPOS_2_bm;
+    ADC0.COMMAND = 0x1;
 }
 
 void vINDTimerFunc( TimerHandle_t xTimer )
@@ -305,3 +333,11 @@ void dsioRedTGL(void)
     PORTC.OUTTGL = PIN2_bm;
 }
 //interrupts go here
+
+ISR(ADC0_RESRDY_vect)
+{
+    uint16_t res[1];
+    res[0] = ADC0.RES; //this should also clear the interrupt flag
+    xQueueSendToBackFromISR(xSTAT_Queue, res, NULL);
+    ADC0.MUXPOS = ADC_MUXPOS_GND_gc;
+}

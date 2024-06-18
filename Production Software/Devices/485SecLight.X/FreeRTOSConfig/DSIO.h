@@ -7,6 +7,8 @@
  * Created on April 23, 2024
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "FreeRTOS.h"
@@ -24,6 +26,7 @@ extern "C" {
 
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define mainSTAT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
     
     //timer globals
     
@@ -37,6 +40,7 @@ extern "C" {
 
     extern QueueHandle_t xIND_Queue;
     extern QueueHandle_t xDeviceIN_Queue;
+    extern QueueHandle_t xSTAT_Queue;
     
     //Event Groups
     extern EventGroupHandle_t xEventInit;
@@ -44,11 +48,18 @@ extern "C" {
     //Task Definition
     void dsIOOutTask ( void * parameters );
     
+    void dsIOSTATUS ( void * parameters );
+    
     //task setup function
     void DSIOSetup(void);
     
     //timer callback functions
     void vINDTimerFunc( TimerHandle_t xTimer ); 
+    
+    /* Current sense request
+     * Starts the process of sampling the current sense resistor
+     */
+    void LightCheck(void);
     
     /* RS 485 TR
      * Transceiver control function for transmit or receive.
