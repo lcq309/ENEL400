@@ -223,6 +223,24 @@ void dsIOOutTask (void * parameters)
                 }
                 break;
                 
+            case 'W': //warning flash (used for lockout warning)
+                dsioBlueOn();
+                vTaskDelay(5);
+                dsioBlueTGL();
+                vTaskDelay(5);
+                dsioBlueTGL();
+                vTaskDelay(5);
+                dsioBlueTGL();
+                vTaskDelay(5);
+                dsioBlueTGL();
+                vTaskDelay(5);
+                dsioBlueTGL();
+                vTaskDelay(5);
+                dsioBlueTGL();
+                vTaskDelay(5);
+                dsioBlueOff();
+                break;
+                
             case 'S': //solid
                 dsioBlueOn();
             break;
@@ -257,6 +275,24 @@ void dsIOOutTask (void * parameters)
                 }
                 break;
             
+            case 'W': //warning flash (used for lockout warning)
+                dsioYellowOn();
+                vTaskDelay(5);
+                dsioYellowTGL();
+                vTaskDelay(5);
+                dsioYellowTGL();
+                vTaskDelay(5);
+                dsioYellowTGL();
+                vTaskDelay(5);
+                dsioYellowTGL();
+                vTaskDelay(5);
+                dsioYellowTGL();
+                vTaskDelay(5);
+                dsioYellowTGL();
+                vTaskDelay(5);
+                dsioYellowOff();
+                break;
+                
             case 'S': //solid
                 dsioYellowOn();
             break;

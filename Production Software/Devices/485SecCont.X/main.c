@@ -298,7 +298,7 @@ void prvWSCTask( void * parameters )
                             buffer[1] = 'O'; //turn all off first
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             buffer[0] = 0xff;
-                            buffer[1] = 'W'; //warn flash all
+                            buffer[1] = 'W'; //warning flash all
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             updateIND = 1;
                             break;
