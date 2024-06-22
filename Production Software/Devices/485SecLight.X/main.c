@@ -621,11 +621,10 @@ void prvWSLTask( void * parameters )
                     {
                         //send the error message
                         buffer[0] = 'E'; //error
-                        buffer[1] = 'L'; //light
                         buffer[2] = Error_send; //error colour
                         buffer[2] = ControllerTable[i].index; //load with retransmission request
                         NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 4, 5);
+                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
                         y = MaxNets;
                     }
                     else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit

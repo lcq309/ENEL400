@@ -197,6 +197,7 @@ void prvWSCTask( void * parameters )
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
     volatile uint8_t colour_cur = 'O'; //current confirmed colour
+    uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     
     /* High level overview
@@ -706,6 +707,7 @@ void prvWSCTask( void * parameters )
                         case 'c': //clearance confirmation, only relevant to requester 1 devices update status.
                             ControllerTable[tablePos].status = 'C'; //mark device as cleared
                             break;
+                            
                         default: //can put an error message here, for incorrect command.
                             break;
                     }
@@ -734,6 +736,8 @@ void prvWSCTask( void * parameters )
                     switch(buffer[1])
                     {
                         case 'E': //Error messages?
+                            colour_err = buffer[2];
+                            updateIND = 1;
                             break;
                             
                         default: //anything else should just be state confirmations
@@ -816,6 +820,8 @@ void prvWSCTask( void * parameters )
         }
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
+            //discard errors here
+            colour_err = 0;
             switch(Requester)
             //how this acts depends on if it is a requester 1 or 2
             {
@@ -1058,6 +1064,30 @@ void prvWSCTask( void * parameters )
                 buffer[0] = colour_cur;
                 buffer[1] = 'D'; //double flash
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+            }
+            else if(colour_err == colour_cur)
+            {
+                if(colour_cur == 'O')
+                {
+                    //blink all indicators, if a light hasn't turned off
+                    //set single light flash to show all devices have confirmed change but are still releasing lights
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = 0xff;
+                    buffer[1] = 'B'; //blink
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
+                else
+                {
+                    //set single light flash to show all devices have confirmed change but are still releasing lights
+                    buffer[0] = 0xff; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = colour_cur;
+                    buffer[1] = 'B'; //blink
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
             }
             else if(colour_cur == colour_req)
             {
