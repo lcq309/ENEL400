@@ -241,6 +241,7 @@ void dsIOSTATUS (void * parameters)
     {
         //start check, wait until done, then wait half a second
         uint8_t output = 0;
+        uint8_t outbuffer[2] = {'S', 'L'};
         uint16_t received[1];
         LightCheck();
         //check pin output states to see if there should be anything right now
@@ -252,10 +253,13 @@ void dsIOSTATUS (void * parameters)
         if((received[0] < 31) && (output == 1))
         {
             //this is an error case, send the error out to the main task
+            //error is S L
+            xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
         }
         else if((received[0] > 31) && (output == 0))
         {
             //this is an error case
+            xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
         }
         //otherwise there is no error and no action should be taken.
         //send on/off to main task

@@ -50,6 +50,9 @@ uint8_t GLOBAL_ColourNum = 0; //3 or 4 colour light
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainWSC_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
+
+#define MaxNets 40
+
 //task pointers
 
 void prvWiredInitTask( void * parameters );
@@ -239,12 +242,8 @@ void prvWSLTask( void * parameters )
                         case 'L': //light error, only act if not in progress of colour change
                             if(Colour_Change_Sample_Block == 0)
                             {
-                                if(colour_cur == 'O') //if current colour is off, then a light should not be on and this is an error
-                                {
-                                    //send an error message to all attached controllers
-                                    Error_send = 'O'; //failure to turn off
-                                }
-                                //if the current colour is a colour, then the light should be on and there is no error.
+                                //if we are here, then there is an error
+                                Error_send = colour_cur;
                             }
                             else
                                 Colour_Change_Sample_Block = 0;
@@ -605,6 +604,39 @@ void prvWSLTask( void * parameters )
                 default: //something went wrong with a command, just do nothing
                     break;
             }
-        }            //loop and restart
+        }
+        //now check for errors and handle sending the error case.
+        if(Error_send != 0)
+        {
+            uint8_t NetSent[MaxNets];
+            for(uint8_t i = 0; i < MaxNets; i++)
+            {
+                NetSent[i] = 0;
+            }
+            for(uint8_t i = 0; i < numControllers; i++)
+            {
+                for(uint8_t y = 0; y < MaxNets; y++)
+                {
+                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                    {
+                        //send the error message
+                        buffer[0] = 'E'; //error
+                        buffer[1] = 'L'; //light
+                        buffer[2] = Error_send; //error colour
+                        buffer[2] = ControllerTable[i].index; //load with retransmission request
+                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 4, 5);
+                        y = MaxNets;
+                    }
+                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                    {
+                        //just end loop and move on to next device in table
+                        y = MaxNets;
+                    }
+                }
+            }
+            Error_send = 0; //don't spam error messages
+        }
+        //loop and restart
     }
 }
