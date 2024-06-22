@@ -194,6 +194,8 @@ void prvWSLTask( void * parameters )
     uint8_t length = 0; //message length
     uint8_t colour_req = 'O'; //requested colour
     uint8_t colour_cur = 'O'; //current confirmed colour
+    uint8_t Colour_Change_Sample_Block = 1; //block the first sample after a colour change.
+    uint8_t Error_send = 0; //errors to be sent will be here, to be handled at the end of the loop.
     
     /* High level overview
      * 1. check for any commands from pushbutton or other internal source.
@@ -223,14 +225,34 @@ void prvWSLTask( void * parameters )
                             //send the network join message
                             ; //this needs to be here or an error is thrown for the next line.
                             uint8_t NetJoin[1] = {0xff};
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, portMAX_DELAY);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
+                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
                     }
                 }
                 break;
                 
+                case 'S': //Status check, low battery will come here for battery powered lights, otherwise it is just the circuit check
+                {
+                    switch(buffer[1])
+                    {
+                        case 'L': //light error, only act if not in progress of colour change
+                            if(Colour_Change_Sample_Block == 0)
+                            {
+                                if(colour_cur == 'O') //if current colour is off, then a light should not be on and this is an error
+                                {
+                                    //send an error message to all attached controllers
+                                    Error_send = 'O'; //failure to turn off
+                                }
+                                //if the current colour is a colour, then the light should be on and there is no error.
+                            }
+                            else
+                                Colour_Change_Sample_Block = 0;
+                            break;
+                    }
+                }
+                break;
                 default:
                     break;
             }
@@ -518,6 +540,7 @@ void prvWSLTask( void * parameters )
         //update indicators if needed
         if(colour_cur != colour_req)
         {
+            Colour_Change_Sample_Block = 1; //block the first sample
             switch(colour_req)
             {
                 case 'B': //blue, flash implied

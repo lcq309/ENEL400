@@ -6,6 +6,8 @@
  * Created on April 23, 2024
  */
 
+#include <avr/ioavr128da28.h>
+
 #include "DSIO.h"
 //timer globals
     
@@ -239,17 +241,30 @@ void dsIOSTATUS (void * parameters)
 {
     for(;;)
     {
-    //start check, wait until done, then wait half a second
-    uint16_t received[1];
-    LightCheck();
-    xQueueReceive(xSTAT_Queue, received, portMAX_DELAY);
-    //check against reference value
+        //start check, wait until done, then wait half a second
+        uint8_t output = 0;
+        uint16_t received[1];
+        LightCheck();
+        //check pin output states to see if there should be anything right now
+        //pins are PC3, PD1, PD0 and PC2 for outputs
+        if((PORTC.OUT & PIN3_bm) || (PORTC.OUT & PIN2_bm) || (PORTD.OUT & PIN1_bm) || (PORTD.OUT & PIN0_bm)) //if any outputs are live
+            output = 1;
+        xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
+        //check against reference value of 31 (~25mV over resistor) and light state
+        if((received[0] < 31) && (output == 1))
+        {
+            //this is an error case, send the error out to the main task
+        }
+        else if((received[0] > 31) && (output == 0))
+        {
+            //this is an error case
+        }
+        //otherwise there is no error and no action should be taken.
+        //send on/off to main task
     
-    //send on/off to main task
-    
-    //wait half a second
-    vTaskDelay(500);
-    //the more complex ones will need more than this, but this should be good enough for testing for now.
+        //wait half a second
+        vTaskDelay(500);
+        //the more complex ones will need more than this, but this should be good enough for testing for now.
     }
 }
 
