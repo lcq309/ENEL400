@@ -16,6 +16,8 @@
 #include "USART.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/ioavr128da28.h>
+#include <avr/delay.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
@@ -40,6 +42,7 @@ struct DeviceTracker
 uint8_t GLOBAL_DeviceID = 0;
 uint8_t GLOBAL_Channel = 0;
 uint8_t GLOBAL_DeviceType = '3'; //Generic Sector Light: Wired Light
+uint8_t GLOBAL_ColourNum = 0; //3 or 4 colour light
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
@@ -66,6 +69,22 @@ int main(int argc, char** argv) {
     LTCHIn(); //latch input register
     GLOBAL_Channel = ShiftIn(); //grab channel
     GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
+    
+    //setup 3 vs 4 colour
+    
+    //configure PD6 as a pullup input and check if it is high or low.
+    //if PD6 is low, then this is a 3 colour light, otherwise it is 4 colour
+    
+    PORTD.DIRCLR = PIN6_bm; //pin D6 is an input
+    PORTD.PIN6CTRL = PORT_PULLUPEN_bm; //enable pullup
+    _delay_us(50); //a short delay to ensure that everything is setup properly
+    if(PIN6_bm == (PORTD.IN & PIN6_bm)) //if the input is high then 4 colour
+        GLOBAL_ColourNum = 4;
+    else   //if the input is not high, then it is a 3 colour
+        GLOBAL_ColourNum = 3;
+    //cleanup by disabling the pullup and the input
+    PORTD.PIN6CTRL = PORT_ISC_INPUT_DISABLE_gc; //should overwrite the pullup as well?
+    
     
     //setup modules
     
