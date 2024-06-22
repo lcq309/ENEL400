@@ -6,8 +6,6 @@
  * Created on April 23, 2024
  */
 
-#include <avr/ioavr128da28.h>
-
 #include "DSIO.h"
 //timer globals
     
