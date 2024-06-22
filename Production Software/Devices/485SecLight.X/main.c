@@ -521,13 +521,26 @@ void prvWSLTask( void * parameters )
             switch(colour_req)
             {
                 case 'B': //blue, flash implied
-                    buffer[0] = 0xff; //all indicators
-                    buffer[1] = 'O'; //off
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    buffer[0] = 'B'; //blue
-                    buffer[1] = 'D'; //double flash
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    colour_cur = colour_req;
+                    if(GLOBAL_ColourNum == 4)
+                    {
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        buffer[0] = 'B'; //blue
+                        buffer[1] = 'D'; //double flash
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                    }
+                    else //3 colour lights just remain green but report blue
+                    {
+                        buffer[0] = 0xff; //all indicators
+                        buffer[1] = 'O'; //off
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        buffer[0] = 'G'; //blue
+                        buffer[1] = 'S'; //Solid
+                        xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                        colour_cur = colour_req;
+                    }
                     break;
                     
                 case 'G': //Green, solid colour
