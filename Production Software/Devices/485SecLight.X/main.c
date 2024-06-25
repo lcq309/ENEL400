@@ -621,7 +621,7 @@ void prvWSLTask( void * parameters )
                     {
                         //send the error message
                         buffer[0] = 'E'; //error
-                        buffer[2] = Error_send; //error colour
+                        buffer[1] = Error_send; //error colour
                         buffer[2] = ControllerTable[i].index; //load with retransmission request
                         NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
                         xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);

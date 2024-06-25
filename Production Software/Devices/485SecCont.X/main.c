@@ -714,7 +714,7 @@ void prvWSCTask( void * parameters )
                 }
                 break;
                 
-                case 'L': //light device, should only ever be confirming colours or giving an error response (not yet implemented)
+                case 'L': //light device, should only ever be confirming colours or giving an error response
                     //just mark status as confirmed
                     //first check if on the table, add if not
                     for(uint8_t i = 0; i < numLights; i++)

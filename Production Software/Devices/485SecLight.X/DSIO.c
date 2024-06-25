@@ -23,6 +23,11 @@
     
 void DSIOSetup()
 {
+    //prepare ADC
+    ADC_init();
+    
+    //ADC pin setup
+    
     //485 R/W pin setup
     PORTA.DIRSET = PIN2_bm;
     PORTA.OUTCLR = PIN2_bm;
@@ -240,9 +245,9 @@ void dsIOSTATUS (void * parameters)
     for(;;)
     {
         //start check, wait until done, then wait half a second
-        uint8_t output = 0;
+        volatile uint8_t output = 0;
         uint8_t outbuffer[2] = {'S', 'L'};
-        uint16_t received[1];
+        volatile uint16_t received[1];
         LightCheck();
         //check pin output states to see if there should be anything right now
         //pins are PC3, PD1, PD0 and PC2 for outputs
@@ -289,7 +294,7 @@ void RS485TR(uint8_t dir)
 
 void LightCheck(void)
 {
-    ADC0.MUXPOS = ADC_MUXPOS_2_bm;
+    ADC0.MUXPOS = ADC_MUXPOS_AIN2_gc;
     ADC0.COMMAND = 0x1;
 }
 
@@ -353,8 +358,8 @@ void dsioRedTGL(void)
 
 ISR(ADC0_RESRDY_vect)
 {
-    uint16_t res[1];
+    volatile uint16_t res[1];
     res[0] = ADC0.RES; //this should also clear the interrupt flag
-    xQueueSendToBackFromISR(xSTAT_Queue, res, NULL);
     ADC0.MUXPOS = ADC_MUXPOS_GND_gc;
+    xQueueSendToBackFromISR(xSTAT_Queue, res, NULL);
 }

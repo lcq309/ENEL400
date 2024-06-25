@@ -16,6 +16,7 @@
 #include "semphr.h"
 #include "event_groups.h"
 #include "timers.h"
+#include "ADC.h"
 
 #ifndef DSIO_H
 #define	DSIO_H
@@ -26,7 +27,7 @@ extern "C" {
 
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainSTAT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define mainSTAT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
     
     //timer globals
     
