@@ -237,12 +237,10 @@ void prvWSCTask( void * parameters )
                         case 'B': //blue lockout, allow any colour through
                             switch(buffer[1])
                             {
-                                case 'B': //blue on blue, just do nothing
-                                    break;
-                                    
                                 default:
                                     colour_req = buffer[1];
                                     lockout = buffer[1];
+                                    colour_cur = 'O'; //reset processing
                                     Requester = 1; //we are initiating this change
                                     updateIND = 1; //update the indicators
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
@@ -257,11 +255,13 @@ void prvWSCTask( void * parameters )
                                 case 'Y': //yellow light
                                     colour_req = buffer[1];
                                     lockout = buffer[1];
+                                    colour_cur = 'O'; //reset processing
                                     Requester = 1; //we are initiating this change
                                     updateIND = 1; //update the indicators
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;
                                     
+                                case 'G': //Green retry
                                 case 'B': //blue light
                                     //flash green for a short time
                                     buffer[0] = 0xff;
