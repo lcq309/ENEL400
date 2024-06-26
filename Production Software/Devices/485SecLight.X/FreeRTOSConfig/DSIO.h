@@ -32,10 +32,16 @@ extern "C" {
     //timer globals
     
     extern uint8_t xINDTimerSet;
+    extern uint8_t xSTATTimerSet;
     
     //timer handles
     
     extern TimerHandle_t xINDTimer;
+    extern TimerHandle_t xSTATTimer;
+    
+    //Stat semaphore
+    
+    extern SemaphoreHandle_t xCircCheckTrig; //manual circuit check trigger
     
     //queue handles
 
@@ -55,7 +61,8 @@ extern "C" {
     void DSIOSetup(void);
     
     //timer callback functions
-    void vINDTimerFunc( TimerHandle_t xTimer ); 
+    void vINDTimerFunc( TimerHandle_t xTimer );
+    void vCircCheckTimerFunc( TimerHandle_t xTimer );
     
     /* Current sense request
      * Starts the process of sampling the current sense resistor

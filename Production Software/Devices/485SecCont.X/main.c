@@ -540,7 +540,6 @@ void prvWSCTask( void * parameters )
                                         updateIND = 1;
                                         lockout = 'Y';
                                         colour_req = 'Y';
-                                        colour_cur = 'G';
                                         Requester = 2;
                                         buffer[0] = 'y';
                                         buffer[1] = ControllerTable[tablePos].index;

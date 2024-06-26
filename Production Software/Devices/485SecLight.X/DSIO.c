@@ -10,10 +10,16 @@
 //timer globals
     
     uint8_t xINDTimerSet;
+    uint8_t xSTATTimerSet;
     
     //timer handles
     
     TimerHandle_t xINDTimer;
+    TimerHandle_t xSTATTimer;
+    
+    //Semaphores
+    
+    SemaphoreHandle_t xCircCheckTrig;
     
     //queue handles
 
@@ -46,6 +52,11 @@ void DSIOSetup()
     //setup timers
 
     xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xSTATTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vCircCheckTimerFunc);
+    
+    //setup the semaphore
+    
+    xCircCheckTrig = xSemaphoreCreateBinary();
     
     //start the indicator timer
     xTimerStart(xINDTimer, 0);
@@ -71,35 +82,37 @@ void dsIOOutTask (void * parameters)
     //receiver buffer
     uint8_t received[2];
     
+    
     //running loop
     for(;;)
     {
         //first, check for commands from other tasks (hold for 50ms)
         if(xQueueReceive(xIND_Queue, received, 25) == pdTRUE)
         {
-        switch(received[0]) //first check the intended target
-        {
-            case 0x0: //do nothing/no target
-                break;
-            case 'G': //Green indicator
-                GREEN = received[1];
-                break;
-            case 'Y': //Yellow indicator
-                YELLOW = received[1];
-                break;
-            case 'B': //Blue indicator
-                BLUE = received[1];
-                break;
-            case 'R': //Red indicator
-                RED = received[1];
-                break;
-            case 0xff: //All indicators
-                GREEN = received[1];
-                YELLOW = received[1];
-                BLUE = received[1];
-                RED = received[1];
-                break;
-        }
+            //should indicate that a change is occurring for all cases except zero and incorrect
+            switch(received[0]) //first check the intended target
+            {
+                case 0x0: //do nothing/no target
+                    break;
+                case 'G': //Green indicator
+                    GREEN = received[1];
+                    break;
+                case 'Y': //Yellow indicator
+                    YELLOW = received[1];
+                    break;
+                case 'B': //Blue indicator
+                    BLUE = received[1];
+                    break;
+                case 'R': //Red indicator
+                    RED = received[1];
+                    break;
+                case 0xff: //All indicators
+                    GREEN = received[1];
+                    YELLOW = received[1];
+                    BLUE = received[1];
+                    RED = received[1];
+                    break;
+            }
         }
         //if timer has triggered, increment ms250 and reset flash and blink timers
         if(xINDTimerSet == 1)
@@ -118,22 +131,30 @@ void dsIOOutTask (void * parameters)
         {
             case 'B': //blink
                 if(blink == 0 && ms250 == 0)
+                {
                     dsioGreenTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'F': //flash
                 if(flash == 0)
+                {
                     dsioGreenTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'S': //solid
                 dsioGreenOn();
+                xSemaphoreGive(xCircCheckTrig);
             break;
             
             case 'D': //double flash
                 if(flash == 0)
                 {
                     dsioGreenTGL();
+                    xSemaphoreGive(xCircCheckTrig);
                     vTaskDelay(25);
                     dsioGreenTGL();
                 }
@@ -148,18 +169,26 @@ void dsIOOutTask (void * parameters)
         {
             case 'B': //blink
                 if(blink == 0 && ms250 == 0)
+                {
                     dsioBlueTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'F': //flash
                 if(flash == 0)
+                {
                     dsioBlueTGL();
-            break;
+                    xSemaphoreGive(xCircCheckTrig);
+            
+                }
+                break;
             
             case 'D': //double flash
                 if(flash == 0)
                 {
                     dsioBlueTGL();
+                    xSemaphoreGive(xCircCheckTrig);
                     vTaskDelay(25);
                     dsioBlueTGL();
                 }
@@ -167,6 +196,7 @@ void dsIOOutTask (void * parameters)
             
             case 'S': //solid
                 dsioBlueOn();
+                xSemaphoreGive(xCircCheckTrig);
             break;
             
             case 'O': //off
@@ -178,18 +208,25 @@ void dsIOOutTask (void * parameters)
         {
             case 'B': //blink
                 if(blink == 0 && ms250 == 0)
+                {
                     dsioYellowTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'F': //flash
                 if(flash == 0)
+                {
                     dsioYellowTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'D': //double flash
                 if(flash == 0)
                 {
                     dsioYellowTGL();
+                    xSemaphoreGive(xCircCheckTrig);
                     vTaskDelay(25);
                     dsioYellowTGL();
                 }
@@ -197,6 +234,7 @@ void dsIOOutTask (void * parameters)
             
             case 'S': //solid
                 dsioYellowOn();
+                xSemaphoreGive(xCircCheckTrig);
             break;
             
             case 'O': //off
@@ -208,18 +246,25 @@ void dsIOOutTask (void * parameters)
         {
             case 'B': //blink
                 if(blink == 0 && ms250 == 0)
+                {
                     dsioRedTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'F': //flash
                 if(flash == 0)
+                {
                     dsioRedTGL();
+                    xSemaphoreGive(xCircCheckTrig);
+                }
             break;
             
             case 'D': //double flash
                 if(flash == 0)
                 {
                     dsioRedTGL();
+                    xSemaphoreGive(xCircCheckTrig);
                     vTaskDelay(25);
                     dsioRedTGL();
                 }
@@ -227,6 +272,7 @@ void dsIOOutTask (void * parameters)
             
             case 'S': //solid
                 dsioRedOn();
+                xSemaphoreGive(xCircCheckTrig);
             break;
             
             case 'O': //off
@@ -244,34 +290,61 @@ void dsIOSTATUS (void * parameters)
 {
     for(;;)
     {
-        //start check, wait until done, then wait half a second
         volatile uint8_t output = 0;
         uint8_t outbuffer[2] = {'S', 'L'};
         volatile uint16_t received[1];
-        LightCheck();
-        //check pin output states to see if there should be anything right now
-        //pins are PC3, PD1, PD0 and PC2 for outputs
-        if((PORTC.OUT & PIN3_bm) || (PORTC.OUT & PIN2_bm) || (PORTD.OUT & PIN1_bm) || (PORTD.OUT & PIN0_bm)) //if any outputs are live
-            output = 1;
-        xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
-        //check against reference value of 31 (~25mV over resistor) and light state
-        if((received[0] < 31) && (output == 1))
+        //block on manual trigger semaphore
+        if(xSemaphoreTake(xCircCheckTrig, 50) == pdTRUE)
         {
-            //this is an error case, send the error out to the main task
-            //error is S L
-            xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
+            //check pin output states to see if there should be anything right now
+            //pins are PC3, PD1, PD0 and PC2 for outputs
+            if((PORTC.OUT & PIN3_bm) || (PORTC.OUT & PIN2_bm) || (PORTD.OUT & PIN1_bm) || (PORTD.OUT & PIN0_bm)) //if any outputs are live
+                output = 1;
+            //manual check requested, start check and reset the periodic timer
+            LightCheck();
+            xSTATTimerSet = 0;
+            xTimerReset(xSTATTimer, 0);
+            //wait for result before moving on
+            xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
+            //check against reference value of 31 (~25mV over resistor) and light state
+            if((received[0] < 31) && (output == 1))
+            {
+                //this is an error case, send the error out to the main task
+                //error is S L
+                xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
+            }
+            else if((received[0] > 31) && (output == 0))
+            {
+                //this is an error case
+                xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
+            }
         }
-        else if((received[0] > 31) && (output == 0))
+        else //if not a manual trigger, then check timer and do the periodic if the time is right
         {
-            //this is an error case
-            xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
+            if(xSTATTimerSet == 1)
+            {
+                //check pin output states to see if there should be anything right now
+                //pins are PC3, PD1, PD0 and PC2 for outputs
+                if((PORTC.OUT & PIN3_bm) || (PORTC.OUT & PIN2_bm) || (PORTD.OUT & PIN1_bm) || (PORTD.OUT & PIN0_bm)) //if any outputs are live
+                    output = 1;
+                LightCheck();
+                xSTATTimerSet = 0;
+                xTimerReset(xSTATTimer, 0);
+                xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
+                //check against reference value of 31 (~25mV over resistor) and light state
+                if((received[0] < 31) && (output == 1))
+                {
+                    //this is an error case, send the error out to the main task
+                    //error is S L
+                    xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
+                }
+                else if((received[0] > 31) && (output == 0))
+                {
+                    //this is an error case
+                    xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
+                }
+            }
         }
-        //otherwise there is no error and no action should be taken.
-        //send on/off to main task
-    
-        //wait half a second
-        vTaskDelay(500);
-        //the more complex ones will need more than this, but this should be good enough for testing for now.
     }
 }
 
@@ -301,6 +374,11 @@ void LightCheck(void)
 void vINDTimerFunc( TimerHandle_t xTimer )
 {
     xINDTimerSet = 1;
+}
+
+void vCircCheckTimerFunc( TimerHandle_t xTimer )
+{
+    xSTATTimerSet = 1;
 }
 
 void dsioGreenOn(void)
