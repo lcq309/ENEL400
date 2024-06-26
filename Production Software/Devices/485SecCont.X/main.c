@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvWSCTask, "WSC", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
+    xTaskCreate(prvWSCTask, "WSC", 700, NULL, mainWSC_TASK_PRIORITY, NULL);
     
     //setup timer
     
@@ -197,7 +197,7 @@ void prvWSCTask( void * parameters )
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
     volatile uint8_t colour_cur = 'O'; //current confirmed colour
-    uint8_t colour_err = 0; //error tracking colour
+    volatile uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     
     /* High level overview
@@ -820,8 +820,6 @@ void prvWSCTask( void * parameters )
         }
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
-            //discard errors here
-            colour_err = 0;
             switch(Requester)
             //how this acts depends on if it is a requester 1 or 2
             {
@@ -1035,6 +1033,8 @@ void prvWSCTask( void * parameters )
             if(colour_cur != colour_req)
             {
                 //set both to flash
+                //discard errors here
+                colour_err = 0;
                 buffer[0] = 0xff; //all indicators
                 buffer[1] = 'O'; //off
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
