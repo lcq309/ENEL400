@@ -27,3 +27,18 @@ the red light will flash when attempting to change state.
 The stop button only needs to check the state of other stop buttons if it is trying to release the network from red, otherwise they do not matter.
 
 PC1 is indicator 1, which is the red light indicator.
+
+PD6 and 5 are buttons 1 and 2, I'm not sure which is which yet so it will need a bit of testing.
+
+This should be able to use an interrupt for the off button, but the stop button will be a bit strange.
+The DSIOin task needs to check the state of the stop button often, so it knows when it has been released.
+
+The stop button is special in that it doesn't need to confirm all devices as red to release, it only needs to confirm the state of other stop buttons.
+It releases to yellow, which handles lockouts the same way that a normal controller might.
+
+when switching to red, or out of red. The red light will flash. When all lights have confirmed the yellow state change and released lockout it will turn off.
+
+off is a bit special, it doesn't set a lockout at all. It will only confirm lights have turned off (and override any existing lockout aside from red).
+
+The device will set the red lockout on other buttons as well, even if they are released. stop buttons will make use of a local lockout (tracking the state of the big red button)
+as well as a global lockout(tracking the state of the network). in order to prevent confusion with whether the button is released or not.

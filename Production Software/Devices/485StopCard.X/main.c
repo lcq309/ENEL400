@@ -219,63 +219,21 @@ void prvWSBTask( void * parameters )
             switch(buffer[0])
             {
                 case 'P': //pushbutton
-                    //check if the colour requested is of a higher priority than the current lockout
-                    //either allow it through, or flash the current lockout colour
-                    switch(lockout)
+                    //this is a bit different from the normal controller, since this has the option of red, yellow, or off.
+                    //off can override yellow, and serves as an escape if something is going wrong with this part
+                    //yellow overrides red, but off cannot override red, only yellow.
+                    
+                    switch(buffer[1])
                     {
                         case 'C': //clear, allow colour change request
                             colour_req = buffer[1];
                             lockout = buffer[1];
-                            Requester = 1; //we are initiating this change
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
                         
-                        case 'b': //blue lockout clearing
-                        case 'B': //blue lockout, allow any colour through
-                            switch(buffer[1])
-                            {
-                                default:
-                                    colour_req = buffer[1];
-                                    lockout = buffer[1];
-                                    colour_cur = 'O'; //reset processing
-                                    Requester = 1; //we are initiating this change
-                                    updateIND = 1; //update the indicators
-                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
-                                    break;  
-                            }
-                            break;
-                            
-                        case 'g': //green lockout clearing
-                        case 'G': //green lockout, allow yellow through but not blue
-                            switch(buffer[1])
-                            {
-                                case 'Y': //yellow light
-                                    colour_req = buffer[1];
-                                    lockout = buffer[1];
-                                    colour_cur = 'O'; //reset processing
-                                    Requester = 1; //we are initiating this change
-                                    updateIND = 1; //update the indicators
-                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
-                                    break;
-                                    
-                                case 'G': //Green retry
-                                case 'B': //blue light
-                                    //flash green for a short time
-                                    buffer[0] = 0xff;
-                                    buffer[1] = 'O'; //turn all off first
-                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                                    buffer[0] = 'G';
-                                    buffer[1] = 'W'; //green warn flash
-                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                                    updateIND = 1;
-                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
-                                    break;
-                            }
-                            break;
-                            
                         case 'y': //yellow lockout clearing
-                        case 'Y': //yellow lockout, flash yellow for a short time
+                        case 'Y': //yellow lockout, yield to red or off
                             colour_req = 'Y'; //reset processing
                             colour_cur = 'O'; //reset processing
                             lockout = 'Y'; //reset processing
@@ -287,8 +245,6 @@ void prvWSBTask( void * parameters )
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             updateIND = 1;
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
-                            breakloop = 1; //break the loop so this command can be processed right away.
-                            //running code will fix indicators after this delay has passed.
                             break;
                             
                         case 'r': //red lockout clearing

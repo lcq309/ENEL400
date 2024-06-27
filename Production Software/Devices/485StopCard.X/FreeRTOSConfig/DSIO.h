@@ -69,13 +69,12 @@ extern "C" {
     void dsioRedOff(void);
     void dsioRedTGL(void);
     
-    void dsioYellowOn(void);
-    void dsioYellowOff(void);
-    void dsioYellowTGL(void);
-    
-    void dsioBlueOn(void);
-    void dsioBlueOff(void);
-    void dsioBlueTGL(void);
+    /* input state functions
+     * function used to track the state of the input, to know if the stop button
+     * has been released yet or not
+     * returns 1 for pressed, and 0 for not pressed
+     */
+    uint8_t dsioStopButt(void);
     
 #ifdef	__cplusplus
 }

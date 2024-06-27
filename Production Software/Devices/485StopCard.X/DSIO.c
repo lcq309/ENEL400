@@ -56,28 +56,47 @@ void DSIOSetup()
 void dsIOInTask (void * parameters)
 {
     //initialize inputs
-    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm;
+    PORTD.DIRCLR = PIN6_bm | PIN5_bm;
     //Then I will set up the multi-configure register for port D.
     PORTD.PINCONFIG = 0x3 | PORT_PULLUPEN_bm; //enable falling edge interrupt and pullup
     //update configuration for selected pins
-    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm;
+    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm;
             
-    //for now, this just reads button presses with a half second debounce delay to avoid spam.
-    //block until a button press occurs, then check anti spam timer and reset timer
-    //initialization complete, enter looping section.
+    //the off button works the same as a normal controller, but the stop button 
+    //sets the stop state which is not released until the stop button is released
+    //this can be checked each time the loop runs until the button is released
     uint8_t input[1];
     uint8_t output[2] = {'P', 0}; //P for pushbutton in intertask messages
+    uint8_t stopState = 0; // 0 is clear, 'S' is stopped, 'R' is released
     for(;;)
     {
-        //wait for input
-        xQueueReceive(xPB_Queue, input, portMAX_DELAY);
-        output[1] = input[0];
-        if(input[0] == 'Y') //if yellow, send to front
+        //wait for input (up to 25ms)
+        xQueueReceive(xPB_Queue, input, 25);
+        if(input[0] == 'R') //if red, set stop state
+        {
+            output[1] = 'S'; //stop
             xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
-        else
+            stopState = 'S'; //S for stopped
+            xSemaphoreGive(xNotify);
+        }
+        else if(input[0] == 'O') //off button
+        {
+            output[1] = 'O'; //O for off
             xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
-        xSemaphoreGive(xNotify);
-        //send message to inter-task queue
+            xSemaphoreGive(xNotify);
+        }
+        else if(stopState == 'S') //if stopped, check to see if it has been released yet
+        {
+            if(dsioStopButt() == 0)
+            {
+                stopState = 'R'; //released, send a release message
+                output[1] = 'R'; //release the stop state locally
+                xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
+                xSemaphoreGive(xNotify);
+            }
+        }
+        else if(stopState == 'R')
+            stopState = 0;
     }
     
 }
@@ -218,41 +237,20 @@ void vINDTimerFunc( TimerHandle_t xTimer )
 
 void dsioRedOn(void)
 {
-    PORTC.OUTSET = PIN0_bm;
+    PORTC.OUTSET = PIN1_bm;
 }
 void dsioRedOff(void)
 {
-    PORTC.OUTCLR = PIN0_bm;
+    PORTC.OUTCLR = PIN1_bm;
 }
 void dsioRedTGL(void)
 {
-    PORTC.OUTTGL = PIN0_bm;
-}
-    
-void dsioYellowOn(void)
-{
-    PORTC.OUTSET = PIN1_bm;
-}
-void dsioYellowOff(void)
-{
-    PORTC.OUTCLR = PIN1_bm;
-}
-void dsioYellowTGL(void)
-{
     PORTC.OUTTGL = PIN1_bm;
 }
-    
-void dsioBlueOn(void)
+
+uint8_t dsioStopButt(void)
 {
-    PORTA.OUTSET = PIN7_bm;
-}
-void dsioBlueOff(void)
-{
-    PORTA.OUTCLR = PIN7_bm;
-}
-void dsioBlueTGL(void)
-{
-    PORTA.OUTTGL = PIN7_bm;
+    return(!!(PORTD.IN & PIN6_bm));
 }
 
 //interrupts go here
@@ -270,15 +268,11 @@ ISR(PORTD_PORT_vect)
     {
         case PIN6_bm: //button 1
             PORTD.INTFLAGS = PIN6_bm; //reset interrupt
-            pb[0] = 'Y';
+            pb[0] = 'R';
             break;
         case PIN5_bm: //button 2
             PORTD.INTFLAGS = PIN5_bm; //reset interrupt
-            pb[0] = 'G';
-            break;
-        case PIN3_bm: //button 3
-            PORTD.INTFLAGS = PIN3_bm; //reset interrupt
-            pb[0] = 'B';
+            pb[0] = 'O';
             break;
     }
     xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
