@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/485SecCont.X.production.elf">                 
+  <executable name="dist/default/debug/485SecCont.X.debug.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>27030</used>                     
-      <free>104042</free>                     
+      <used>26996</used>                     
+      <free>104076</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 

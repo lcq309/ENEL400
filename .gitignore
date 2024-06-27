@@ -1085,3 +1085,6 @@ Production Software/Devices/485SecCont.X/.generated_files/flags/default/f3bee639
 *.bkp
 *.hex
 *.hex
+/Production Software/Devices/485StopCard.X/.generated_files/flags/default
+*.inx
+*.inx

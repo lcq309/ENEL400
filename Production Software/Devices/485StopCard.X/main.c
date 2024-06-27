@@ -1,12 +1,10 @@
 /* 
- * RS 485 Sector Controller
+ * RS 485 Stop Light
  * Author:  Michael King
  * 
- * Created on April 22, 2024
+ * Created on June 26, 2024
  * 
- * This is meant to be a generic Sector Light controller on the wired network
- * which means that it has 3 buttons (Blue, Yellow, Green) and controls 
- * a sector light with either 3 or 4 colours.
+ * This is meant to be a stop card, it controls all lights and controllers on the network in an emergency situation.
  */
 
 #include <stdio.h>
@@ -39,8 +37,8 @@ struct DeviceTracker
 
 //define global variables
 uint8_t GLOBAL_DeviceID = 0;
-uint8_t GLOBAL_Channel = 0;
-uint8_t GLOBAL_DeviceType = '1';
+uint8_t GLOBAL_Channel = 0xff;
+uint8_t GLOBAL_DeviceType = 'S';
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
@@ -54,7 +52,7 @@ uint8_t GLOBAL_DeviceType = '1';
 //task pointers
 
 void prvWiredInitTask( void * parameters );
-void prvWSCTask( void * parameters );
+void prvWSBTask( void * parameters );
 
 //retransmission timer
 
@@ -72,7 +70,7 @@ int main(int argc, char** argv) {
     
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvWSCTask, "WSC", 700, NULL, mainWSC_TASK_PRIORITY, NULL);
+    xTaskCreate(prvWSBTask, "WSB", 700, NULL, mainWSC_TASK_PRIORITY, NULL);
     
     //setup timer
     
@@ -81,7 +79,7 @@ int main(int argc, char** argv) {
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
     LTCHIn(); //latch input register
-    GLOBAL_Channel = ShiftIn(); //grab channel
+    ShiftIn(); //grab channel and discard
     GLOBAL_DeviceID = ShiftIn(); //grab DeviceID
     
     
@@ -170,7 +168,7 @@ void prvWiredInitTask( void * parameters )
     }
 }
 
-void prvWSCTask( void * parameters )
+void prvWSBTask( void * parameters )
 {
     /* Wired Sector Controller
      * maintain a table of controller and light indexes, with a confirmation marker
@@ -182,16 +180,16 @@ void prvWSCTask( void * parameters )
      * a controller will yield to a controller trying to send a higher priority
      * a light will 'warn' a controller trying to send a lower priority before the lockout has released
      */
-    struct DeviceTracker ControllerTable[20]; //maximum of 20 connected controlled devices (probably not a hard limit)
+    struct DeviceTracker ControllerTable[30]; //maximum of 30 connected controlled devices (probably not a hard limit)
     uint8_t numControllers = 0;
     uint8_t tablePos = 0;
-    struct DeviceTracker LightTable[20]; //20 connected lights
+    struct DeviceTracker LightTable[30]; //30 connected lights
     uint8_t numLights = 0;
     struct DeviceTracker SpecialTable[10]; //10 connected special devices (stop button etc)
     uint8_t numSpecials = 0;
     struct DeviceTracker MenuTable[5]; //5 connected menu devices
     uint8_t numMenus = 0;
-    uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
+    uint8_t lockout = 'C'; //used to track lockout status ('R'ed, 'Y'ellow, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
@@ -805,8 +803,6 @@ void prvWSCTask( void * parameters )
 
                             case 'C': //Clear command, stop light is special and doesn't need to follow the same rules that a controller would
                                 lockout = 'C';
-                                colour_cur = colour_req;
-                                updateIND = 1;
                                 buffer[0] = 'c'; //confirm clear
                                 buffer[1] = SpecialTable[tablePos].index;
                                 xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
