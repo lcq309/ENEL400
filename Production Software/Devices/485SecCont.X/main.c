@@ -199,6 +199,7 @@ void prvWSCTask( void * parameters )
     volatile uint8_t colour_cur = 'O'; //current confirmed colour
     volatile uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
+    uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
     
     /* High level overview
      * 1. check for any commands from pushbutton or other internal source.
@@ -229,6 +230,7 @@ void prvWSCTask( void * parameters )
                             colour_req = buffer[1];
                             lockout = buffer[1];
                             Requester = 1; //we are initiating this change
+                            ForceCheck = 1;
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
@@ -242,6 +244,7 @@ void prvWSCTask( void * parameters )
                                     lockout = buffer[1];
                                     colour_cur = 'O'; //reset processing
                                     Requester = 1; //we are initiating this change
+                                    ForceCheck = 1;
                                     updateIND = 1; //update the indicators
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;  
@@ -257,6 +260,7 @@ void prvWSCTask( void * parameters )
                                     lockout = buffer[1];
                                     colour_cur = 'O'; //reset processing
                                     Requester = 1; //we are initiating this change
+                                    ForceCheck = 1;
                                     updateIND = 1; //update the indicators
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;
@@ -271,6 +275,7 @@ void prvWSCTask( void * parameters )
                                     buffer[1] = 'W'; //green warn flash
                                     xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                                     updateIND = 1;
+                                    ForceCheck = 1;
                                     GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                     break;
                             }
@@ -288,6 +293,7 @@ void prvWSCTask( void * parameters )
                             buffer[1] = 'W'; //yellow warn flash
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                             updateIND = 1;
+                            ForceCheck = 1;
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             breakloop = 1; //break the loop so this command can be processed right away.
                             //running code will fix indicators after this delay has passed.
@@ -827,6 +833,14 @@ void prvWSCTask( void * parameters )
         for(uint8_t i = 0; i < MaxNets; i++)
         {
             NetSent[i] = 0;
+        }
+        if(ForceCheck == 1) //if we are forcing a state check
+        {
+            for(uint8_t i = 0; i < numControllers; i++)
+                ControllerTable[i].status = 0;
+            for(uint8_t i = 0; i < numLights; i++)
+                LightTable[i].status = 0;
+            ForceCheck = 0;
         }
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {

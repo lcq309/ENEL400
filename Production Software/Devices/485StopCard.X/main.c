@@ -170,15 +170,12 @@ void prvWiredInitTask( void * parameters )
 
 void prvWSBTask( void * parameters )
 {
-    /* Wired Sector Controller
+    /* Wired Stop Button
      * maintain a table of controller and light indexes, with a confirmation marker
-     * communicate with other controllers on the same channel for coordination
-     * communicate with lights on the same channel for coordination
-     * lights and controllers will lockout when asked to turn yellow or red
-     * controller is responsible for releasing yellow lockout when all lights are yellow
+     * communicate with other stop buttons on the same channel for coordination
      * stop button is responsible for releasing red lockout at the director's discretion
-     * a controller will yield to a controller trying to send a higher priority
-     * a light will 'warn' a controller trying to send a lower priority before the lockout has released
+     * stop button will release the yellow lockout when all lights, controllers, and stop buttons have confirmed
+     * 
      */
     struct DeviceTracker ControllerTable[30]; //maximum of 30 connected controlled devices (probably not a hard limit)
     uint8_t numControllers = 0;
@@ -197,9 +194,10 @@ void prvWSBTask( void * parameters )
     volatile uint8_t colour_cur = 'O'; //current confirmed colour
     volatile uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
+    uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
     
     /* High level overview
-     * 1. check for any commands from pushbutton or other internal source.
+     * 1. check for any commands from pushbutton
      * 2. check for any waiting messages.
      * 3. check timer for resending messages if applicable.
      * 4. resend messages if applicable
@@ -223,39 +221,55 @@ void prvWSBTask( void * parameters )
                     //off can override yellow, and serves as an escape if something is going wrong with this part
                     //yellow overrides red, but off cannot override red, only yellow.
                     
-                    switch(buffer[1])
+                    switch(lockout)
                     {
                         case 'C': //clear, allow colour change request
                             colour_req = buffer[1];
-                            lockout = buffer[1];
+                            if(buffer[1] = 'O')
+                                lockout = 'C';
+                            else
+                                lockout = buffer[1];
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            ForceCheck = 1;
                             break;
                         
                         case 'y': //yellow lockout clearing
                         case 'Y': //yellow lockout, yield to red or off
-                            colour_req = 'Y'; //reset processing
-                            colour_cur = 'O'; //reset processing
-                            lockout = 'Y'; //reset processing
-                            buffer[0] = 0xff;
-                            buffer[1] = 'O'; //turn all off first
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            buffer[0] = 'Y';
-                            buffer[1] = 'W'; //yellow warn flash
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            updateIND = 1;
+                            if(buffer[1] == 'R')
+                                lockout = 'R';
+                            else if(buffer[1] == 'O')
+                                lockout = 'C';
+                            colour_req = buffer[1];
+                            Requester = 1;
+                            ForceCheck = 1;
+                            updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
-                            
+                        
                         case 'r': //red lockout clearing
-                        case 'R': //red lockout, flash all for a short time
-                            buffer[0] = 0xff;
-                            buffer[1] = 'O'; //turn all off first
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            buffer[0] = 0xff;
-                            buffer[1] = 'W'; //warning flash all
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            updateIND = 1;
+                            if(buffer[1] == 'R')
+                            {
+                                lockout = 'R';
+                                Requester = 1;
+                                ForceCheck = 1;
+                                GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                updateIND = 1;
+                            }
+                        case 'R': //red lockout, flash red for a short time for off, yellow will override
+                            if(buffer[1] == 'O')
+                            {
+                                buffer[0] = 'R';
+                                buffer[1] = 'W'; //warning flash red
+                                xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
+                                updateIND = 1;
+                            }
+                            else if(buffer[1] == 'Y')
+                            {
+                                lockout = 'r'; //button released, other checks need to happen before anything else can occur
+                                colour_req = 'Y'; //request for yellow
+                                GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            }
                             break;
                     }
                     break;
@@ -324,6 +338,7 @@ void prvWSBTask( void * parameters )
             switch(router)
             {
                 case 'C': //controlling device, check if it is on the internal table, add if not
+                    //controllers should only ever be confirming state
                 {
                     for(uint8_t i = 0; i < numControllers; i++)
                     {
@@ -343,335 +358,21 @@ void prvWSBTask( void * parameters )
                     //now the device is on the table, evaluate its message (if one is present)
                     if(length > 1)
                     {
-                        switch(buffer[1]) //first byte of message
+                        switch(buffer[1])
                         {
-                            case 'B': //blue colour change request
-                                //if we are currently requesting blue, this device is also requesting blue at the same time
-                                //this should be responded to with a lowercase
-                                //if we are not currently requesting blue, this is a colour change request
-                                switch(lockout)
-                                {
-                                    case 'C': //Clear, become a subordinate and respond
-                                        Requester = 2;
-                                        updateIND = 1;
-                                        colour_req = 'B';
-                                        lockout = 'B';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        buffer[0] = 'b'; //confirmation
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'B': //Blue lockout
-                                        switch(Requester)
-                                        {
-                                            case 1: //this is a requester one, update status and respond with confirmation
-                                                ControllerTable[tablePos].status = buffer[1];
-                                                buffer[0] = 'b'; //confirmation
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                            case 2: //this is a subordinate requester, just respond with confirmation
-                                                buffer[0] = 'b'; //confirmation
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                        }
-                                        break;
-
-                                    default: //if there is a lockout, respond with the lockout colour
-                                        buffer[0] = lockout;
-                                        buffer[1] = ControllerTable[tablePos].index; //respond with controller lockout colour
-                                        //this should set the controller as requester 2 with a lockout
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-                                }
+                            case 'E': //error?
                                 break;
-                            case 'b': //blue confirmation
-                                //if we are requester 1 for a blue colour change, mark status as confirmed.
-                                //if lockout level is above blue, send a colour change request to the lockout level.
-                                switch(lockout)
-                                {
-                                    case 'B': //blue lockout
-                                        if(Requester == 1)
-                                            ControllerTable[tablePos].status = 'B';
-                                        break;
-                                    default: //other lockout level, just ignore
-                                        break;
-                                }
-                                break;
-                            case 'G': //Green colour change request
-                                //if we are requesting blue, green will override it
-                                switch(lockout)
-                                {
-                                    case 'C': //no lockout, this is a green request from another controller
-                                        //set lockout and colour_req to green, update controller status, and reply
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'G';
-                                        colour_req = 'G';
-                                        Requester = 2; //start helping with colour change
-                                        buffer[0] = 'g';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'B': //blue lockout will be overridden
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'G';
-                                        colour_req = 'G';
-                                        Requester = 2;
-                                        buffer[0] = 'g';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'G': //green lockout
-                                        switch(Requester)
-                                        {
-                                            case 1: //this is a requester one, update status and respond with confirmation
-                                                ControllerTable[tablePos].status = buffer[1];
-                                                buffer[0] = 'g'; //confirmation
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                            case 2: //this is a subordinate requester, just respond with confirmation
-                                                buffer[0] = 'g'; //confirmation
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                        }
-                                        break;
-                                    default: //other lockout level, reply with lockout level
-                                        buffer[0] = lockout; 
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-                                }
-                                break;
-                            case 'g': //green colour change confirmation
-                                switch(lockout)
-                                {
-                                    case 'G': //green lockout, mark as confirmed if Requester 1
-                                        if(Requester == 1)
-                                            ControllerTable[tablePos].status = 'G';
-                                        break;
-                                    default: //other lockout level, just ignore
-                                        break;
-                                }
-                                break;
-
-                            case 'Y': //yellow colour change request
-                                switch(lockout)
-                                {
-                                    case 'C': //no lockout, this is a yellow request from another controller
-                                        //set lockout and colour_req to green, update controller status, and reply
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'Y';
-                                        colour_req = 'Y';
-                                        Requester = 2; //start helping with colour change
-                                        buffer[0] = 'y';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case'b': //blue lockout release will be overridden
-                                    case 'B': //blue lockout will be overridden
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'Y';
-                                        colour_req = 'Y';
-                                        Requester = 2;
-                                        buffer[0] = 'y';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'g': //green lockout release will be overridden
-                                    case 'G': //green lockout will be overridden
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'Y';
-                                        colour_req = 'Y';
-                                        Requester = 2;
-                                        buffer[0] = 'y';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'y': //yellow lockout release will be overridden
-                                    case 'Y': //yellow lockout
-                                        switch(Requester)
-                                        {
-                                            case 1: //this is a requester one, update status and respond with confirmation
-                                                ControllerTable[tablePos].status = buffer[1];
-                                                buffer[0] = 'y'; //confirmation
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                            case 2: //this is a subordinate requester, just respond with confirmation
-                                                buffer[0] = 'y'; //confirmation
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                        }
-                                        break;
-                                    default: //other lockout level, reply with lockout level
-                                        buffer[0] = lockout; 
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-                                }
-                                break;
-
-                            case 'y': //confirm yellow 
-                                switch(lockout)
-                                {
-                                    case 'Y': //green lockout, mark as confirmed if Requester 1
-                                        if(Requester == 1)
-                                            ControllerTable[tablePos].status = 'Y';
-                                        break;
-                                    default: //other lockout level, just ignore
-                                        break;
-                                }
-                                break;
-
-                            case 'R': //red requested by default become a subordinate and confirm
-                                ControllerTable[tablePos].status = buffer[1];
-                                lockout = 'R';
-                                colour_req = 'R';
-                                updateIND = 1;
-                                Requester = 2;
-                                buffer[0] = 'r';
-                                buffer[1] = ControllerTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                break;
-
-                            case 'r': //red confirmation, shouldn't end up here normally, just ignore for now
-                                break;
-
-                            //lockout clear requests go here
-                            case 'C':
-                                switch(buffer[2])
-                                {
-                                    case 'B': //clear blue lockout, clear and confirm by sending 'c' in response
-                                        switch(lockout)
-                                        {
-                                            case 'C': //lockout already cleared, confirm
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-                                            case 'B': //clear the blue lockout and confirm clearance.
-                                                if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                    lockout = 'B';
-                                                else
-                                                {
-                                                    lockout = 'C';
-                                                    colour_cur = 'B';
-                                                    updateIND = 1;
-                                                }
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'b': //we are working on clearing lights, just confirm clearance.
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            default: //just ignore anything else for now
-                                                break;
-                                        }
-                                        break;
-
-                                    case 'Y': //clear yellow lockout, clear and confirm by sending 'c' in response
-                                        switch(lockout)
-                                        {
-                                            case 'C': //lockout already cleared, confirm
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'Y': //clear the yellow lockout and confirm clearance.
-                                                if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                    lockout = 'Y';
-                                                else    //if we are not responsible for releasing lights, assume all lights are the correct colour
-                                                {
-                                                    lockout = 'C';
-                                                    colour_cur = 'Y';
-                                                    updateIND = 1;
-                                                }
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'y': //we are working on clearing lights, just confirm clearance.
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            default: //just ignore anything else for now
-                                                break;
-                                        }
-                                        break;
-
-                                    case 'G': //clear green lockout, clear and confirm by sending 'c' 'g' in response
-                                        switch(lockout)
-                                        {
-                                            case 'C': //lockout already cleared, confirm
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'G': //clear the yellow lockout and confirm clearance.
-                                                if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                    lockout = 'G';
-                                                else
-                                                {
-                                                    lockout = 'C';
-                                                    colour_cur = 'G';
-                                                    updateIND = 1;
-                                                }
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'g': //we are working on clearing lights, just confirm clearance.
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            default: //just ignore anything else for now
-                                                break;
-                                        }
-                                        break;
-                                        //red clearance not handled by this type of device.
-                                }
-                                break;
-
-                            case 'c': //clearance confirmation, only relevant to requester 1 devices update status.
-                                ControllerTable[tablePos].status = 'C'; //mark device as cleared
-                                break;
-
-                            default: //can put an error message here, for incorrect command.
+                                
+                            default: //status confirmation
+                                ControllerTable[tablePos].status = (buffer[1] - 32);
                                 break;
                         }
+                            
                     }
                 }
                 break;
                 
                 case 'L': //light device, should only ever be confirming colours or giving an error response
-                    //just mark status as confirmed
                     //first check if on the table, add if not
                     for(uint8_t i = 0; i < numLights; i++)
                     {
@@ -705,8 +406,7 @@ void prvWSBTask( void * parameters )
                     }
                     break;
                     
-                case 'S': //special device, stop button and etc. we are always subordinate
-                    //check table and add if needed
+                case 'S': //special device, stop button and etc. we need to work together, record the state and use it to set our own.
                     for(uint8_t i = 0; i < numSpecials; i++)
                     {
                         if(SpecialTable[i].index == buffer[0])
@@ -726,42 +426,100 @@ void prvWSBTask( void * parameters )
                     {
                         switch(buffer[1])
                         {
-                            case 'R': //red request, we are required to turn red
-                                lockout = 'R'; //can only be released by Stop button
-                                colour_req = 'R';
-                                Requester = 2;
+                            case 'R': //red request, we are required to indicate red, lockout depends on button state
+                                if(lockout != 'R') //if we have not already pressed the stop button, just update state
+                                {
+                                    lockout = 'r'; //unpressed button, red lockout
+                                    colour_req = 'R'; //request red
+                                    Requester = 2;
+                                    buffer[0] = 'x'; //confirm red release state
+                                }
+                                else //we are also stopped, update the state of the stop button and respond in kind
+                                {
+                                    buffer[0] = 'r'; //confirm red locked state
+                                }
+                                SpecialTable[tablePos].status = 'R';
                                 updateIND = 1;
-                                buffer[0] = 'r'; //confirm red
                                 buffer[1] = SpecialTable[tablePos].index;
                                 xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                 break;
-
-                            case 'Y': //will send yellow when the stop command has been cleared
-                                //overrides any normal colour change logic, will be released by the stop button
-                                lockout = 'Y';
-                                colour_req = 'Y';
-                                Requester = 2;
+                                
+                            case 'r': //this is a response, this tells that the button is currently pressed.
+                                //update the state of the stop button
+                                SpecialTable[tablePos].status = 'R';
                                 updateIND = 1;
-                                buffer[0] = 'y'; //confirm yellow
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                break;
+                                
+                            case 'x': //this is a response, this tells that the button is currently released.
+                                
+                                SpecialTable[tablePos].status = 'r'; //lowercase r means the button is released.
+                                updateIND = 1;
                                 break;
 
-                            case 'O': //off command, overrides any normal colour change logic
-                                lockout = 'C';
-                                colour_req = 'O';
-                                Requester = 2;
-                                updateIND = 1;
-                                buffer[0] = 'o'; //confirm off
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            case 'Y': //if they are trying to signal yellow before we are ready to release, take over the network
+                                //this shouldn't really happen as they are supposed to negotiate together before attempting to release
+                                if(lockout == 'R')
+                                {
+                                    buffer[0] = 'R'; //take control of the network
+                                    buffer[1] = SpecialTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                }
+                                else if(lockout == 'r') //we are ready to release
+                                {
+                                    buffer[0] = 'y'; //confirm yellow, and release red lockout
+                                    buffer[1] = SpecialTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    lockout = 'Y';
+                                    updateIND = 1;
+                                }
                                 break;
 
-                            case 'C': //Clear command, stop light is special and doesn't need to follow the same rules that a controller would
-                                lockout = 'C';
-                                buffer[0] = 'c'; //confirm clear
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            case 'O': //off command, overrides any normal colour change logic (unless we are RED)
+                                if(lockout != 'R')
+                                {
+                                    lockout = 'C';
+                                    colour_req = 'O';
+                                    Requester = 2;
+                                    updateIND = 1;
+                                    buffer[0] = 'o'; //confirm off
+                                    buffer[1] = SpecialTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                }
+                                else if(lockout == 'R') //we are not ready to release
+                                {
+                                    lockout = 'R';
+                                    colour_req = 'R';
+                                    buffer[0] = 'R'; //take control of the network
+                                    buffer[1] = SpecialTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    GLOBAL_RetransmissionTimerSet = 1;
+                                    updateIND = 1;
+                                }
+                                break;
+
+                            case 'C': //Clear command, issued after yellow lockout is released.
+                                //can't clear directly from red, the yellow transition needs to be complete first
+                                //should never try to clear on red, stop buttons will query each other before attempting to release
+                                 if(lockout != 'R')
+                                {
+                                    lockout = 'C';
+                                    colour_req = 'O';
+                                    Requester = 2;
+                                    updateIND = 1;
+                                    buffer[0] = 'o'; //confirm off
+                                    buffer[1] = SpecialTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                }
+                                else if(lockout == 'R') //we are not ready to release
+                                {
+                                    lockout = 'R';
+                                    colour_req = 'R';
+                                    buffer[0] = 'R'; //take control of the network
+                                    buffer[1] = SpecialTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    GLOBAL_RetransmissionTimerSet = 1;
+                                    updateIND = 1;
+                                }
                                 break;
                         }
                     }
@@ -773,84 +531,316 @@ void prvWSBTask( void * parameters )
             }
         }
         //message processing now complete, check the status of any colour change request
-        //if all colours are matching colour_req, then change colour_cur into colour_req
+        //if not all devices have confirmed for red or yellow, keep trying
+        //only the yellow lockout needs to be released, the red lockout is controlled manually
+        //red lockout can only be released if all stop buttons are in agreement
+        //if we are attempting to release (lockout 'r'), query the state of the other stop buttons
+        //if all stop buttons are ready to release, set lockout level to yellow
         uint8_t check_variable = 1;
         uint8_t NetSent[MaxNets];
         for(uint8_t i = 0; i < MaxNets; i++)
         {
             NetSent[i] = 0;
         }
+        if(ForceCheck == 1) //if we are forcing a state check
+        {
+            for(uint8_t i = 0; i < numControllers; i++)
+                ControllerTable[i].status = 0;
+            for(uint8_t i = 0; i < numLights; i++)
+                LightTable[i].status = 0;
+            ForceCheck = 0;
+        }
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
             switch(Requester)
-            //how this acts depends on if it is a requester 1 or 2
+            //how this acts depends on what colour is requested
             {
-                
                 case 1: //Lead Requester
-                //check retransmission timers and retransmit if needed
+                    //for lockout 'R', turn lights red
+                    //for lockout 'r', check other stop buttons and change to yellow
+                    //for lockout 'Y', normal controller behaviour down to 'C'
+                    //for colour_req 'O', turn everything off
+                    //check retransmission timers and retransmit if needed
                     if(GLOBAL_RetransmissionTimerSet == 1 && GLOBAL_MessageSent == 1)
                     {
-                        //check other controllers
-                        for(uint8_t i = 0; i < numControllers; i++)
+                        if((lockout == 'R') && (Requester == 1))
                         {
-                            if(ControllerTable[i].status != colour_req)
+                            for(uint8_t i = 0; i < numSpecials; i++)
                             {
-                                for(uint8_t y = 0; y < MaxNets; y++)
+                                if((SpecialTable[i].status != 'R') && (SpecialTable[i].status != 'r'))
                                 {
-                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    for(uint8_t y = 0; y < MaxNets; y++)
                                     {
-                                        y = MaxNets;
-                                        //send another colour change request, and set check_variable
-                                        buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[1] = ControllerTable[i].index; //load with retransmission request
-                                        check_variable = 0;
-                                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                    }
-                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
-                                    {
-                                        //just end loop and move on to next device in table
-                                        y = MaxNets;
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        //check lights
-                        for(uint8_t i = 0; i < numLights; i++)
-                        {
-                            if(LightTable[i].status != colour_req)
+                            for(uint8_t i = 0; i < numControllers; i++)
                             {
-                                for(uint8_t y = 0; y < MaxNets; y++)
+                                if(ControllerTable[i].status != 'R')
                                 {
-                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    for(uint8_t y = 0; y < MaxNets; y++)
                                     {
-                                        y = MaxNets;
-                                        //send another colour change request, and set check_variable
-                                        buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[1] = LightTable[i].index; //load with retransmission request
-                                        check_variable = 0;
-                                        NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                    }
-                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
-                                    {
-                                        //just end loop and move on to next device in table
-                                        y = MaxNets;
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
                                     }
                                 }
                             }
+                            for(uint8_t i = 0; i < numLights; i++)
+                            {
+                                if(LightTable[i].status != colour_req)
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = LightTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            if(check_variable == 1)
+                            {
+                                colour_cur = colour_req;
+                                updateIND = 1;
+                            }
+                            //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                            else // if something was transmitted, we need to reset the timer.
+                            {
+                                GLOBAL_RetransmissionTimerSet = 0;
+                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            }
                         }
-                        //if all colours are matching, we can set colour_cur to colour_req
-                        if(check_variable == 1)
+                        else if((lockout == 'r') && (Requester == 1))
                         {
-                            colour_cur = colour_req;
-                            updateIND = 1;
+                            check_variable = 1;
+                            //check the state of the other stop buttons
+                            for(uint8_t i = 0; i < numSpecials; i++)
+                            {
+                                if(SpecialTable[i].status != 'r')
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = 'R'; //R is how we can query the state
+                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            if(check_variable == 1) //move to yellow lockout
+                            {
+                                lockout = 'Y';
+                                updateIND = 1;
+                                colour_req = 'Y';
+                            }
+                            else // if something was transmitted, we need to reset the timer.
+                            {
+                                GLOBAL_RetransmissionTimerSet = 0;
+                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            }
                         }
-                        //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                        else // if something was transmitted, we need to reset the timer.
+                        else if(colour_req == 'O')
                         {
-                            GLOBAL_RetransmissionTimerSet = 0;
-                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            for(uint8_t i = 0; i < numSpecials; i++)
+                            {
+                                if(SpecialTable[i].status != 'O')
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            for(uint8_t i = 0; i < numControllers; i++)
+                            {
+                                if(ControllerTable[i].status != 'O')
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            for(uint8_t i = 0; i < numLights; i++)
+                            {
+                                if(LightTable[i].status != 'O')
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = LightTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            if(check_variable == 1)
+                            {
+                                colour_cur = colour_req;
+                                updateIND = 1;
+                            }
+                            //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                            else // if something was transmitted, we need to reset the timer.
+                            {
+                                GLOBAL_RetransmissionTimerSet = 0;
+                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            }
+                        }
+                        else if(lockout == 'Y')
+                        {
+                        //check all controllers, lights, and stop buttons
+                        //retransmit to any that haven't acknowledged the change yet
+                        //set colour_cur to 'Y' once they have all confirmed
+                            for(uint8_t i = 0; i < numControllers; i++)
+                            {
+                                if(ControllerTable[i].status != colour_req)
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            //check lights
+                            for(uint8_t i = 0; i < numLights; i++)
+                            {
+                                if(LightTable[i].status != colour_req)
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[1] = LightTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                            //if all colours are matching, we can set colour_cur to colour_req
+                            if(check_variable == 1)
+                            {
+                                colour_cur = colour_req;
+                                updateIND = 1;
+                            }
+                            //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                            else // if something was transmitted, we need to reset the timer.
+                            {
+                                GLOBAL_RetransmissionTimerSet = 0;
+                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            }
                         }
                     }
                     break;
@@ -892,102 +882,105 @@ void prvWSBTask( void * parameters )
         //if we are requester 1, we should ensure that first the controller lockouts are released
         //as a requester 2, we can return to requester 0 once all lights have confirmed colour
         //at this point, all lights and controllers have confirmed colour change, so we need to start releasing lockouts
-        switch(Requester)
+        if((lockout == 'Y') || (lockout == 'y'))
         {
-            case 1:
-                if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
-                {
-                    for(uint8_t i = 0; i < numControllers; i++)
-                        {
-                            if(ControllerTable[i].status != 'C')
+            switch(Requester)
+            {
+                case 1:
+                    if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
+                    {
+                        for(uint8_t i = 0; i < numControllers; i++)
                             {
-                                for(uint8_t y = 0; y < MaxNets; y++)
+                                if(ControllerTable[i].status != 'C')
                                 {
-                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                    for(uint8_t y = 0; y < MaxNets; y++)
                                     {
-                                        //send another clear request, and set check_variable
-                                        buffer[0] = 'C';
-                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[2] = ControllerTable[i].index; //load with retransmission request
-                                        check_variable = 0;
-                                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                                        y = MaxNets;
-                                    }
-                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
-                                    {
-                                        //just end loop and move on to next device in table
-                                        y = MaxNets;
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            //send another clear request, and set check_variable
+                                            buffer[0] = 'C';
+                                            buffer[1] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[2] = ControllerTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
+                                            y = MaxNets;
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
                                     }
                                 }
                             }
-                        }
-                    //if all controllers are confirmed, we can move on to releasing lights
-                    if(check_variable == 1)
-                    {
-                        lockout = lockout + 32; //switch to lowercase lockout letter
-                        updateIND = 1;
-                    }
-                    //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                    else // if something was transmitted, we need to reset the timer.
-                    {
-                        GLOBAL_RetransmissionTimerSet = 0;
-                        xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                    }
-                }
-                if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))) //at this point, all controllers have confirmed lockout release
-                {
-                    //we can begin releasing the lights
-                    for(uint8_t i = 0; i < numLights; i++)
-                    {
-                        if(LightTable[i].status != 'C') //if not confirmed cleared
+                        //if all controllers are confirmed, we can move on to releasing lights
+                        if(check_variable == 1)
                         {
-                                for(uint8_t y = 0; y < MaxNets; y++)
-                                {
-                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                    {
-                                        //send another clear request, and set check_variable
-                                        buffer[0] = 'C';
-                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[2] = LightTable[i].index; //load with retransmission request
-                                        check_variable = 0;
-                                        NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                                        y = MaxNets;
-                                    }
-                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
-                                    {
-                                        //just end loop and move on to next device in table
-                                        y = MaxNets;
-                                    }
-                                }
+                            lockout = lockout + 32; //switch to lowercase lockout letter
+                            updateIND = 1;
+                        }
+                        //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                        else // if something was transmitted, we need to reset the timer.
+                        {
+                            GLOBAL_RetransmissionTimerSet = 0;
+                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
                         }
                     }
-                    //if all controllers and lights are confirmed, we can release internal lockout and return to requester 0
-                    //but there is a special case for blue, where we should return the lights to green after a delay.
-                    //this needs some more discussion
-                    if(check_variable == 1)
+                    if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))) //at this point, all controllers have confirmed lockout release
                     {
-                        lockout = 'C';
-                        colour_req = colour_cur;
-                        updateIND = 1;
+                        //we can begin releasing the lights
+                        for(uint8_t i = 0; i < numLights; i++)
+                        {
+                            if(LightTable[i].status != 'C') //if not confirmed cleared
+                            {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            //send another clear request, and set check_variable
+                                            buffer[0] = 'C';
+                                            buffer[1] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[2] = LightTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
+                                            y = MaxNets;
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                            }
+                        }
+                        //if all controllers and lights are confirmed, we can release internal lockout and return to requester 0
+                        //but there is a special case for blue, where we should return the lights to green after a delay.
+                        //this needs some more discussion
+                        if(check_variable == 1)
+                        {
+                            lockout = 'C';
+                            colour_req = colour_cur;
+                            updateIND = 1;
+                            Requester = 0;
+                        }
+                        //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
+                        else // if something was transmitted, we need to reset the timer.
+                        {
+                            GLOBAL_RetransmissionTimerSet = 0;
+                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                        }
+                    }
+                    break;
+
+                case 2: // we can return to requester 0 if the lights have confirmed colour
+                    if(colour_cur == colour_req)
                         Requester = 0;
-                    }
-                    //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                    else // if something was transmitted, we need to reset the timer.
-                    {
-                        GLOBAL_RetransmissionTimerSet = 0;
-                        xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                    }
-                }
-                break;
-                    
-            case 2: // we can return to requester 0 if the lights have confirmed colour
-                if(colour_cur == colour_req)
-                    Requester = 0;
-                break;
-            case 0:
-                break;
+                    break;
+                case 0:
+                    break;
+            }
         }
         //update indicators if needed
         if(updateIND == 1)

@@ -76,7 +76,7 @@ void dsIOInTask (void * parameters)
         {
             output[1] = 'S'; //stop
             xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
-            stopState = 'S'; //S for stopped
+            stopState = 'R'; //S for stopped
             xSemaphoreGive(xNotify);
         }
         else if(input[0] == 'O') //off button
@@ -90,7 +90,7 @@ void dsIOInTask (void * parameters)
             if(dsioStopButt() == 0)
             {
                 stopState = 'R'; //released, send a release message
-                output[1] = 'R'; //release the stop state locally
+                output[1] = 'Y'; //release the stop state locally
                 xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
                 xSemaphoreGive(xNotify);
             }

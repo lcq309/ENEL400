@@ -40,5 +40,22 @@ when switching to red, or out of red. The red light will flash. When all lights 
 
 off is a bit special, it doesn't set a lockout at all. It will only confirm lights have turned off (and override any existing lockout aside from red).
 
-The device will set the red lockout on other buttons as well, even if they are released. stop buttons will make use of a local lockout (tracking the state of the big red button)
-as well as a global lockout(tracking the state of the network). in order to prevent confusion with whether the button is released or not.
+when the release signal is sent, the lockout state will transition from 'R' to 'r', signifying the lockout can be released if all buttons are in agreement.
+('R' indicates button down, 'r' indicates button up). any stop button that has been released will be subordinate to those who have not.
+
+In order to prevent messaging confusion, the stop button will use 'x' to acknowledge a red colour change when it's own button hasn't been pressed.
+
+the query is the same as the colour change command, and only when all stop buttons are in agreement will the stop condition be allowed to release.
+stop condition is released by transitioning to a yellow lockout, which then progresses much the same as it might for a normal controller.
+
+when a stop button is trying to release (lockout 'r' and requester 1), it will check the state of the other stop buttons once per messaging cycle.
+when all stop buttons are in agreement (all status 'r'), any requester one (initiator) stop buttons will begin transitioning the network to a yellow lockout.
+the lights can be turned off anytime so long as the network has transitioned to a yellow lockout.
+The yellow lockout will release (stop buttons -> controllers -> lights) once everything has confirmed.
+at this point, controllers will be able to act normally.
+
+only the yellow lockout is released automatically, off doesn't have a lockout (only confirms all lights, and stops).
+The red lockout transitions to yellow when all stop buttons are in agreement.
+yellow releases to clear once all lights and controllers have confirmed.
+
+I should probably add some code to reset the status of everything when a colour change is requested, to avoid a situation where an initiating device has lost track of the network and thinks everything is a colour that it isn't. (on the first transmission from a requester 1 device, set the status of everything to 0).
