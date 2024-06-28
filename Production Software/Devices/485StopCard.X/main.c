@@ -45,7 +45,7 @@ uint8_t GLOBAL_DeviceType = 'S';
 #define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainWSC_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define mainWSB_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 #define MaxNets 40
 
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvWSBTask, "WSB", 700, NULL, mainWSC_TASK_PRIORITY, NULL);
+    xTaskCreate(prvWSBTask, "WSB", 700, NULL, mainWSB_TASK_PRIORITY, NULL);
     
     //setup timer
     
@@ -447,13 +447,10 @@ void prvWSBTask( void * parameters )
                             case 'r': //this is a response, this tells that the button is currently pressed.
                                 //update the state of the stop button
                                 SpecialTable[tablePos].status = 'R';
-                                updateIND = 1;
                                 break;
                                 
                             case 'x': //this is a response, this tells that the button is currently released.
-                                
                                 SpecialTable[tablePos].status = 'r'; //lowercase r means the button is released.
-                                updateIND = 1;
                                 break;
 
                             case 'Y': //if they are trying to signal yellow before we are ready to release, take over the network
@@ -463,17 +460,21 @@ void prvWSBTask( void * parameters )
                                     buffer[0] = 'R'; //take control of the network
                                     buffer[1] = SpecialTable[tablePos].index;
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    ForceCheck = 1;
                                 }
-                                else if(lockout == 'r') //we are ready to release
+                                else //we are ready to release
                                 {
                                     buffer[0] = 'y'; //confirm yellow, and release red lockout
                                     buffer[1] = SpecialTable[tablePos].index;
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     lockout = 'Y';
+                                    colour_req = 'Y';
                                     updateIND = 1;
                                 }
                                 break;
-
+                            case 'y': //this is a response, mark status
+                                SpecialTable[tablePos].status = 'Y';
+                                break;
                             case 'O': //off command, overrides any normal colour change logic (unless we are RED)
                                 if(lockout != 'R')
                                 {
@@ -494,6 +495,7 @@ void prvWSBTask( void * parameters )
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     GLOBAL_RetransmissionTimerSet = 1;
                                     updateIND = 1;
+                                    ForceCheck = 1;
                                 }
                                 break;
 
@@ -519,6 +521,7 @@ void prvWSBTask( void * parameters )
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     GLOBAL_RetransmissionTimerSet = 1;
                                     updateIND = 1;
+                                    ForceCheck = 1;
                                 }
                                 break;
                         }
@@ -544,6 +547,8 @@ void prvWSBTask( void * parameters )
         }
         if(ForceCheck == 1) //if we are forcing a state check
         {
+            for(uint8_t i = 0; i < numSpecials; i++)
+                SpecialTable[i].status = 0;
             for(uint8_t i = 0; i < numControllers; i++)
                 ControllerTable[i].status = 0;
             for(uint8_t i = 0; i < numLights; i++)
@@ -576,7 +581,7 @@ void prvWSBTask( void * parameters )
                                             y = MaxNets;
                                             //send another colour change request, and set check_variable
                                             buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            buffer[1] = SpecialTable[i].index; //load with retransmission request
                                             check_variable = 0;
                                             NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
@@ -599,7 +604,7 @@ void prvWSBTask( void * parameters )
                                         {
                                             y = MaxNets;
                                             //send another colour change request, and set check_variable
-                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[0] = 'R'; //colour_req is the colour we are requesting
                                             buffer[1] = ControllerTable[i].index; //load with retransmission request
                                             check_variable = 0;
                                             NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
@@ -615,7 +620,7 @@ void prvWSBTask( void * parameters )
                             }
                             for(uint8_t i = 0; i < numLights; i++)
                             {
-                                if(LightTable[i].status != colour_req)
+                                if(LightTable[i].status != 'R')
                                 {
                                     for(uint8_t y = 0; y < MaxNets; y++)
                                     {
@@ -623,7 +628,7 @@ void prvWSBTask( void * parameters )
                                         {
                                             y = MaxNets;
                                             //send another colour change request, and set check_variable
-                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                                            buffer[0] = 'R'; //colour_req is the colour we are requesting
                                             buffer[1] = LightTable[i].index; //load with retransmission request
                                             check_variable = 0;
                                             NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
@@ -664,7 +669,7 @@ void prvWSBTask( void * parameters )
                                             y = MaxNets;
                                             //send another colour change request, and set check_variable
                                             buffer[0] = 'R'; //R is how we can query the state
-                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                            buffer[1] = SpecialTable[i].index; //load with retransmission request
                                             check_variable = 0;
                                             NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
@@ -780,7 +785,31 @@ void prvWSBTask( void * parameters )
                         //check all controllers, lights, and stop buttons
                         //retransmit to any that haven't acknowledged the change yet
                         //set colour_cur to 'Y' once they have all confirmed
-                            for(uint8_t i = 0; i < numControllers; i++)
+                        for(uint8_t i = 0; i < numSpecials; i++)
+                            {
+                                if(SpecialTable[i].status != 'Y')
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = 'Y';
+                                            buffer[1] = SpecialTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
+                            }
+                        for(uint8_t i = 0; i < numControllers; i++)
                             {
                                 if(ControllerTable[i].status != colour_req)
                                 {
@@ -804,8 +833,8 @@ void prvWSBTask( void * parameters )
                                     }
                                 }
                             }
-                            //check lights
-                            for(uint8_t i = 0; i < numLights; i++)
+                        //check lights
+                        for(uint8_t i = 0; i < numLights; i++)
                             {
                                 if(LightTable[i].status != colour_req)
                                 {
@@ -891,6 +920,27 @@ void prvWSBTask( void * parameters )
                     {
                         for(uint8_t i = 0; i < numControllers; i++)
                             {
+                                if(SpecialTable[i].status != 'C')
+                                {
+                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    {
+                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
+                                        {
+                                            y = MaxNets;
+                                            //send another colour change request, and set check_variable
+                                            buffer[0] = 'C';
+                                            buffer[1] = SpecialTable[i].index; //load with retransmission request
+                                            check_variable = 0;
+                                            NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
+                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        }
+                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net) //already sent to this network, do not transmit
+                                        {
+                                            //just end loop and move on to next device in table
+                                            y = MaxNets;
+                                        }
+                                    }
+                                }
                                 if(ControllerTable[i].status != 'C')
                                 {
                                     for(uint8_t y = 0; y < MaxNets; y++)
