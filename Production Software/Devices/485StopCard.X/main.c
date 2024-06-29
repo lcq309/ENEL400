@@ -1057,26 +1057,6 @@ void prvWSBTask( void * parameters )
                 buffer[1] = 'F'; //flash
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
             }
-            else if(lockout == colour_cur)
-            {
-                //set single light flash to show all devices have confirmed change but are still releasing controllers
-                buffer[0] = 0xff; //all indicators
-                buffer[1] = 'O'; //off
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_cur;
-                buffer[1] = 'F'; //flash
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-            }
-            else if(lockout == (colour_cur + 32))
-            {
-                //set single light flash to show all devices have confirmed change but are still releasing lights
-                buffer[0] = 0xff; //all indicators
-                buffer[1] = 'O'; //off
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_cur;
-                buffer[1] = 'D'; //double flash
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-            }
             else if(colour_err == colour_cur)
             {
                 if(colour_cur == 'O')
