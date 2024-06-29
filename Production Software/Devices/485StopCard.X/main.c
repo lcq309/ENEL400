@@ -254,6 +254,7 @@ void prvWSBTask( void * parameters )
                             if(buffer[1] == 'R')
                             {
                                 lockout = 'R';
+                                colour_req = buffer[1];
                                 Requester = 1;
                                 ForceCheck = 1;
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
@@ -275,7 +276,16 @@ void prvWSBTask( void * parameters )
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                 GLOBAL_MessageSent = 1;
                             }
-                            
+                            else if(buffer[1] == 'R')
+                            {
+                                lockout = 'R';
+                                colour_req = buffer[1];
+                                Requester = 1;
+                                ForceCheck = 1;
+                                GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                GLOBAL_MessageSent = 1;
+                                updateIND = 1;
+                            }
                             break;
                     }
                     break;

@@ -499,6 +499,9 @@ void prvWSLTask( void * parameters )
                         case 'R': //red request, we are required to turn red
                             lockout = 'R'; //can only be released by Stop button
                             colour_req = 'R';
+                            buffer[0] = 'r'; //confirm red
+                            buffer[1] = SpecialTable[tablePos].index;
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                             break;
                             
                         case 'Y': //will send yellow when the stop command has been cleared
