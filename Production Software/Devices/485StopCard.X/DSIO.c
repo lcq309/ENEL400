@@ -71,23 +71,25 @@ void dsIOInTask (void * parameters)
     for(;;)
     {
         //wait for input (up to 25ms)
-        xQueueReceive(xPB_Queue, input, 25);
-        if(input[0] == 'R') //if red, set stop state
+        if(xQueueReceive(xPB_Queue, input, 25) == pdTRUE)
         {
-            output[1] = 'S'; //stop
-            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
-            stopState = 'R'; //S for stopped
-            xSemaphoreGive(xNotify);
+            if(input[0] == 'R') //if red, set stop state
+            {
+                output[1] = 'R'; //stop
+                xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
+                stopState = 'S'; //S for stopped
+                xSemaphoreGive(xNotify);
+            }
+            else if(input[0] == 'O') //off button
+            {
+                output[1] = 'O'; //O for off
+                xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
+                xSemaphoreGive(xNotify);
+            }
         }
-        else if(input[0] == 'O') //off button
+        if(stopState == 'S') //if stopped, check to see if it has been released yet
         {
-            output[1] = 'O'; //O for off
-            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
-            xSemaphoreGive(xNotify);
-        }
-        else if(stopState == 'S') //if stopped, check to see if it has been released yet
-        {
-            if(dsioStopButt() == 0)
+            if(dsioStopButt() == 1)
             {
                 stopState = 'R'; //released, send a release message
                 output[1] = 'Y'; //release the stop state locally

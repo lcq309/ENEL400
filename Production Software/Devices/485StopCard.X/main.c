@@ -186,7 +186,7 @@ void prvWSBTask( void * parameters )
     uint8_t numSpecials = 0;
     struct DeviceTracker MenuTable[5]; //5 connected menu devices
     uint8_t numMenus = 0;
-    uint8_t lockout = 'C'; //used to track lockout status ('R'ed, 'Y'ellow, 'C'lear)
+    volatile uint8_t lockout = 'C'; //used to track lockout status ('R'ed, 'Y'ellow, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
@@ -225,13 +225,15 @@ void prvWSBTask( void * parameters )
                     {
                         case 'C': //clear, allow colour change request
                             colour_req = buffer[1];
-                            if(buffer[1] = 'O')
+                            if(buffer[1] == 'O')
                                 lockout = 'C';
                             else
                                 lockout = buffer[1];
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            GLOBAL_MessageSent = 1;
                             ForceCheck = 1;
+                            Requester = 1;
                             break;
                         
                         case 'y': //yellow lockout clearing
@@ -245,6 +247,7 @@ void prvWSBTask( void * parameters )
                             ForceCheck = 1;
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            GLOBAL_MessageSent = 1;
                             break;
                         
                         case 'r': //red lockout clearing
@@ -254,6 +257,7 @@ void prvWSBTask( void * parameters )
                                 Requester = 1;
                                 ForceCheck = 1;
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                GLOBAL_MessageSent = 1;
                                 updateIND = 1;
                             }
                         case 'R': //red lockout, flash red for a short time for off, yellow will override
@@ -266,10 +270,12 @@ void prvWSBTask( void * parameters )
                             }
                             else if(buffer[1] == 'Y')
                             {
+                                colour_req = 'Y';
                                 lockout = 'r'; //button released, other checks need to happen before anything else can occur
-                                colour_req = 'Y'; //request for yellow
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                GLOBAL_MessageSent = 1;
                             }
+                            
                             break;
                     }
                     break;
@@ -461,6 +467,7 @@ void prvWSBTask( void * parameters )
                                     buffer[1] = SpecialTable[tablePos].index;
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     ForceCheck = 1;
+                                    Requester = 1;
                                 }
                                 else //we are ready to release
                                 {
@@ -566,7 +573,7 @@ void prvWSBTask( void * parameters )
                     //for lockout 'Y', normal controller behaviour down to 'C'
                     //for colour_req 'O', turn everything off
                     //check retransmission timers and retransmit if needed
-                    if(GLOBAL_RetransmissionTimerSet == 1 && GLOBAL_MessageSent == 1)
+                    if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))
                     {
                         if((lockout == 'R') && (Requester == 1))
                         {
@@ -644,7 +651,7 @@ void prvWSBTask( void * parameters )
                             }
                             if(check_variable == 1)
                             {
-                                colour_cur = colour_req;
+                                colour_cur = 'R';
                                 updateIND = 1;
                             }
                             //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
@@ -694,7 +701,7 @@ void prvWSBTask( void * parameters )
                                 xTimerReset(xRetransmitTimer, portMAX_DELAY);
                             }
                         }
-                        else if(colour_req == 'O')
+                        else if((colour_req == 'O') && (lockout != 'R'))
                         {
                             for(uint8_t i = 0; i < numSpecials; i++)
                             {
