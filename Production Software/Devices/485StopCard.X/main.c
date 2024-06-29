@@ -190,8 +190,8 @@ void prvWSBTask( void * parameters )
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
-    uint8_t colour_req = 'O'; //requested colour
-    volatile uint8_t colour_cur = 'O'; //current confirmed colour
+    uint8_t colour_req = 'Y'; //requested colour
+    volatile uint8_t colour_cur = 'Y'; //current confirmed colour
     volatile uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
@@ -224,11 +224,14 @@ void prvWSBTask( void * parameters )
                     switch(lockout)
                     {
                         case 'C': //clear, allow colour change request
-                            colour_req = buffer[1];
                             if(buffer[1] == 'O')
+                            {
                                 lockout = 'C';
+                                colour_cur = 0;
+                            }
                             else
                                 lockout = buffer[1];
+                            colour_req = buffer[1];
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             GLOBAL_MessageSent = 1;
@@ -275,6 +278,7 @@ void prvWSBTask( void * parameters )
                                 lockout = 'r'; //button released, other checks need to happen before anything else can occur
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                 GLOBAL_MessageSent = 1;
+                                updateIND = 1;
                             }
                             else if(buffer[1] == 'R')
                             {
@@ -486,6 +490,7 @@ void prvWSBTask( void * parameters )
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                     lockout = 'Y';
                                     colour_req = 'Y';
+                                    colour_cur = 'O';
                                     updateIND = 1;
                                 }
                                 break;
@@ -497,6 +502,7 @@ void prvWSBTask( void * parameters )
                                 {
                                     lockout = 'C';
                                     colour_req = 'O';
+                                    colour_cur = 'O';
                                     Requester = 2;
                                     updateIND = 1;
                                     buffer[0] = 'o'; //confirm off
@@ -523,6 +529,7 @@ void prvWSBTask( void * parameters )
                                 {
                                     lockout = 'C';
                                     colour_req = 'O';
+                                    colour_cur = 'O';
                                     Requester = 2;
                                     updateIND = 1;
                                     buffer[0] = 'o'; //confirm off
@@ -935,7 +942,7 @@ void prvWSBTask( void * parameters )
                 case 1:
                     if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
                     {
-                        for(uint8_t i = 0; i < numControllers; i++)
+                        for(uint8_t i = 0; i < numSpecials; i++)
                             {
                                 if(SpecialTable[i].status != 'C')
                                 {
