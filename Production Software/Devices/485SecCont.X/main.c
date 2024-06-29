@@ -1126,6 +1126,7 @@ void prvWSCTask( void * parameters )
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
             }
                 //error case should blink lights slowly.
+            updateIND = 0;
         }
         //loop and restart
     } 
