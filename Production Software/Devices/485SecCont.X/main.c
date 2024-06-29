@@ -781,7 +781,8 @@ void prvWSCTask( void * parameters )
                             case 'R': //red request, we are required to turn red
                                 lockout = 'R'; //can only be released by Stop button
                                 colour_req = 'R';
-                                Requester = 2;
+                                colour_cur = 'R';
+                                Requester = 0;
                                 updateIND = 1;
                                 buffer[0] = 'r'; //confirm red
                                 buffer[1] = SpecialTable[tablePos].index;
@@ -802,7 +803,8 @@ void prvWSCTask( void * parameters )
                             case 'O': //off command, overrides any normal colour change logic
                                 lockout = 'C';
                                 colour_req = 'O';
-                                Requester = 2;
+                                colour_cur = 'O';
+                                Requester = 0;
                                 updateIND = 1;
                                 buffer[0] = 'o'; //confirm off
                                 buffer[1] = SpecialTable[tablePos].index;
