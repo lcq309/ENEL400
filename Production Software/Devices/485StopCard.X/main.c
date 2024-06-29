@@ -497,6 +497,9 @@ void prvWSBTask( void * parameters )
                             case 'y': //this is a response, mark status
                                 SpecialTable[tablePos].status = 'Y';
                                 break;
+                            case 'o': //off command response
+                                SpecialTable[tablePos].status = 'O';
+                                break;
                             case 'O': //off command, overrides any normal colour change logic (unless we are RED)
                                 if(lockout != 'R')
                                 {
