@@ -56,14 +56,14 @@ uint8_t GLOBAL_ColourNum = 0; //3 or 4 colour light
 //task pointers
 
 void prvWiredInitTask( void * parameters );
-void prvWSLTask( void * parameters );
+void prvWPLTask( void * parameters );
 
 int main(int argc, char** argv) {
     
     //setup tasks
     
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvWSLTask, "WSL", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
+    xTaskCreate(prvWPLTask, "WPL", 600, NULL, mainWSC_TASK_PRIORITY, NULL);
     
     //grab the channel and device ID
     
@@ -174,7 +174,7 @@ void prvWiredInitTask( void * parameters )
     }
 }
 
-void prvWSLTask( void * parameters )
+void prvWPLTask( void * parameters )
 {
     /* Wired Pit light
      * maintain a table of controller indexes to easily send replies and send error messages

@@ -1,0 +1,113 @@
+The device specific main.c is responsible for providing the main running task, as well as the initialization task for devices that need to be initialized with the scheduler running.
+
+network initialization will involve a few steps:
+1. on boot, all devices perform their internal initialization and any diagnostics that they can
+2. after a short delay to allow all devices time to initialize, the coordinator sends out pings to all devices on the wired bus sequentially.
+3. the devices respond with the generic ping response and unlock any tasks waiting for initialization.
+4. after constructing the round robin table, the coordinator begins sending out sequential round robin pings to all devices that responded.
+
+the initialization task should do something to show that the device is on, like flashing an indicator.
+
+the controller task should be capable of:
+- forming a table of controllers and lights on the same network
+- the messages sent to each is identical, but the way they respond to it changes.
+
+A controller receiving a message from another controller will:
+- yield (stop trying to change light colours) if the controller is sending a command of a higher priority level
+& acknowledge (respond to the controller with the new colour) & set its internal lockout to prevent any lower priority input until released.
+
+A controller receiving a message from a light will:
+- mark the light as confirmed, if this is a confirmation response.
+- check lockout and colour status, if the message is a warning.
+- blink the corresponding indicator, if the message is an error or failure message.
+
+once all lights are confirmed:
+for green and blue, the controller will light the indicators (blue will flash for a few seconds then return to green) and blank all other indicators.
+for yellow, the controller will light the indicator and send the lockout release byte (with a delay if this wasn't the sending controller and hasn't been released yet).
+for red, the controller will start blinking all indicators.
+for off, the controller will turn off all light indicators.
+
+Green and Blue:
+Blue will always return to green after a few seconds, and blue is a somewhat lower priority signal, so don't resend more than once.
+and once confirmed, assume that the lights will return to green after (lights will confirm with blue, then green). Controller will flash blue, then return to green once confirmed.
+
+Green lockout:
+All lights must confirm green before blue can be issued.
+
+Yellow:
+Once yellow is received, lights and controller will set a yellow lockout that can only be released by either the release signal, or by the colour red which will override this lockout.
+The release command will be 2 bytes, "C" "Y" for clear yellow, and "C" "R" for clear red.
+if a clear command has been received, but not all lights are confirmed for a controller, it will stop sending commands to other controllers
+
+Clear Yellow can be sent by any controller, but they will wait a few seconds for the initiating controller before taking over (not yet implemented).
+
+Red:
+once red is received, lights and controllers will override any other lockouts, and set the red lockout. This lockout can only be released from one of the stop buttons by releasing the switch.
+
+Off:
+The off command is only sent from the director's controllers, and should be considered the lowest priority colour. Any lockouts will need to be released before a light responds to an off command.
+
+colour change operation:
+when a colour change is requested, and in progress. Flash the colours that the controller is trying to change between.
+if there is still an active lockout when trying to change colours, flash the lockout colour.
+
+in general, controllers will track light colour, but will only set requested colour when instructed by another controller.
+This way, if messages from lights arrive before a message from a controller, it will still track that message when processing the colour change.
+
+I may implement failover controller functionality later, after ensuring the communications algorithm works.
+failover can include yellow/green lockout override after a timeout.
+
+Requester 1 means this device is a requesting device, and will tell other controllers as well as lights.
+Requester 2 means this device is a helping device, and will only tell lights to avoid controllers repeat locking.
+Requester 2 will only confirm when requested by a requester 1 to minimize unnecessary traffic.
+Requester 0 means this device is idle, and will respond as though another controller is requester 1.
+
+Requester 1 can only be set by buttons (or failover functionality if implemented).
+Requester 2 is set when a colour change is requested by another controller, this controller will help change light colours until released by the initial controller.
+Requester 0 is set once the controller is released by another controller, or has confirmed the lockout conditions and released all controllers.
+
+Requester 2 sends command messages to lights, as they are only reactive.
+
+Requester 2 is released when the lockout is cleared by Requester 1.
+Requester 1 is released once all lights and controllers have confirmed the lockout release.
+- Requester 1 won't release lights until all controllers have confirmed lockout release, to prevent controller confusion
+
+Requester 2 sets colour_cur once all lights have confirmed.
+Requester 1 sets colour_cur once all lights and subordinate controllers have confirmed.
+
+Requester 2 should use a special character when responding to ensure that a loop doesn't occur between two subordinates.
+This character could be the lowercase letter so that controllers can differentiate between Requester 1 and 2.
+
+if there are multiple Requester 1's, they will release each other once all devices have confirmed colour anyways.
+
+for example:
+
+Controller A is trying to turn the network blue, it sends B to all controllers and lights and is designated as Requester 1.
+if Controller B also tries to turn the network blue before becoming a subordinate, they will both be Requester 1.
+They will see eachother as requester 1 anyways and should be able to avoid a locking situation by confirming with each other.
+
+
+for Requester 1, an uppercase status character means the colour is confirmed, but the lockout release has not been confirmed yet.
+while a lowercase means that the lockout release has been confirmed. This naming scheme can also follow for Colour_cur and Colour_req
+
+Requester 1 can also use the lockout variable to provide confirmation once all lights have locked out, so it can move on to releasing controllers.
+I.E.
+
+lockout = Y, Colour_cur = G, Colour_req = Y means not all devices have confirmed yet.
+
+lockout = Y, Colour_cur = Y, Colour_req = Y means all devices have confirmed the change, and we can start releasing lights.
+
+lockout = y, Colour_cur = Y, Colour_req = Y means all controllers have confirmed the lockout release. We can start releasing lights.
+
+lockout = C, Colour_cur = Y, Colour_req = Y means all lights and controllers have confirmed, we can return to Requester 0.
+
+lockout release response should be 'c' "clear confirm", and will respond in either a colour lockout, or no lockout to help confirm the state if a message gets lost.
+
+Colour check will take two main paths depending on the Requester level of the controller.
+
+For Requester 1, it will check the status of the other controllers as well as the lights. And if it is time to retransmit, it will queue up the messages and reset the timer
+
+For Requester 2, it will only check the status of the lights.
+
+Indicator settings will always send a command to the indicator task, if colour_cur and colour_req are different, it will flash to indicate processing a colour change operation.
+Otherwise, it if colour_cur and colour_req are the same, it will set colour_cur to solid.
