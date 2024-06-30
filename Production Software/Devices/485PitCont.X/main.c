@@ -411,34 +411,20 @@ void prvWPCTask( void * parameters )
                     {
                         switch(buffer[1]) //first byte of message
                         {
-                            case 'G': //Green colour change request
-                                //if we are requesting blue, green will override it
+                            case 'G': 
                                 switch(lockout)
                                 {
-                                    case 'C': //no lockout, this is a green request from another controller
-                                        //set lockout and colour_req to green, update controller status, and reply
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'G';
-                                        colour_req = 'G';
-                                        Requester = 2; //start helping with colour change
-                                        buffer[0] = 'g';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'B': //blue lockout will be overridden
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'G';
-                                        colour_req = 'G';
+                                    case 'C': //Clear, become a subordinate and respond
                                         Requester = 2;
-                                        buffer[0] = 'g';
+                                        updateIND = 1;
+                                        colour_req = 'G';
+                                        lockout = 'G';
                                         buffer[1] = ControllerTable[tablePos].index;
+                                        buffer[0] = 'g'; //confirmation
                                         xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                         break;
 
-                                    case 'G': //green lockout
+                                    case 'G':
                                         switch(Requester)
                                         {
                                             case 1: //this is a requester one, update status and respond with confirmation
@@ -454,17 +440,19 @@ void prvWPCTask( void * parameters )
                                                 break;
                                         }
                                         break;
-                                    default: //other lockout level, reply with lockout level
-                                        buffer[0] = lockout; 
-                                        buffer[1] = ControllerTable[tablePos].index;
+
+                                    default: //if there is a lockout, respond with the lockout colour
+                                        buffer[0] = lockout;
+                                        buffer[1] = ControllerTable[tablePos].index; //respond with controller lockout colour
+                                        //this should set the controller as requester 2 with a lockout
                                         xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                         break;
                                 }
                                 break;
-                            case 'g': //green colour change confirmation
+                            case 'g': 
                                 switch(lockout)
                                 {
-                                    case 'G': //green lockout, mark as confirmed if Requester 1
+                                    case 'G':
                                         if(Requester == 1)
                                             ControllerTable[tablePos].status = 'G';
                                         break;
@@ -472,12 +460,10 @@ void prvWPCTask( void * parameters )
                                         break;
                                 }
                                 break;
-
-                            case 'Y': //yellow colour change request
+                            case 'Y':
                                 switch(lockout)
                                 {
-                                    case 'C': //no lockout, this is a yellow request from another controller
-                                        //set lockout and colour_req to green, update controller status, and reply
+                                    case 'C': 
                                         ControllerTable[tablePos].status = buffer[1];
                                         updateIND = 1;
                                         lockout = 'Y';
@@ -488,8 +474,7 @@ void prvWPCTask( void * parameters )
                                         xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                         break;
 
-                                    case'b': //blue lockout release will be overridden
-                                    case 'B': //blue lockout will be overridden
+                                    case 'G': 
                                         ControllerTable[tablePos].status = buffer[1];
                                         updateIND = 1;
                                         lockout = 'Y';
@@ -500,20 +485,7 @@ void prvWPCTask( void * parameters )
                                         xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                         break;
 
-                                    case 'g': //green lockout release will be overridden
-                                    case 'G': //green lockout will be overridden
-                                        ControllerTable[tablePos].status = buffer[1];
-                                        updateIND = 1;
-                                        lockout = 'Y';
-                                        colour_req = 'Y';
-                                        Requester = 2;
-                                        buffer[0] = 'y';
-                                        buffer[1] = ControllerTable[tablePos].index;
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        break;
-
-                                    case 'y': //yellow lockout release will be overridden
-                                    case 'Y': //yellow lockout
+                                    case 'Y': //green lockout
                                         switch(Requester)
                                         {
                                             case 1: //this is a requester one, update status and respond with confirmation
@@ -536,11 +508,10 @@ void prvWPCTask( void * parameters )
                                         break;
                                 }
                                 break;
-
-                            case 'y': //confirm yellow 
+                            case 'y': 
                                 switch(lockout)
                                 {
-                                    case 'Y': //green lockout, mark as confirmed if Requester 1
+                                    case 'Y':
                                         if(Requester == 1)
                                             ControllerTable[tablePos].status = 'Y';
                                         break;
@@ -549,25 +520,86 @@ void prvWPCTask( void * parameters )
                                 }
                                 break;
 
-                            case 'R': //red requested by default become a subordinate and confirm
-                                ControllerTable[tablePos].status = buffer[1];
-                                lockout = 'R';
-                                colour_req = 'R';
-                                updateIND = 1;
-                                Requester = 2;
-                                buffer[0] = 'r';
-                                buffer[1] = ControllerTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            case 'R':
+                                switch(lockout)
+                                {
+                                    case 'C':
+                                        ControllerTable[tablePos].status = buffer[1];
+                                        updateIND = 1;
+                                        lockout = 'R';
+                                        colour_req = 'R';
+                                        Requester = 2; //start helping with colour change
+                                        buffer[0] = 'r';
+                                        buffer[1] = ControllerTable[tablePos].index;
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        break;
+
+                                    case 'g': 
+                                    case 'G': 
+                                        ControllerTable[tablePos].status = buffer[1];
+                                        updateIND = 1;
+                                        lockout = 'R';
+                                        colour_req = 'R';
+                                        Requester = 2;
+                                        buffer[0] = 'r';
+                                        buffer[1] = ControllerTable[tablePos].index;
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        break;
+
+                                    case 'y':
+                                    case 'Y':
+                                        ControllerTable[tablePos].status = buffer[1];
+                                        updateIND = 1;
+                                        lockout = 'R';
+                                        colour_req = 'R';
+                                        Requester = 2;
+                                        buffer[0] = 'r';
+                                        buffer[1] = ControllerTable[tablePos].index;
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        break;
+
+                                    case 'r': 
+                                    case 'R':
+                                        switch(Requester)
+                                        {
+                                            case 1: //this is a requester one, update status and respond with confirmation
+                                                ControllerTable[tablePos].status = buffer[1];
+                                                buffer[0] = 'r'; //confirmation
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+                                            case 2: //this is a subordinate requester, just respond with confirmation
+                                                buffer[0] = 'r'; //confirmation
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+                                        }
+                                        break;
+                                    default: //other lockout level, reply with lockout level
+                                        buffer[0] = lockout; 
+                                        buffer[1] = ControllerTable[tablePos].index;
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        break;
+                                }
                                 break;
 
-                            case 'r': //red confirmation, shouldn't end up here normally, just ignore for now
+                            case 'r':
+                                switch(lockout)
+                                {
+                                    case 'R': 
+                                        if(Requester == 1)
+                                            ControllerTable[tablePos].status = 'R';
+                                        break;
+                                    default: //other lockout level, just ignore
+                                        break;
+                                }
                                 break;
-
+                                
                             //lockout clear requests go here
                             case 'C':
                                 switch(buffer[2])
                                 {
-                                    case 'Y': //clear yellow lockout, clear and confirm by sending 'c' in response
+                                    case 'G':
                                         switch(lockout)
                                         {
                                             case 'C': //lockout already cleared, confirm
@@ -575,42 +607,7 @@ void prvWPCTask( void * parameters )
                                                 buffer[1] = ControllerTable[tablePos].index;
                                                 xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                                 break;
-
-                                            case 'Y': //clear the yellow lockout and confirm clearance.
-                                                if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
-                                                    lockout = 'Y';
-                                                else    //if we are not responsible for releasing lights, assume all lights are the correct colour
-                                                {
-                                                    lockout = 'C';
-                                                    colour_cur = 'Y';
-                                                    updateIND = 1;
-                                                }
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'y': //we are working on clearing lights, just confirm clearance.
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            default: //just ignore anything else for now
-                                                break;
-                                        }
-                                        break;
-
-                                    case 'G': //clear green lockout, clear and confirm by sending 'c' 'g' in response
-                                        switch(lockout)
-                                        {
-                                            case 'C': //lockout already cleared, confirm
-                                                buffer[0] = 'c';
-                                                buffer[1] = ControllerTable[tablePos].index;
-                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                                break;
-
-                                            case 'G': //clear the yellow lockout and confirm clearance.
+                                            case 'G': //clear the blue lockout and confirm clearance.
                                                 if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
                                                     lockout = 'G';
                                                 else
@@ -625,6 +622,74 @@ void prvWPCTask( void * parameters )
                                                 break;
 
                                             case 'g': //we are working on clearing lights, just confirm clearance.
+                                                buffer[0] = 'c';
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+
+                                            default: //just ignore anything else for now
+                                                break;
+                                        }
+                                        break;
+
+                                    case 'R':
+                                        switch(lockout)
+                                        {
+                                            case 'C': //lockout already cleared, confirm
+                                                buffer[0] = 'c';
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+
+                                            case 'R': //clear the yellow lockout and confirm clearance.
+                                                if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
+                                                    lockout = 'R';
+                                                else    //if we are not responsible for releasing lights, assume all lights are the correct colour
+                                                {
+                                                    lockout = 'C';
+                                                    colour_cur = 'R';
+                                                    updateIND = 1;
+                                                }
+                                                buffer[0] = 'c';
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+
+                                            case 'r': //we are working on clearing lights, just confirm clearance.
+                                                buffer[0] = 'c';
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+
+                                            default: //just ignore anything else for now
+                                                break;
+                                        }
+                                        break;
+
+                                    case 'Y': //clear green lockout, clear and confirm by sending 'c' 'g' in response
+                                        switch(lockout)
+                                        {
+                                            case 'C': //lockout already cleared, confirm
+                                                buffer[0] = 'c';
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+
+                                            case 'Y': //clear the yellow lockout and confirm clearance.
+                                                if(Requester == 1) //if we are responsible for releasing lights, don't change lockout level yet
+                                                    lockout = 'Y';
+                                                else
+                                                {
+                                                    lockout = 'C';
+                                                    colour_cur = 'Y';
+                                                    updateIND = 1;
+                                                }
+                                                buffer[0] = 'c';
+                                                buffer[1] = ControllerTable[tablePos].index;
+                                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                                break;
+
+                                            case 'y': //we are working on clearing lights, just confirm clearance.
                                                 buffer[0] = 'c';
                                                 buffer[1] = ControllerTable[tablePos].index;
                                                 xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
