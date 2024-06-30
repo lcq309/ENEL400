@@ -1088,3 +1088,5 @@ Production Software/Devices/485SecCont.X/.generated_files/flags/default/f3bee639
 /Production Software/Devices/485StopCard.X/.generated_files/flags/default
 *.inx
 *.inx
+/Production Software/Devices/485PitLight.X/.generated_files/flags
+Production Software/Devices/485PitLight.X/defmplabxtrace.log.inx

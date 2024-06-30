@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/485StopCard.X.production.elf">                 
+  <executable name="dist/default/debug/485SecLight.X.debug.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>25811</used>                     
-      <free>105261</free>                     
+      <used>22218</used>                     
+      <free>108854</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 
       <length>16384</length>                 
-      <used>11382</used>                     
-      <free>5002</free>                     
+      <used>11376</used>                     
+      <free>5008</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

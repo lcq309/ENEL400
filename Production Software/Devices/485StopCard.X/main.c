@@ -341,6 +341,14 @@ void prvWSBTask( void * parameters )
                     router = 'L';
                     break;
                     
+                case '5': //pit controller
+                    router = 'C';
+                    break;
+                    
+                case '6': //pit light
+                    router = 'L';
+                    break;
+                    
                 case 'S': //stop button card
                     router = 'S';
                     break;
