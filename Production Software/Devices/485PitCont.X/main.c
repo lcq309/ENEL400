@@ -40,7 +40,7 @@ struct DeviceTracker
 //define global variables
 uint8_t GLOBAL_DeviceID = 0;
 uint8_t GLOBAL_Channel = 0;
-uint8_t GLOBAL_DeviceType = '5'; wired pit controller
+uint8_t GLOBAL_DeviceType = '5'; //wired pit controller
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
@@ -239,7 +239,8 @@ void prvWPCTask( void * parameters )
                         case 'G': //green lockout, allow yellow through but not blue
                             switch(buffer[1])
                             {
-                                case 'Y': //yellow light
+                                case 'R': //red button
+                                case 'Y': //yellow button
                                     colour_req = buffer[1];
                                     lockout = buffer[1];
                                     colour_cur = 'O'; //reset processing
@@ -266,25 +267,62 @@ void prvWPCTask( void * parameters )
                             break;
                             
                         case 'y': //yellow lockout clearing
-                        case 'Y': //yellow lockout, flash yellow for a short time
-                            colour_req = 'Y'; //reset processing
-                            colour_cur = 'O'; //reset processing
-                            lockout = 'Y'; //reset processing
-                            buffer[0] = 0xff;
-                            buffer[1] = 'O'; //turn all off first
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            buffer[0] = 'Y';
-                            buffer[1] = 'W'; //yellow warn flash
-                            xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
-                            updateIND = 1;
-                            ForceCheck = 1;
-                            GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
-                            breakloop = 1; //break the loop so this command can be processed right away.
-                            //running code will fix indicators after this delay has passed.
+                        case 'Y': //Yellow lockout, allow red through but nothing else
+                            switch(buffer[1])
+                            {
+                                case 'R': //red button
+                                case 'Y': //yellow button
+                                    colour_req = buffer[1];
+                                    lockout = buffer[1];
+                                    colour_cur = 'O'; //reset processing
+                                    Requester = 1; //we are initiating this change
+                                    ForceCheck = 1;
+                                    updateIND = 1; //update the indicators
+                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                    break;
+                                    
+                                case 'G': //block green and warn
+                                    //flash Yellow for a short time
+                                    buffer[0] = 0xff;
+                                    buffer[1] = 'O'; //turn all off first
+                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
+                                    buffer[0] = 'Y';
+                                    buffer[1] = 'W'; //green warn flash
+                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
+                                    updateIND = 1;
+                                    break;
+                            }
+                            break;
+
+                        case 'r': //red lockout clearing
+                        case 'R': //Red lockout, allow red through but nothing else
+                            switch(buffer[1])
+                            {
+                                case 'R': //Red button
+                                    colour_req = buffer[1];
+                                    lockout = buffer[1];
+                                    colour_cur = 'O'; //reset processing
+                                    Requester = 1; //we are initiating this change
+                                    ForceCheck = 1;
+                                    updateIND = 1; //update the indicators
+                                    GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                                    break;
+                                    
+                                case 'Y': //block yellow and green and warn
+                                case 'G':
+                                    //flash Red for a short time
+                                    buffer[0] = 0xff;
+                                    buffer[1] = 'O'; //turn all off first
+                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
+                                    buffer[0] = 'R';
+                                    buffer[1] = 'W'; //green warn flash
+                                    xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
+                                    updateIND = 1;
+                                    break;
+                            }
                             break;
                             
-                        case 'r': //red lockout clearing
-                        case 'R': //red lockout, flash all for a short time
+                        case 'S': //stop button pressed, warn all
                             buffer[0] = 0xff;
                             buffer[1] = 'O'; //turn all off first
                             xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);

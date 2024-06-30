@@ -4,7 +4,7 @@
  * 
  * Created on April 26, 2024
  * 
- * This is meant to be a generic Sector Light on the wired network
+ * This is meant to be a generic Pit Light on the wired network
  * which means that it drives a light with either 3 or 4 colours
  * there is a physical way to check which one this is.
  */
@@ -319,14 +319,13 @@ void prvWPLTask( void * parameters )
                                     break;
                                 
                                 case 'G': //Green light confirmation
-                                    
-                                case 'B': //blue lockout will be overridden
                                     lockout = 'G';
                                     colour_req = 'G';
                                     buffer[1] = ControllerTable[tablePos].index;
                                     buffer[0] = 'g'; //confirmation
                                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                     break;
+                                    
                                 default: //other lockout level, just ignore
                                     break;
                             }
@@ -336,14 +335,6 @@ void prvWPLTask( void * parameters )
                             switch(lockout)
                             {
                                 case 'C': //Yellow colour request
-                                    lockout = 'Y';
-                                    colour_req = 'Y';
-                                    buffer[1] = ControllerTable[tablePos].index;
-                                    buffer[0] = 'y'; //confirmation
-                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                    break;
-                                
-                                case 'B': //blue lockout will be overridden
                                     lockout = 'Y';
                                     colour_req = 'Y';
                                     buffer[1] = ControllerTable[tablePos].index;
@@ -378,7 +369,7 @@ void prvWPLTask( void * parameters )
                         case 'C':
                             switch(buffer[2])
                             {
-                                case 'B': //clear blue lockout, clear and confirm by sending 'c' in response
+                                case 'R': //clear red lockout, clear and confirm by sending 'c' in response
                                     switch(lockout)
                                     {
                                         case 'C': //lockout already cleared, confirm
@@ -387,7 +378,7 @@ void prvWPLTask( void * parameters )
                                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
                                             break;
                                             
-                                        case 'B': //clear the blue lockout and confirm clearance.
+                                        case 'R': //clear the blue lockout and confirm clearance.
                                             lockout = 'C';
                                             buffer[0] = 'c';
                                             buffer[1] = ControllerTable[tablePos].index;
