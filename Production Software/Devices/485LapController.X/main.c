@@ -271,6 +271,7 @@ void prvWLCTask( void * parameters )
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             
                     }
+                    break;
                     
                 case 'T': //timers
                 {
@@ -356,6 +357,12 @@ void prvWLCTask( void * parameters )
                                 DigitTwo = buffer[3];
                                 Requester = 0;
                                 updateIND = 1;
+                                //reply
+                                buffer[0] = 'C'; //'C' specifies this as a confirmation
+                                buffer[1] = DigitOne;
+                                buffer[2] = DigitTwo;
+                                buffer[3] = ControllerTable[tablePos].index;
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 4, 5);
                                 break;
                         }
                     }

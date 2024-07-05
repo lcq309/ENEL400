@@ -1,0 +1,25 @@
+The device specific main.c is responsible for providing the main running task, as well as the initialization task for devices that need to be initialized with the scheduler running.
+
+network initialization will involve a few steps:
+1. on boot, all devices perform their internal initialization and any diagnostics that they can
+2. after a short delay to allow all devices time to initialize, the coordinator sends out pings to all devices on the wired bus sequentially.
+3. the devices respond with the generic ping response and unlock any tasks waiting for initialization.
+4. after constructing the round robin table, the coordinator begins sending out sequential round robin pings to all devices that responded.
+
+The initialization task should do something to show that the device is on, like flashing the display.
+
+The task needs to store the state of two digits for the lap count display. They should increment logically, with the left most digit being off until needed.
+With a separate counter to store the current lap as well.
+
+Other buttons will do special things
+0 will zero out the display (turn it off and reset the lap count byte)
+halfway will set characters HF and increment the internal counter by one, when the up button is pressed again it will just display as normal.
+The last lap button will set characters LL, and when the up button is pressed again it will set characters FN.
+If the down button is pressed after the HF or LL, it will just serve to reverse the signal.
+
+So the controller logic can respond differently based on the currently displayed symbols. If the display is 'L''L' and up is pressed, instead of just incrementing the count it displays 'F''N'.
+
+The dsioOUT task is responsible for controlling the control panel display, so it will structure the i2c messages and send them out to the display using the i2c peripheral.
+
+the disoIN task just passes button presses to the main task.
+The main task tracks the current lap number, and mostly works off logic based on that.

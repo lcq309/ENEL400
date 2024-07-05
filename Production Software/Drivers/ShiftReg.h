@@ -75,6 +75,11 @@ uint8_t ShiftIn(void);
  */
 void LTCHIn(void);
 
+/* Translate Char
+ * translates a character to the output format required for the shift registers
+ */
+uint8_t ShiftTranslate (uint8_t in);
+
 #ifdef	__cplusplus
 }
 #endif

@@ -14,8 +14,6 @@
 #include "semphr.h"
 #include "event_groups.h"
 #include "timers.h"
-#include "I2C.h"
-#include "stream_buffer.h"
 
 #ifndef DSIO_H
 #define	DSIO_H
@@ -40,14 +38,9 @@ extern "C" {
     extern TimerHandle_t xINDTimer;
     
     //queue handles
-
-    extern QueueHandle_t xPB_Queue;
+    
     extern QueueHandle_t xIND_Queue;
     extern QueueHandle_t xDeviceIN_Queue;
-    
-    //stream handle
-    
-    extern StreamBufferHandle_t xI2C_out_Buffer;
     
     //Event Groups
     extern EventGroupHandle_t xEventInit;
