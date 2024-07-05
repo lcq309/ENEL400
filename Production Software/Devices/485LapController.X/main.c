@@ -354,6 +354,7 @@ void prvWLCTask( void * parameters )
                             case 'U': //update message
                                 DigitOne = buffer[2];
                                 DigitTwo = buffer[3];
+                                Requester = 0;
                                 updateIND = 1;
                                 break;
                         }
@@ -385,71 +386,6 @@ void prvWLCTask( void * parameters )
                             default: //anything else should just be state confirmations
                                 if((DigitOne == buffer[2]) && (DigitTwo == buffer[3]))
                                     ControllerTable[tablePos].status = 'C';
-                                break;
-                        }
-                    }
-                    break;
-                    
-                    //check table and add if needed
-                    for(uint8_t i = 0; i < numSpecials; i++)
-                    {
-                        if(SpecialTable[i].index == buffer[0])
-                        {
-                            match = 1;
-                            tablePos = i;
-                            i = numSpecials;
-                        }
-                    }
-                    if(match != 1) //if no match found, add to table
-                    {
-                        SpecialTable[numSpecials].index = buffer[0];
-                        tablePos = numSpecials;
-                        numSpecials++;
-                    }
-                    if(length > 1)
-                    {
-                        switch(buffer[1])
-                        {
-                            case 'R': //red request, we are required to turn red
-                                lockout = 'R'; //can only be released by Stop button
-                                colour_req = 'R';
-                                colour_cur = 'R';
-                                Requester = 0;
-                                updateIND = 1;
-                                buffer[0] = 'r'; //confirm red
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                break;
-
-                            case 'Y': //will send yellow when the stop command has been cleared
-                                //overrides any normal colour change logic, will be released by the stop button
-                                lockout = 'Y';
-                                colour_req = 'Y';
-                                Requester = 2;
-                                updateIND = 1;
-                                buffer[0] = 'y'; //confirm yellow
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                break;
-
-                            case 'O': //off command, overrides any normal colour change logic
-                                lockout = 'C';
-                                colour_req = 'O';
-                                colour_cur = 'O';
-                                Requester = 0;
-                                updateIND = 1;
-                                buffer[0] = 'o'; //confirm off
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                break;
-
-                            case 'C': //Clear command, stop light is special and doesn't need to follow the same rules that a controller would
-                                lockout = 'C';
-                                colour_cur = colour_req;
-                                updateIND = 1;
-                                buffer[0] = 'c'; //confirm clear
-                                buffer[1] = SpecialTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                 break;
                         }
                     }
@@ -487,7 +423,7 @@ void prvWLCTask( void * parameters )
                         //check other controllers
                         for(uint8_t i = 0; i < numControllers; i++)
                         {
-                            if(ControllerTable[i].status != colour_req)
+                            if(ControllerTable[i].status != 'C')
                             {
                                 for(uint8_t y = 0; y < MaxNets; y++)
                                 {
@@ -495,11 +431,13 @@ void prvWLCTask( void * parameters )
                                     {
                                         y = MaxNets;
                                         //send another colour change request, and set check_variable
-                                        buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[1] = ControllerTable[i].index; //load with retransmission request
+                                        buffer[0] = 'U'; //'U' specifies this as an update command
+                                        buffer[1] = DigitOne;
+                                        buffer[2] = DigitTwo;
+                                        buffer[3] = ControllerTable[i].index;
                                         check_variable = 0;
                                         NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 4, 5);
                                     }
                                     else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
                                     {
@@ -512,7 +450,7 @@ void prvWLCTask( void * parameters )
                         //check lights
                         for(uint8_t i = 0; i < numDisplays; i++)
                         {
-                            if(DisplayTable[i].status != colour_req)
+                            if(DisplayTable[i].status != 'C')
                             {
                                 for(uint8_t y = 0; y < MaxNets; y++)
                                 {
@@ -520,11 +458,13 @@ void prvWLCTask( void * parameters )
                                     {
                                         y = MaxNets;
                                         //send another colour change request, and set check_variable
-                                        buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[1] = DisplayTable[i].index; //load with retransmission request
+                                        buffer[0] = 'U'; //'U' specifies this as an update command
+                                        buffer[1] = DigitOne;
+                                        buffer[2] = DigitTwo;
+                                        buffer[3] = DisplayTable[i].index;
                                         check_variable = 0;
                                         NetSent[y] = GLOBAL_DEVICE_TABLE[DisplayTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 4, 5);
                                     }
                                     else if(NetSent[y] == GLOBAL_DEVICE_TABLE[DisplayTable[i].index].Net) //already sent to this network, do not transmit
                                     {
@@ -534,10 +474,10 @@ void prvWLCTask( void * parameters )
                                 }
                             }
                         }
-                        //if all colours are matching, we can set colour_cur to colour_req
+                        //if all devices are matching, we can stop blinking the display
                         if(check_variable == 1)
                         {
-                            colour_cur = colour_req;
+                            Requester = 0;
                             updateIND = 1;
                         }
                         //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
@@ -549,213 +489,29 @@ void prvWLCTask( void * parameters )
                     }
                     break;
                         
-                case 2: //Subordinate Requester, not yet implemented
-                    /*if(GLOBAL_RetransmissionTimerSet == 1)
-                    {
-                        //check lights
-                        for(uint8_t i = 0; i < numLights; i++)
-                        {
-                            if(LightTable[i].status != colour_req)
-                            {
-                                //send another colour change request, and set check_variable
-                                buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                buffer[1] = LightTable[i].index; //load with retransmission request
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, portMAX_DELAY);
-                                check_variable = 0;
-                            }
-                        }
-                        //if all colours are matching, we can set colour_cur to colour_req
-                        if(check_variable == 1)
-                        {
-                            colour_cur = colour_req;
-                        }
-                        //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                        else // if something was transmitted, we need to reset the timer.
-                        {
-                            GLOBAL_RetransmissionTimerSet = 0;
-                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                        }
-                    }*/
-                    break;
-                        
                 case 0: //just do nothing if we are not set to request anything
                     break;
             }
-        check_variable = 1;
-        //if we are requester 1, we should ensure that first the controller lockouts are released
-        //as a requester 2, we can return to requester 0 once all lights have confirmed colour
-        //at this point, all lights and controllers have confirmed colour change, so we need to start releasing lockouts
-        switch(Requester)
-        {
-            case 1:
-                if((lockout == colour_cur) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1)) //at this point, all devices have confirmed change and we should start releasing lockouts
-                {
-                    for(uint8_t i = 0; i < numControllers; i++)
-                        {
-                            if(ControllerTable[i].status != 'C')
-                            {
-                                for(uint8_t y = 0; y < MaxNets; y++)
-                                {
-                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                    {
-                                        //send another clear request, and set check_variable
-                                        buffer[0] = 'C';
-                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[2] = ControllerTable[i].index; //load with retransmission request
-                                        check_variable = 0;
-                                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                                        y = MaxNets;
-                                    }
-                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
-                                    {
-                                        //just end loop and move on to next device in table
-                                        y = MaxNets;
-                                    }
-                                }
-                            }
-                        }
-                    //if all controllers are confirmed, we can move on to releasing lights
-                    if(check_variable == 1)
-                    {
-                        lockout = lockout + 32; //switch to lowercase lockout letter
-                        updateIND = 1;
-                    }
-                    //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                    else // if something was transmitted, we need to reset the timer.
-                    {
-                        GLOBAL_RetransmissionTimerSet = 0;
-                        xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                    }
-                }
-                if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))) //at this point, all controllers have confirmed lockout release
-                {
-                    //we can begin releasing the lights
-                    for(uint8_t i = 0; i < numDisplays; i++)
-                    {
-                        if(DisplayTable[i].status != 'C') //if not confirmed cleared
-                        {
-                                for(uint8_t y = 0; y < MaxNets; y++)
-                                {
-                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                    {
-                                        //send another clear request, and set check_variable
-                                        buffer[0] = 'C';
-                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
-                                        buffer[2] = DisplayTable[i].index; //load with retransmission request
-                                        check_variable = 0;
-                                        NetSent[y] = GLOBAL_DEVICE_TABLE[DisplayTable[i].index].Net; //update NetSent table
-                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                                        y = MaxNets;
-                                    }
-                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[DisplayTable[i].index].Net) //already sent to this network, do not transmit
-                                    {
-                                        //just end loop and move on to next device in table
-                                        y = MaxNets;
-                                    }
-                                }
-                        }
-                    }
-                    //if all controllers and lights are confirmed, we can release internal lockout and return to requester 0
-                    //but there is a special case for blue, where we should return the lights to green after a delay.
-                    //this needs some more discussion
-                    if(check_variable == 1)
-                    {
-                        lockout = 'C';
-                        colour_req = colour_cur;
-                        updateIND = 1;
-                        Requester = 0;
-                    }
-                    //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                    else // if something was transmitted, we need to reset the timer.
-                    {
-                        GLOBAL_RetransmissionTimerSet = 0;
-                        xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                    }
-                }
-                break;
-                    
-            case 2: // we can return to requester 0 if the lights have confirmed colour
-                if(colour_cur == colour_req)
-                    Requester = 0;
-                break;
-            case 0:
-                break;
-        }
+        //at this point, all controllers and displays have confirmed the numbers, we can update our own display.
         //update indicators if needed
         if(updateIND == 1)
         {
-            if(colour_cur != colour_req)
+            if(Requester == 1)
             {
-                //set both to flash
-                //discard errors here
-                colour_err = 0;
-                buffer[0] = 0xff; //all indicators
-                buffer[1] = 'O'; //off
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_cur;
-                buffer[1] = 'F'; //flash
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_req;
-                buffer[1] = 'F'; //flash
+                //set output to flashing
+                buffer[0] = DigitOne;
+                buffer[1] = DigitTwo;
+                buffer[2] = 'F'; //flash
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
             }
-            else if(lockout == colour_cur)
+            else
             {
-                //set single light flash to show all devices have confirmed change but are still releasing controllers
-                buffer[0] = 0xff; //all indicators
-                buffer[1] = 'O'; //off
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_cur;
-                buffer[1] = 'F'; //flash
+                //set output to solid
+                buffer[0] = DigitOne;
+                buffer[1] = DigitTwo;
+                buffer[2] = 'S'; //solid
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
             }
-            else if(lockout == (colour_cur + 32))
-            {
-                //set single light flash to show all devices have confirmed change but are still releasing lights
-                buffer[0] = 0xff; //all indicators
-                buffer[1] = 'O'; //off
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_cur;
-                buffer[1] = 'D'; //double flash
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-            }
-            else if(colour_err == colour_cur)
-            {
-                if(colour_cur == 'O')
-                {
-                    //blink all indicators, if a light hasn't turned off
-                    //set single light flash to show all devices have confirmed change but are still releasing lights
-                    buffer[0] = 0xff; //all indicators
-                    buffer[1] = 'O'; //off
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    buffer[0] = 0xff;
-                    buffer[1] = 'B'; //blink
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                }
-                else
-                {
-                    //set single light flash to show all devices have confirmed change but are still releasing lights
-                    buffer[0] = 0xff; //all indicators
-                    buffer[1] = 'O'; //off
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                    buffer[0] = colour_cur;
-                    buffer[1] = 'B'; //blink
-                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                }
-            }
-            else if(colour_cur == colour_req)
-            {
-                //set solid
-                buffer[0] = 0xff; //all indicators
-                buffer[1] = 'O'; //off
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-                buffer[0] = colour_cur;
-                buffer[1] = 'S'; //solid
-                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
-            }
-                //error case should blink lights slowly.
-            updateIND = 0;
         }
         //loop and restart
     } 

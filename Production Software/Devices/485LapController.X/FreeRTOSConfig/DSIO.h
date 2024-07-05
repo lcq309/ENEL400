@@ -14,6 +14,8 @@
 #include "semphr.h"
 #include "event_groups.h"
 #include "timers.h"
+#include "I2C.h"
+#include "stream_buffer.h"
 
 #ifndef DSIO_H
 #define	DSIO_H
@@ -61,21 +63,6 @@ extern "C" {
      * 'T' should set the transceiver, 'R' should set the receiver.
      */
     void RS485TR(uint8_t dir);
-    
-    /* output indicator functions
-     * functions to toggle, turn on, or turn off the output indicators
-     */
-    void dsioYellowOn(void);
-    void dsioYellowOff(void);
-    void dsioYellowTGL(void);
-    
-    void dsioRedOn(void);
-    void dsioRedOff(void);
-    void dsioRedTGL(void);
-    
-    void dsioGreenOn(void);
-    void dsioGreenOff(void);
-    void dsioGreenTGL(void);
     
 #ifdef	__cplusplus
 }

@@ -25,21 +25,28 @@
     QueueHandle_t xIND_Queue;
     QueueHandle_t xDeviceIN_Queue;
     
+    //stream buffer
+
+    StreamBufferHandle_t xI2C_out_Buffer;
+    
 void DSIOSetup()
 {
     //485 R/W pin setup
     PORTD.DIRSET = PIN7_bm;
     PORTD.OUTCLR = PIN7_bm;
     
-    //Indicator pin setup
-    PORTA.DIRSET = PIN7_bm;
-    PORTC.DIRSET = PIN0_bm | PIN1_bm;
+    //I2C setup
+    I2C_init();
     
     //setup Queues
     
     xPB_Queue = xQueueCreate(1, sizeof(uint8_t)); //up to 1 button presses held
-    xIND_Queue = xQueueCreate(4, 2 * sizeof(uint8_t)); // up to 4 Indicator Commands held
+    xIND_Queue = xQueueCreate(4, 3 * sizeof(uint8_t)); // up to 4 Indicator Commands held
     xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
+    
+    //setup stream buffer
+    
+    xI2C_out_Buffer = xStreamBufferCreate(20,1); //20 bytes, triggers when a byte is added
     
     //setup tasks
     
@@ -56,11 +63,14 @@ void DSIOSetup()
 void dsIOInTask (void * parameters)
 {
     //initialize inputs
-    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm;
+    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm;
+    PORTC.DIRCLR = PIN3_bm;
     //Then I will set up the multi-configure register for port D.
     PORTD.PINCONFIG = 0x3 | PORT_PULLUPEN_bm; //enable falling edge interrupt and pullup
     //update configuration for selected pins
-    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm;
+    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm;
+    // single pin configuration for PORT C
+    PORTC.PIN3CTRL |= PORT_PULLUPEN_bm | 0x3;
             
     //for now, this just reads button presses with a half second debounce delay to avoid spam.
     //block until a button press occurs, then check anti spam timer and reset timer
@@ -72,10 +82,7 @@ void dsIOInTask (void * parameters)
         //wait for input
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
         output[1] = input[0];
-        if(input[0] == 'Y') //if yellow, send to front
-            xQueueSendToFront(xDeviceIN_Queue, output, portMAX_DELAY);
-        else
-            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
+        xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
         xSemaphoreGive(xNotify);
         //send message to inter-task queue
     }
@@ -88,10 +95,11 @@ void dsIOOutTask (void * parameters)
     //this controls the three indicators on the console
     //blink should be somewhat slow, flash should be faster (mostly used for blue, initialization, and maybe errors)
     
-    //indicator state buffers initialized to zero
-    static uint8_t GREEN = 0; 
-    static uint8_t YELLOW = 0; 
-    static uint8_t BLUE = 0;
+    //digit state buffer initialized to zero.
+    static uint8_t DigitOne = 0;
+    static uint8_t DigitTwo = 0;
+    static uint8_t displaytype = 0; //flashing, solid, off
+    uint8_t state = 0; //for flashing
     
     //time buffers for flash and latches
     static uint8_t flash = 0; 
@@ -100,11 +108,14 @@ void dsIOOutTask (void * parameters)
     
     //setup IO
     
-    PORTA.DIRSET = PIN7_bm;
-    PORTC.DIRSET = PIN0_bm | PIN1_bm;
-    
     //receiver buffer
-    uint8_t received[2];
+    uint8_t received[3];
+
+    //output buffer
+    uint8_t output[9] = {0,0,0,0,0,0,0,0,0};
+    
+    //working digit buffer
+    uint16_t digit = 0;
     
     //running loop
     for(;;)
@@ -112,25 +123,10 @@ void dsIOOutTask (void * parameters)
         //first, check for commands from other tasks (hold for 50ms)
         if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
         {
-        switch(received[0]) //first check the intended target
-        {
-            case 0x0: //do nothing/no target
-                break;
-            case 'G': //Green indicator
-                GREEN = received[1];
-                break;
-            case 'Y': //Yellow indicator
-                YELLOW = received[1];
-                break;
-            case 'B': //Blue indicator
-                BLUE = received[1];
-                break;
-            case 0xff: //All indicators
-                GREEN = received[1];
-                YELLOW = received[1];
-                BLUE = received[1];
-                break;
-        }
+            //set the digits and mode
+            received[0] = DigitOne;
+            received[1] = DigitTwo;
+            received[2] = displaytype;
         }
         //if timer has triggered, increment ms250 and reset flash and blink timers
         if(xINDTimerSet == 1)
@@ -144,162 +140,55 @@ void dsIOOutTask (void * parameters)
             flash = 0;
             xINDTimerSet = 0;
         }
-        //process green first
-        switch(GREEN)
+        //process based on display mode
+        switch(displaytype)
         {
-            case 'B': //blink
-                if(blink == 0 && ms250 == 0)
-                    dsioGreenTGL();
-            break;
-            
-            case 'F': //flash
-                if(flash == 0)
-                    dsioGreenTGL();
-            break;
-            
-            case 'D': //double flash
+            case 'S': //solid
+                state = 1;
+                break;
+
+            case 'F': //flashing
                 if(flash == 0)
                 {
-                    dsioGreenOn();
-                    vTaskDelay(5);
-                    dsioGreenTGL();
-                    vTaskDelay(5);
-                    dsioGreenTGL();
-                    vTaskDelay(5);
-                    dsioGreenOff();
+                    if(state == 1)
+                        state = 0;
+                    else
+                        state = 1;
                 }
                 break;
-                
-            case 'W': //warning flash (used for lockout warning)
-                dsioGreenOn();
-                vTaskDelay(5);
-                dsioGreenTGL();
-                vTaskDelay(5);
-                dsioGreenTGL();
-                vTaskDelay(5);
-                dsioGreenTGL();
-                vTaskDelay(5);
-                dsioGreenTGL();
-                vTaskDelay(5);
-                dsioGreenTGL();
-                vTaskDelay(5);
-                dsioGreenTGL();
-                vTaskDelay(5);
-                dsioGreenOff();
-                break;
-                
-                            
-            case 'S': //solid
-                dsioGreenOn();
-            break;
-            
+
             case 'O': //off
-                dsioGreenOff();
-            break;
+                state = 0;
+                break;
         }
-        //process blue
-        switch(BLUE)
+        switch(state) //display is either on or off, based on state
         {
-            case 'B': //blink
-                if(blink == 0 && ms250 == 0)
-                    dsioBlueTGL();
-            break;
-            
-            case 'F': //flash
-                if(flash == 0)
-                    dsioBlueTGL();
-            break;
-            
-            case 'D': //double flash
-                if(flash == 0)
+            case 1: //on
+                //first and last digit is always left blank
+                digit = I2C_translate(DigitOne);
+                output[3] = digit & 0xff;
+                output[4] = (digit >> 8) & 0xff;
+                digit = I2C_translate(DigitTwo);
+                output[5] = digit & 0xff;
+                output[6] = (digit >> 8) & 0xff;
+                xStreamBufferSend(xI2C_out_Buffer, output, 9, 10);
+                //with the message loaded, load the address buffer with the address for the display
+                TWI0.MADDR = 0x70;
+                //start message sending by enabling the interrupt
+                TWI0.MCTRLA |= TWI_WIEN_bm;
+                break;
+                
+            case 0: //off
+                for(uint8_t i = 0; i < 9; i++)
                 {
-                    dsioBlueOn();
-                    vTaskDelay(5);
-                    dsioBlueTGL();
-                    vTaskDelay(5);
-                    dsioBlueTGL();
-                    vTaskDelay(5);
-                    dsioBlueOff();
+                    output[i] = 0;
                 }
+                xStreamBufferSend(xI2C_out_Buffer, output, 9, 10);
+                //with the message loaded, load the address buffer with the address for the display
+                TWI0.MADDR = 0x70;
+                //start message sending by enabling the interrupt
+                TWI0.MCTRLA |= TWI_WIEN_bm;
                 break;
-                
-            case 'W': //warning flash (used for lockout warning)
-                dsioBlueOn();
-                vTaskDelay(5);
-                dsioBlueTGL();
-                vTaskDelay(5);
-                dsioBlueTGL();
-                vTaskDelay(5);
-                dsioBlueTGL();
-                vTaskDelay(5);
-                dsioBlueTGL();
-                vTaskDelay(5);
-                dsioBlueTGL();
-                vTaskDelay(5);
-                dsioBlueTGL();
-                vTaskDelay(5);
-                dsioBlueOff();
-                break;
-                
-            case 'S': //solid
-                dsioBlueOn();
-            break;
-            
-            case 'O': //off
-                dsioBlueOff();
-            break;
-        }
-        //process yellow
-        switch(YELLOW)
-        {
-            case 'B': //blink
-                if(blink == 0 && ms250 == 0)
-                    dsioYellowTGL();
-            break;
-            
-            case 'F': //flash
-                if(flash == 0)
-                    dsioYellowTGL();
-            break;
-            
-            case 'D': //double flash
-                if(flash == 0)
-                {
-                    dsioYellowOn();
-                    vTaskDelay(5);
-                    dsioYellowTGL();
-                    vTaskDelay(5);
-                    dsioYellowTGL();
-                    vTaskDelay(5);
-                    dsioYellowOff();
-                }
-                break;
-            
-            case 'W': //warning flash (used for lockout warning)
-                dsioYellowOn();
-                vTaskDelay(5);
-                dsioYellowTGL();
-                vTaskDelay(5);
-                dsioYellowTGL();
-                vTaskDelay(5);
-                dsioYellowTGL();
-                vTaskDelay(5);
-                dsioYellowTGL();
-                vTaskDelay(5);
-                dsioYellowTGL();
-                vTaskDelay(5);
-                dsioYellowTGL();
-                vTaskDelay(5);
-                dsioYellowOff();
-                break;
-                
-            case 'S': //solid
-                dsioYellowOn();
-            break;
-            
-            case 'O': //off
-                dsioYellowOff();
-            break;
         }
         //set blink and flash
         blink = 1;
@@ -331,45 +220,6 @@ void vINDTimerFunc( TimerHandle_t xTimer )
     xINDTimerSet = 1;
 }
 
-void dsioGreenOn(void)
-{
-    PORTC.OUTSET = PIN0_bm;
-}
-void dsioGreenOff(void)
-{
-    PORTC.OUTCLR = PIN0_bm;
-}
-void dsioGreenTGL(void)
-{
-    PORTC.OUTTGL = PIN0_bm;
-}
-    
-void dsioYellowOn(void)
-{
-    PORTC.OUTSET = PIN1_bm;
-}
-void dsioYellowOff(void)
-{
-    PORTC.OUTCLR = PIN1_bm;
-}
-void dsioYellowTGL(void)
-{
-    PORTC.OUTTGL = PIN1_bm;
-}
-    
-void dsioBlueOn(void)
-{
-    PORTA.OUTSET = PIN7_bm;
-}
-void dsioBlueOff(void)
-{
-    PORTA.OUTCLR = PIN7_bm;
-}
-void dsioBlueTGL(void)
-{
-    PORTA.OUTTGL = PIN7_bm;
-}
-
 //interrupts go here
 
 ISR(PORTD_PORT_vect)
@@ -385,16 +235,52 @@ ISR(PORTD_PORT_vect)
     {
         case PIN6_bm: //button 1
             PORTD.INTFLAGS = PIN6_bm; //reset interrupt
-            pb[0] = 'Y';
+            pb[0] = 'U'; //up
             break;
         case PIN5_bm: //button 2
             PORTD.INTFLAGS = PIN5_bm; //reset interrupt
-            pb[0] = 'G';
+            pb[0] = 'D'; //down
             break;
         case PIN3_bm: //button 3
             PORTD.INTFLAGS = PIN3_bm; //reset interrupt
-            pb[0] = 'B';
+            pb[0] = 'H'; //halfway
+            break;
+        case PIN2_bm: //button 4
+            PORTD.INTFLAGS = PIN2_bm;
+            pb[0] = 'Z'; //zero
+    }
+    xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
+}
+
+ISR(PORTC_PORT_vect)
+{
+    uint8_t pb[1] = {0};
+    switch(PORTC.INTFLAGS)
+    {
+        case PIN3_bm: //button 1
+            PORTC.INTFLAGS = PIN3_bm; //reset interrupt
+            pb[0] = 'L'; //last
             break;
     }
     xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
+}
+
+ISR(TWI0_TWIM_vect)
+{
+    uint8_t byte[1] = {0};
+    if(TWI0.MSTATUS & TWI_WIF_bm) //if this is the write interrupt
+    {
+        if(xStreamBufferReceiveFromISR(xI2C_out_Buffer, byte, 1, NULL) != 0)
+        {
+            //if something was in the buffer
+            TWI0.MDATA = byte[0];
+        }
+        else
+        {
+            //disable the interrupt
+            TWI0.MCTRLA &= ~TWI_WIEN_bm;
+            //after sending the message, send a STOP over the bus by writing to MCMD field
+            TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
+        }
+    }
 }
