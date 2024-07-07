@@ -14,7 +14,7 @@
     //timer globals
     
     uint8_t xINDTimerSet = 0;
-    uint8_t xBATTTimerSet;
+    uint8_t xBATTTimerSet = 0;
     
     //timer handles
     

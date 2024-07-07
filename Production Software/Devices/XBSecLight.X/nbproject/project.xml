@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>com.microchip.mplab.nbide.embedded.makeproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/make-project/1">
+            <name>XBSecLight</name>
+            <name>485SecLight</name>
+            <name>485SecCont</name>
+            <creation-uuid>ec86baae-584d-4df4-afc3-1dc3197ec48a</creation-uuid>
+            <make-project-type>0</make-project-type>
+            <sourceEncoding>ISO-8859-1</sourceEncoding>
+            <make-dep-projects/>
+            <sourceRootList>
+                <sourceRootElem>../../Drivers</sourceRootElem>
+                <sourceRootElem>../../FreeRTOS</sourceRootElem>
+                <sourceRootElem>../../ModularTasks/Communications</sourceRootElem>
+                <sourceRootElem>.</sourceRootElem>
+                <sourceRootElem>../485SecCont.X/FreeRTOSConfig</sourceRootElem>
+            </sourceRootList>
+            <confList>
+                <confElem>
+                    <name>default</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
+        </data>
+    </configuration>
+</project>

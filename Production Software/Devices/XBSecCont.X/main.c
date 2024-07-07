@@ -112,6 +112,7 @@ void prvWirelessInitTask( void * parameters )
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
     FlashAll[0] = 'S'; //Status
     FlashAll[1] = 'S'; //Solid
+    xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
     vTaskSuspend(NULL);
 }
 
@@ -814,6 +815,7 @@ void prvXSCTask( void * parameters )
         //if all colours are matching colour_req, then change colour_cur into colour_req
         uint8_t check_variable = 1;
         uint8_t NetSent[MaxNets];
+        uint8_t MessageSent_internal = 0;
         for(uint8_t i = 0; i < MaxNets; i++)
         {
             NetSent[i] = 0;
@@ -895,8 +897,7 @@ void prvXSCTask( void * parameters )
                         //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                         else // if something was transmitted, we need to reset the timer.
                         {
-                            GLOBAL_RetransmissionTimerSet = 0;
-                            xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                            MessageSent_internal = 1;
                         }
                     }
                     break;
@@ -977,8 +978,7 @@ void prvXSCTask( void * parameters )
                     //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                     else // if something was transmitted, we need to reset the timer.
                     {
-                        GLOBAL_RetransmissionTimerSet = 0;
-                        xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                        MessageSent_internal = 1;
                     }
                 }
                 if((lockout == (colour_cur + 32) && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))) //at this point, all controllers have confirmed lockout release
@@ -1022,8 +1022,7 @@ void prvXSCTask( void * parameters )
                     //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                     else // if something was transmitted, we need to reset the timer.
                     {
-                        GLOBAL_RetransmissionTimerSet = 0;
-                        xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                        MessageSent_internal = 1;
                     }
                 }
                 break;
@@ -1037,7 +1036,7 @@ void prvXSCTask( void * parameters )
         }
         check_variable = 1;
         //low battery error transmission tracking
-        if(lowbatt == 1)
+        if((lowbatt == 1)  && (GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))
         {
             //transmit and confirm with all menus
             //ignore the netnumber stuff, there will only ever be one menu per net.
@@ -1059,9 +1058,14 @@ void prvXSCTask( void * parameters )
             }
             else
             {
-                GLOBAL_RetransmissionTimerSet = 0;
-                xTimerReset(xRetransmitTimer, portMAX_DELAY);
+                MessageSent_internal = 1;
             }
+        }
+        if(MessageSent_internal == 1)
+        {
+            GLOBAL_MessageSent = 0;
+            GLOBAL_RetransmissionTimerSet = 0;
+            xTimerReset(xRetransmitTimer, portMAX_DELAY);
         }
         //update indicators if needed
         if(updateIND == 1)

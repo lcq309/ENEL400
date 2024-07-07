@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/debug/XBSecCont.X.debug.elf">                 
+  <executable name="dist/default/production/485SecLight.X.production.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>27445</used>                     
-      <free>103627</free>                     
+      <used>23090</used>                     
+      <free>107982</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 
       <length>16384</length>                 
-      <used>11388</used>                     
-      <free>4996</free>                     
+      <used>11381</used>                     
+      <free>5003</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

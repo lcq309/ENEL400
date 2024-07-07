@@ -1,0 +1,37 @@
+The device specific main.c is responsible for providing the main running task, as well as the initialization task for devices that need to be initialized with the scheduler running.
+
+network initialization will involve a few steps:
+1. on boot, all devices perform their internal initialization and any diagnostics that they can
+2. after a short delay to allow all devices time to initialize, the coordinator sends out pings to all devices on the wired bus sequentially.
+3. the devices respond with the generic ping response and unlock any tasks waiting for initialization.
+4. after constructing the round robin table, the coordinator begins sending out sequential round robin pings to all devices that responded.
+
+the initialization task should do something to show that the device is on, like flashing an indicator.
+
+In this case, a light should blink yellow to show it is still being initialized.
+
+Lights are mostly responsive devices, They respond to controllers trying to change colour depending on their lockout level.
+
+when a signal below the current lockout level is received, it is ignored.
+
+when a signal at the current lockout level is received, it is confirmed (lowercase colour)
+
+when a signal above the current lockout level is received, the lockout moves to the new lockout level.
+
+The light is also capable of producing error codes during a failure to light scenario, this is measured using the voltage divider.
+Not yet implemented
+
+The light will confirm a colour change after checking that a light has actually turned on (assuming the light is capable of detecting this, for now it just confirms until the check is implemented)
+
+Colour_req is the currently requested colour, colour_cur is set once the colour has confirmed.
+A light in error will respond with an error code to a controller requesting a change and disable itself, and the controller will still allow a lockout to be released so that other lights on the network can be controlled.
+It will also send an error to any menu controllers to show the error, when this is implemented.
+
+The light should check light status on any changes, but also just periodically check when it is "idle".
+If it has an error while it is "idle" it should send a message out to any controllers on it's internal list.
+
+Lights should also have a timeout on error messages, to prevent spamming responses to the network.
+
+The light should respond immediately to a request to change colour or release a lockout, with an error message coming later on after the check has completed.
+
+For the most basic version, only the initiating controller will control devices on the network. Eventually a device may be able to take over if the initiator is unable to complete the process for some reason.
