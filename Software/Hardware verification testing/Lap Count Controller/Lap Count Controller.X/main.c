@@ -20,7 +20,21 @@
 #define half PIN3_bm //PD3
 #define zero PIN2_bm //PD2
 #define last PIN3_bm //PC3
+#define CLK_PER                                         24000000     // 24MHz clock
+#define TWI0_BAUD(F_SCL, T_RISE)                        ((((((float)CLK_PER / (float)F_SCL)) - 10 - ((float)CLK_PER * T_RISE))) / 2)
+#define I2C_SCL_FREQ                                    100000
 
+void I2C_init(void)
+{
+    //// first set the SDA hold time, FM Plus enable defaults to zero
+    //TWI0.CTRLA |= TWI_SDAHOLD_500NS_gc;
+    TWI0.MBAUD = (uint8_t)TWI0_BAUD(I2C_SCL_FREQ, 0);
+    //now enable the TWI as a host
+    TWI0.MCTRLA |= TWI_ENABLE_bm | TWI_SMEN_bm; //enable host and smart mode
+    //set the bus state to idle
+    TWI0.MSTATUS |= TWI_BUSSTATE_IDLE_gc;
+    //TWI should now be initialized and ready to use
+}
 /*
  * 
  */
@@ -59,6 +73,9 @@ int main(int argc, char** argv) {
     // single pin configuration for PORT C
     PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
     // now all inputs and outputs should be configured.
+    
+    I2C_init();
+    
     return (EXIT_SUCCESS);
 }
 void I2C_init(void)
@@ -71,7 +88,7 @@ void I2C_init(void)
      */
     TWI0.MBAUD = 51;
     //now enable the TWI as a host
-    TWI0.MCTRLA |= TWI_ENABLE_bm | TWI_SMEN_bm; //enable host and smart mode
+    TWI0.MCTRLA |= TWI_ENABLE_bm; //enable host and smart mode
     //set the bus state to idle
     TWI0.MSTATUS |= TWI_BUSSTATE_IDLE_gc;
     //TWI should now be initialized and ready to use

@@ -43,7 +43,6 @@ void DSIOSetup()
     
     //setup tasks
     
-    xTaskCreate(dsIOInTask, "PBIN", 250, NULL, mainPBIN_TASK_PRIORITY, NULL);
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
@@ -169,66 +168,3 @@ void vINDTimerFunc( TimerHandle_t xTimer )
 }
 
 //interrupts go here
-
-ISR(PORTD_PORT_vect)
-{
-    /* PORTD interrupt:
-     * 1. check which line the interrupt is on
-     * 2. clear the interrupt
-     * 3. send the button colour to the button task
-     */
-    //1. check which pin the interrupt is on
-    uint8_t pb[1] = {0};
-    switch(PORTD.INTFLAGS)
-    {
-        case PIN6_bm: //button 1
-            PORTD.INTFLAGS = PIN6_bm; //reset interrupt
-            pb[0] = 'U'; //up
-            break;
-        case PIN5_bm: //button 2
-            PORTD.INTFLAGS = PIN5_bm; //reset interrupt
-            pb[0] = 'D'; //down
-            break;
-        case PIN3_bm: //button 3
-            PORTD.INTFLAGS = PIN3_bm; //reset interrupt
-            pb[0] = 'H'; //halfway
-            break;
-        case PIN2_bm: //button 4
-            PORTD.INTFLAGS = PIN2_bm;
-            pb[0] = 'Z'; //zero
-    }
-    xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
-}
-
-ISR(PORTC_PORT_vect)
-{
-    uint8_t pb[1] = {0};
-    switch(PORTC.INTFLAGS)
-    {
-        case PIN3_bm: //button 1
-            PORTC.INTFLAGS = PIN3_bm; //reset interrupt
-            pb[0] = 'L'; //last
-            break;
-    }
-    xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
-}
-
-ISR(TWI0_TWIM_vect)
-{
-    uint8_t byte[1] = {0};
-    if(TWI0.MSTATUS & TWI_WIF_bm) //if this is the write interrupt
-    {
-        if(xStreamBufferReceiveFromISR(xI2C_out_Buffer, byte, 1, NULL) != 0)
-        {
-            //if something was in the buffer
-            TWI0.MDATA = byte[0];
-        }
-        else
-        {
-            //disable the interrupt
-            TWI0.MCTRLA &= ~TWI_WIEN_bm;
-            //after sending the message, send a STOP over the bus by writing to MCMD field
-            TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
-        }
-    }
-}

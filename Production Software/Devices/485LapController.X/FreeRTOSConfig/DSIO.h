@@ -30,6 +30,7 @@ extern "C" {
     //Semaphores
     
     extern SemaphoreHandle_t xNotify; //defined in the communications module
+    extern SemaphoreHandle_t xI2C_Sem;
     
     //timer globals
     

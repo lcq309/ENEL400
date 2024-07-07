@@ -6,6 +6,7 @@
  * Created on April 23, 2024
  */
 
+#define I2C_ADDR 0x70 << 1
 #include "DSIO.h"
     //Semaphores
     
@@ -28,6 +29,10 @@
     //stream buffer
 
     StreamBufferHandle_t xI2C_out_Buffer;
+    
+    //Semaphore
+    
+    SemaphoreHandle_t xI2C_Sem;
     
 void DSIOSetup()
 {
@@ -91,6 +96,34 @@ void dsIOInTask (void * parameters)
 
 void dsIOOutTask (void * parameters)
 {
+    //setup the display
+    //setup the display
+    volatile uint8_t Byte[1];
+    
+    Byte[0] = (0x20 | 1); //enable oscillator
+    xStreamBufferSend(xI2C_out_Buffer, Byte, 1, 10);
+    //with the message loaded, load the address buffer with the address for the display
+    TWI0.MADDR = I2C_ADDR;
+    //start message sending by enabling the interrupt
+    TWI0.MCTRLA |= TWI_WIEN_bm;
+    //wait for message to finish sending
+    xSemaphoreTake(xI2C_Sem, 50);
+    
+    //set brightness to max
+    Byte[0] = (0xE0 | 15);            
+    xStreamBufferSend(xI2C_out_Buffer, Byte, 1, 10);
+    TWI0.MADDR = I2C_ADDR;
+    TWI0.MCTRLA |= TWI_WIEN_bm;
+    //wait for message to finish sending
+    xSemaphoreTake(xI2C_Sem, 50);
+    
+    //No Blink, enable display
+    Byte[0] = (0x80 | 0 << 1 | 1);
+    xStreamBufferSend(xI2C_out_Buffer, Byte, 1, 10);
+    TWI0.MADDR = I2C_ADDR;
+    TWI0.MCTRLA |= TWI_WIEN_bm;
+    //wait for message to finish sending
+    xSemaphoreTake(xI2C_Sem, 50);
     //blink, flash, solid, etc.
     //this controls the three indicators on the console
     //blink should be somewhat slow, flash should be faster (mostly used for blue, initialization, and maybe errors)
@@ -99,23 +132,25 @@ void dsIOOutTask (void * parameters)
     static uint8_t DigitOne = 0;
     static uint8_t DigitTwo = 0;
     static uint8_t displaytype = 0; //flashing, solid, off
-    uint8_t state = 0; //for flashing
+    static uint8_t state = 0; //for flashing
     
     //time buffers for flash and latches
     static uint8_t flash = 0; 
     static uint8_t blink = 0; 
     static uint8_t ms250 = 0;
     
-    //setup IO
-    
     //receiver buffer
     uint8_t received[3];
 
     //output buffer
-    uint8_t output[9] = {0,0,0,0,0,0,0,0,0};
+    volatile uint8_t output[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     
     //working digit buffer
     uint16_t digit = 0;
+    
+    //setup display
+    //first and last digit is always left blank
+    
     
     //running loop
     for(;;)
@@ -124,9 +159,9 @@ void dsIOOutTask (void * parameters)
         if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
         {
             //set the digits and mode
-            received[0] = DigitOne;
-            received[1] = DigitTwo;
-            received[2] = displaytype;
+            DigitOne = received[0];
+            DigitTwo = received[1];
+            displaytype = received[2];
         }
         //if timer has triggered, increment ms250 and reset flash and blink timers
         if(xINDTimerSet == 1)
@@ -166,28 +201,34 @@ void dsIOOutTask (void * parameters)
             case 1: //on
                 //first and last digit is always left blank
                 digit = I2C_translate(DigitOne);
-                output[3] = digit & 0xff;
-                output[4] = (digit >> 8) & 0xff;
+                output[1] = digit & 0xff;
+                //output[4] = output[3];
+                output[2] = (digit >> 8) & 0xff;
                 digit = I2C_translate(DigitTwo);
-                output[5] = digit & 0xff;
-                output[6] = (digit >> 8) & 0xff;
+                output[3] = digit & 0xff;
+                //output[6] = output[5];
+                output[4] = (digit >> 8) & 0xff;
                 xStreamBufferSend(xI2C_out_Buffer, output, 9, 10);
                 //with the message loaded, load the address buffer with the address for the display
-                TWI0.MADDR = 0x70;
+                TWI0.MADDR = I2C_ADDR;
                 //start message sending by enabling the interrupt
                 TWI0.MCTRLA |= TWI_WIEN_bm;
+                //wait for message to finish sending
+                xSemaphoreTake(xI2C_Sem, 50);
                 break;
                 
             case 0: //off
-                for(uint8_t i = 0; i < 9; i++)
+                for(uint8_t i = 0; i < 18; i++)
                 {
-                    output[i] = 0;
+                    output[i] = 0x0;
                 }
-                xStreamBufferSend(xI2C_out_Buffer, output, 9, 10);
+                xStreamBufferSend(xI2C_out_Buffer, output, 18, 10);
                 //with the message loaded, load the address buffer with the address for the display
-                TWI0.MADDR = 0x70;
+                TWI0.MADDR = I2C_ADDR;
                 //start message sending by enabling the interrupt
                 TWI0.MCTRLA |= TWI_WIEN_bm;
+                //wait for message to finish sending
+                xSemaphoreTake(xI2C_Sem, 50);
                 break;
         }
         //set blink and flash
@@ -281,6 +322,8 @@ ISR(TWI0_TWIM_vect)
             TWI0.MCTRLA &= ~TWI_WIEN_bm;
             //after sending the message, send a STOP over the bus by writing to MCMD field
             TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
+            //notify the task
+            xSemaphoreGiveFromISR(xI2C_Sem, NULL);
         }
     }
 }

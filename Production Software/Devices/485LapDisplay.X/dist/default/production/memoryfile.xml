@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/485SecCont.X.production.elf">                 
+  <executable name="dist/default/production/485LapDisplay.X.production.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>27372</used>                     
-      <free>103700</free>                     
+      <used>18583</used>                     
+      <free>112489</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 
       <length>16384</length>                 
-      <used>11384</used>                     
-      <free>5000</free>                     
+      <used>11378</used>                     
+      <free>5006</free>                     
     </memory>                              
   </executable>                            
 </project>                                 
