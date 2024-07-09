@@ -81,59 +81,82 @@ void modCOMMOutTask (void * parameters)
      * clear output buffer by setting DREIE (needs testing to determine if output buffer needs to be pre-fed to trigger interrupt)
      * DREI is disabled by the TXC Interrupt
      */
+    uint32_t checksumcalc = 0;
     uint8_t buffer[MAX_MESSAGE_SIZE];
-    uint8_t header_buffer[14];
+    uint8_t header_buffer[20];
     uint8_t length = 0;
     uint8_t size = 0;
-    uint8_t PR[4] = {0x7e, 2, 'R', GLOBAL_DeviceID};
-    uint8_t netmessage[14] = {0x7e, 12, 'O', GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF};
+    //uint8_t netmessage[14] = {0x7e, 12, 'O', GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF};
+    uint8_t netmessage[21] = {0x7e, 0x00, 0x17, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFE, 0x00, 0x00, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType, 0x0};  
     // header and message bits
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
-    
+    //at this point, we should have all the needed info to populate the netmessage checksum
+    for(uint8_t i = 3; i < 20; i++)
+    {
+        checksumcalc += netmessage[i];
+    }
+    netmessage[20] = 0xff - (checksumcalc & 0xff);
     for(;;) //begin main loop
     {
-    //loop through messages, stop looping when out of messages to send.
-    do {
+        checksumcalc = 0;
+        //loop through messages, send one at a time to the XBEE with the header attached
         size = xMessageBufferReceive(xCOMM_out_Buffer, buffer, MAX_MESSAGE_SIZE, 500);
         //check index
         if((buffer[0] == 0xff) && (size != 0)) //if network generation message requested, load the join message into the output stream
         {
             //load join message into output
-            xStreamBufferSend(xCOMM_out_Stream, netmessage, 14, 0);
+            xStreamBufferSend(xCOMM_out_Stream, netmessage, 21, 0);
         }
         else if(size != 0) //generate header based on the information at the index, and load into the output stream with the message
         {
             //end of message contains the index of the target device.
             //reduce length by one, since we won't be sending the index value
             length = size - 1;
-            length = length + 12; //add header to length
+            length = length + 17; //add header to length
             header_buffer[0] = 0x7e; //start delimiter
-            header_buffer[1] = length; //length byte
-            header_buffer[2] = 'O'; //outgoing
-            header_buffer[3] = GLOBAL_DeviceID; //sender device ID
-            header_buffer[4] = GLOBAL_Channel; //device channel
-            header_buffer[5] = GLOBAL_DeviceType; //sender device type
-            header_buffer[6] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[0];
-            header_buffer[7] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[1];
-            header_buffer[8] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[2];
-            header_buffer[9] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[3];
-            header_buffer[10] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[4];
-            header_buffer[11] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[5];
-            header_buffer[12] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[6];
-            header_buffer[13] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[7];
+            header_buffer[1] = 0x00; //length MSB
+            header_buffer[2] = length; //length LSB
+            header_buffer[3] = 0x10; //Transmit request
+            header_buffer[4] = 0x00; //no frame ID
+            header_buffer[5] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[0]; //destination address
+            header_buffer[6] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[1];
+            header_buffer[7] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[2];
+            header_buffer[8] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[3];
+            header_buffer[9] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[4];
+            header_buffer[10] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[5];
+            header_buffer[11] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[6];
+            header_buffer[12] = GLOBAL_DEVICE_TABLE[buffer[size - 1]].XBeeADD[7];
+            header_buffer[13] = 0xff; //start of 16 bit address
+            header_buffer[14] = 0xfe; //end of 16 bit address
+            header_buffer[15] = 0x00; //broadcast radius
+            header_buffer[16] = 0x00; //no transmission options
+            header_buffer[17] = GLOBAL_DeviceID;
+            header_buffer[18] = GLOBAL_Channel;
+            header_buffer[19] = GLOBAL_DeviceType;
             //load output header
-            xStreamBufferSend(xCOMM_out_Stream, header_buffer, 14, 0);
-            //load output message
-            xStreamBufferSend(xCOMM_out_Stream, buffer, size - 1, 0);
+            xStreamBufferSend(xCOMM_out_Stream, header_buffer, 20, 0);
+            //calculate checksum and load it into the buffer
+            for(uint8_t i = 3; i < 20; i++)
+            {
+                checksumcalc += header_buffer[i];
+            }
+            for(uint8_t i = 0; i < (size - 1); i++)
+            {
+                checksumcalc += buffer[i];
+            }
+            buffer[size - 1] = 0xff - (checksumcalc & 0xff);
+            //load output message (includes checksum on end, replacing the index)
+            xStreamBufferSend(xCOMM_out_Stream, buffer, size, 0);
         }
-        } while(size != 0);
-    // wait for notification (if not received then just go back to the start of the loop)
-    //enable DRE interrupt
-    USART0.CTRLA |= USART_DREIE_bm;
-    //wait for TXcomplete notification
-    xSemaphoreTake(xTXC, portMAX_DELAY);
-    GLOBAL_MessageSent = 1;
-    }
+        if(size != 0)
+        {
+            //enable DRE interrupt
+            USART0.CTRLA |= USART_DREIE_bm;
+            //wait for TXcomplete notification
+            xSemaphoreTake(xTXC, portMAX_DELAY);
+            GLOBAL_MessageSent = 1;
+        }
+        }
 }
 
 void modCOMMInTask (void * parameters)
@@ -170,10 +193,13 @@ void modCOMMInTask (void * parameters)
         if(byte_buffer[0] == 0x7E)
         {
             pos = 0;
-            //next byte is length, grab length for message construction loop
+            //next 2 bytes are length, grab length for message construction loop
+            //if the length is greater than 255, we are gonna have a bad time to begin with
+            //just discard the first byte
             check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 10);
             if(check > 0)
             {
+                xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 10);
                 length = byte_buffer[0]; // load loop iterator
                 size = length; //save length for use later
                 //loop and assemble message until length = 0;
@@ -204,30 +230,35 @@ void modCOMMInTask (void * parameters)
         uint8_t netmatch = 0; //track if a device is on the same wireless address as another to avoid redundant messages.
         switch(buffer[0])
         {
-            case 'P': //ping
-                //compare against device ID and notify output
-            break;
-            
-            case 'R': //ping response
-            break; //do nothing with ping response
-            
-            case 'I': //inbound message
-            {
-                //check channel, special channel, and menu
-                if((buffer[2] == GLOBAL_Channel) || (buffer[2] == 0xff) || (buffer[2] == 0x0) || (GLOBAL_Channel == 0xff))
+            case 0x90: //receive packet
+                //first check the channel number against our own
+                /* XBEE + OUR HEADER
+                 * byte 0 = frame type
+                 * byte 1 = start of 64 bit address
+                 * -
+                 * byte 8 = end of 64 bit address
+                 * byte 9 = start of 16 bit address 
+                 * byte 10 = end of 16 bit address
+                 * byte 11 = Receive options field
+                 * byte 12 = start of our header (WiredADD)
+                 * byte 13 = Channel #
+                 * byte 14 = Device Type
+                 * byte 15 = start of message
+                 * byte n = end of message
+                 * n+1 = checksum (not captured)
+                 */
+                if((buffer[13] == GLOBAL_Channel) || (buffer[13] == 0xff) || (buffer[13] == 0x0) || (GLOBAL_Channel == 0xff))
                 {
-                    matched = 'I';
-                    //header structure: {start, length, type, wired address, ch, device type, wireless address}
-                    //check wireless address against device table until a match is found
+                    matched = 0x90;
                     for(uint8_t i = 0; i < GLOBAL_TableLength; i++)
                     {
                         //wireless address check, start with LSB
-                        for(uint8_t y = 11; y >= 4; y--)
+                        for(uint8_t y = 8; y >= 1; y--)
                         {
-                            if(buffer[y] != GLOBAL_DEVICE_TABLE[i].XBeeADD[y-4]) //if address doesn't match
+                            if(buffer[y] != GLOBAL_DEVICE_TABLE[i].XBeeADD[y-1]) //if address doesn't match
                             {
-                                y = 3; //end loop
-                                matched = 'I'; //not a match
+                                y = 0; //end loop
+                                matched = 0x90; //not a match
                             }
                             else
                             {
@@ -238,17 +269,17 @@ void modCOMMInTask (void * parameters)
                         }
                         if(matched == 1) //if the wireless address matches, perform rest of checks
                         {
-                            if(buffer[1] == GLOBAL_DEVICE_TABLE[i].WiredADD)
+                            if(buffer[12] == GLOBAL_DEVICE_TABLE[i].WiredADD)
                             {
                                 matched = 1;
-                                if(buffer[3] == GLOBAL_DEVICE_TABLE[i].Type) //now fully matched
+                                if(buffer[14] == GLOBAL_DEVICE_TABLE[i].Type) //now fully matched
                                 {
                                     matched = 1;
                                     //send message to the device, with the index entry at the front
                                     buffer[0] = i;
-                                    for(uint8_t x = 0; x < size - 12; x++)
-                                        buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
-                                    size = size - 12; //resize to remove the header
+                                    for(uint8_t x = 0; x < size - 15; x++)
+                                        buffer[x + 1] = buffer[x + 15]; //move the message forwards in the buffer
+                                    size = size - 15; //resize to remove the header
                                     //send to device buffer
                                     xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                                     //notify the device
@@ -257,128 +288,35 @@ void modCOMMInTask (void * parameters)
                                     i = GLOBAL_TableLength;
                                 }
                                 else
-                                    matched = 'I';
+                                    matched = 0x90;
                             }
                             else
-                                matched = 'I';
+                                matched = 0x90;
                         }
                     }
-                    //at this point, matched is either 1 or 0
                     
                 }
-                //(confirm full match with device table)
-                //send message to DS with index
-            }
-            break;
-            
-            case 'O': //outbound message
-            {
-                //check channel, special channel, and menu
-                if((buffer[2] == GLOBAL_Channel) || (buffer[2] == 0xff) || (buffer[2] == 0x0) || (GLOBAL_Channel == 0xff))
-                {
-                    matched = 'O';
-                    //check wired address against device table
-                    for(uint8_t i = 0; i < GLOBAL_TableLength; i++)
-                    {
-                        if(buffer[1] == GLOBAL_DEVICE_TABLE[i].WiredADD)
-                        {
-                            matched = 1;
-                            if(buffer[3] == GLOBAL_DEVICE_TABLE[i].Type)
-                            {
-                                matched = 1;
-                                //wireless address check, start with LSB
-                                for(uint8_t y = 11; y >= 4; y--)
-                                {
-                                    if(0x0 != GLOBAL_DEVICE_TABLE[i].XBeeADD[y-4]) //if this is a separate wired network
-                                    {
-                                        y = 3; //end loop
-                                        matched = 'O'; //not a match
-                                    }
-                                    else
-                                        matched = 1;
-                                }
-                                if(matched == 1)
-                                {
-                                    //all checks complete, send message with index
-                                    //send message to the device, with the index entry at the front
-                                    buffer[0] = i;
-                                    for(uint8_t x = 0; x < size - 12; x++)
-                                        buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
-                                    size = size - 11; //resize to remove the header
-                                    //send to device buffer
-                                    xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
-                                    //notify the device
-                                    xSemaphoreGive(xNotify);
-                                    //end looping iterations
-                                    i = GLOBAL_TableLength;
-                                }
-                            }
-                        }
-                        else
-                            matched = 'O';
-                    }
-                }
-                //check wired address against device table
-                //(confirm full match with device table, can ignore wireless address from message and just check to ensure is all zeroes)
-                //send message to DS with index
-                //release mutex
-                case 0: //message receipt failure, maybe an error here in the future, otherwise just do nothing
-                    break;
-            }
-            break;
+                break;
         }
         //now check if anything needs to be added to the device table
         switch(matched)
         {
-            case 'O':
-            {
+            case 0x90:
                 /* populate a new entry in the device table
                  * increment table length
                  * send message to the device specific task
                  */
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Channel = buffer[2];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Type = buffer[3];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].WiredADD = buffer[1];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[4] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[5] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[6] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[7] = 0x0;
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Net = 1; //same wired network is always net 1
-                //increment length
-                GLOBAL_TableLength++;
-                //send message to the device, with the index entry at the front
-                buffer[0] = GLOBAL_TableLength - 1;
-                for(uint8_t x = 0; x < size - 12; x++)
-                    buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
-                size = size - 12; //resize to remove the header
-                //send to device buffer
-                xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
-                //notify the device
-                xSemaphoreGive(xNotify);
-            }
-            break;
-            
-            case 'I':
-            {
-                /* populate a new entry in the device table
-                 * increment table length
-                 * send message to the device specific task
-                 */
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Channel = buffer[2];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Type = buffer[3];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].WiredADD = buffer[1];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[4];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[5];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[6];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[7];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[4] = buffer[8];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[5] = buffer[9];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[6] = buffer[10];
-                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[7] = buffer[11];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Channel = buffer[13];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].Type = buffer[14];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].WiredADD = buffer[12];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[0] = buffer[1];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[1] = buffer[2];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[2] = buffer[3];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[3] = buffer[4];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[4] = buffer[5];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[5] = buffer[6];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[6] = buffer[7];
+                GLOBAL_DEVICE_TABLE[GLOBAL_TableLength].XBeeADD[7] = buffer[8];
                 //netmatch check here
                 if(netmatch == 0)
                 {
@@ -391,15 +329,14 @@ void modCOMMInTask (void * parameters)
                 GLOBAL_TableLength++;
                 //send message to the device, with the index entry at the front
                 buffer[0] = GLOBAL_TableLength - 1;
-                for(uint8_t x = 0; x < size - 12; x++)
-                    buffer[x + 1] = buffer[x + 12]; //move the message forwards in the buffer
-                size = size - 12; //resize to remove the header
+                for(uint8_t x = 0; x < size - 15; x++)
+                    buffer[x + 1] = buffer[x + 15]; //move the message forwards in the buffer
+                size = size - 15; //resize to remove the header
                 //send to device buffer
                 xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                 //notify the device
                 xSemaphoreGive(xNotify);
-            }
-            break;
+                break;
             
             case 1: //matched, do nothing
                 break;

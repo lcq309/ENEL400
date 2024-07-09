@@ -1,10 +1,10 @@
 /* 
  * File:   RS485TASKS.h
  * Author: Michael King
- * Header file that defines the RS485 IN/OUT tasks for devices on the wired network
+ * Header file that defines the XBEE IN/OUT functions for the wireless network
  * as well as a small function to set them up, to be called before the scheduler starts or during initialization.
  * The tasks are included in the .c
- * Created on April 22, 2024
+ * Created on July 9, 2024
  */
 
 #include <avr/io.h>
