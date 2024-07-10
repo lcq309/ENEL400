@@ -110,6 +110,9 @@ int main(int argc, char** argv) {
     
     xTaskCreate(prvXBEEOUTTask, "XBO", 600, NULL, mainOUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvXBEEINTask, "XBI", 600, NULL, mainIN_TASK_PRIORITY, NULL);
+    
+    xTaskCreate(prvMENUOUTTask, "MO", 600, NULL, mainOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(prvMENUINTask, "MI", 600, NULL, mainIN_TASK_PRIORITY, NULL);
     //setup modules (no modules for the coordinator)
     
     //setup event group
@@ -119,6 +122,8 @@ int main(int argc, char** argv) {
     //setup USART
     
     USART0_init();
+    USART1_init();
+    USART2_init();
     
     //USART 485 control pin
     
@@ -430,7 +435,6 @@ void prvXBEEOUTTask( void * parameters )
     uint8_t header_buffer[20];
     uint8_t length = 0;
     uint8_t size = 0;
-    uint8_t byte_buffer[1];
     uint8_t length = 0; //message length from header
     //wait for initialization
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
@@ -525,6 +529,7 @@ void prvXBEEOUTTask( void * parameters )
         }
     }
 }
+
 void prvXBEEINTask( void * parameters )
 {
     //take messages from the XBEE, rearrange the header, and send to the 485 or menu task.
@@ -670,6 +675,105 @@ void prvXBEEINTask( void * parameters )
                     }
                 }
                 break;
+        }
+        
+    }
+}
+
+//menu tasks
+
+void prvMENUOUTTask( void * parameters )
+{
+    //pass messages from either wireless or wired network on to menu
+    uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
+    uint8_t output_leader[2] = {0x7e, 0}; //output leader
+    uint8_t length = 0;  //message length
+    //this is fairly simple, just output the message buffer when the bus is available.
+    //message length should be taken directly from the stream receive.
+    //wait for initialization
+    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
+    for(;;)
+    {
+        //wait until a message arrives in the buffer
+        length = xMessageBufferReceive(xMENU_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
+        output_leader[1] = length;
+        xStreamBufferSend(xMENU_out_Stream, output_leader, 2, 0);
+        //pass message to the output buffer
+        xStreamBufferSend(xMENU_out_Stream, output_buffer, length, 0);
+        //enable DRE interrupt to start transmission
+        USART1.CTRLA |= USART_DREIE_bm;
+        //wait for TXcomplete semaphore
+        xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
+        //end of loop, start over by waiting for a new message in the buffer
+    }
+}
+
+void prvMENUINTask( void * parameters )
+{
+    /* listen for messages from menu
+     * - there may be multiple messages in a stream, process them appropriately based on destination
+     * = for messages targeted outbound, send them to the wireless task
+     * = for messages targeted inbound, send them to the 485 task
+     * 
+     * 1. wait until message start is received, start collecting and building messages
+     * 2. route messages to appropriate destination task
+     */
+    uint8_t message_buffer[MAX_MESSAGE_SIZE];
+    uint8_t byte_buffer[1];
+    uint8_t length = 0; //message length from header
+    //wait for initialization
+    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
+    for(;;)
+    {
+        //wait for something to appear on the bus
+        if(xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 200) == 0)
+        {
+            byte_buffer[0] = 0x0;
+        }
+        //check for start delimiter
+        if(byte_buffer[0] == 0x7e)
+        {
+            //next byte should be length
+            xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 50); //at worst, this will collect garbage, but it shouldn't lock up
+            length = byte_buffer[0];
+        }
+        else
+            length = 0; //just ignore this message, something went wrong
+        
+        //now we know the message length(if there is a message)
+        for(uint8_t i = 0; i < length; i++)
+        {
+            //assemble the message byte by byte until the length is reached
+            if(xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 10) != 0)
+                message_buffer[i] = byte_buffer[0];
+            //if nothing is received, cancel message receipt. Something went wrong
+            else
+                length = 0;
+            //this if/else statement constitutes collision recovery code.
+            //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
+        }
+        //now the full message should be within the message buffer, perform routing
+        if(length != 0)
+        {
+            uint8_t wirelesscheck = 0;
+            switch(message_buffer[0])
+            {
+                case 'O': //outbound message, route to XBEE task
+                    if(xSemaphoreTake(xXBEE_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xXBEE_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
+                        xSemaphoreGive(xXBEE_MUTEX);
+                    }
+                    break;
+                    
+                case 'I': //inbound message, route to 485 task
+                    if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xRS485_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
+                        xSemaphoreGive(x485_MUTEX);
+                    }
+                    break;
+            }
         }
         
     }
