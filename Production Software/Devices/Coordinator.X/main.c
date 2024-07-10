@@ -433,7 +433,6 @@ void prvXBEEOUTTask( void * parameters )
     uint8_t buffer[MAX_MESSAGE_SIZE];
     uint32_t checksumcalc = 0;
     uint8_t header_buffer[20];
-    uint8_t length = 0;
     uint8_t size = 0;
     uint8_t length = 0; //message length from header
     //wait for initialization
