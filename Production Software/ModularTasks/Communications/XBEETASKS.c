@@ -140,7 +140,7 @@ void modCOMMOutTask (void * parameters)
             {
                 checksumcalc += header_buffer[i];
             }
-            for(uint8_t i = 0; i < (size - 1); i++)
+            for(uint8_t i = 0; i < (size - 1); i++) //do not include the index
             {
                 checksumcalc += buffer[i];
             }
@@ -156,7 +156,7 @@ void modCOMMOutTask (void * parameters)
             xSemaphoreTake(xTXC, portMAX_DELAY);
             GLOBAL_MessageSent = 1;
         }
-        }
+    }
 }
 
 void modCOMMInTask (void * parameters)
