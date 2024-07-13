@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     GLOBAL_Channel = ShiftIn(); //grab channel
     
     //setup modules
-    
+    USART0BAUD = 57600;
     COMMSetup();
     DSIOSetup();
     

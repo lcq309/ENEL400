@@ -15,12 +15,22 @@
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#define USARTBAUD 115200 //define initial baudrate, for easy changes later
+
 #define CPU_F 24000000 //24MHz
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
+    
+/* BAUDRATE variables
+ * set these before calling the initialization
+ * they have a default of 115200
+ */
+    extern uint32_t USART0BAUD;
+    extern uint32_t USART1BAUD;
+    extern uint32_t USART2BAUD;
+    
+    
 /* USART0_init
  * Initializes USART0 to run with interrupts enabled, interrupts will need to be
  * setup depending on which device type it is. (interrupt driven tasks will be

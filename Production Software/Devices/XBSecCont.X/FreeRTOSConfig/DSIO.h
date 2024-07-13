@@ -7,6 +7,8 @@
  * Created on July 7, 2024
  */
 
+#define USARTBAUD 57600 //redefine BAUD for the wireless network
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "FreeRTOS.h"
