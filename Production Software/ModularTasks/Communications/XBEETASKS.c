@@ -11,7 +11,7 @@
     
     uint8_t GLOBAL_TableLength = 0; //increments as new entries are added to the table
     uint8_t GLOBAL_NetNum = 1; //always at least one net for a wired device (our own)
-    uint8_t GLOBAL_MessageSent = 0; //track whether a message has been sent or not
+    uint8_t GLOBAL_MessageSent = 1; //track whether a message has been sent or not
     
     //Timer Counters
     

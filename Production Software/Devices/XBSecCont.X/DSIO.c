@@ -60,6 +60,7 @@ void DSIOSetup()
     
     //setup the semaphore
     xBattCheckTrig = xSemaphoreCreateBinary();
+    xSemaphoreGive(xBattCheckTrig);
     
     //start the indicator timer
     xTimerStart(xINDTimer, 0);
@@ -377,14 +378,12 @@ void dsIOSTATUS (void * parameters)
     {
         volatile uint8_t output = 0;
         uint8_t outbuffer[2] = {'S', 'B'};
-        volatile uint16_t received[1];
+        uint16_t received[1];
         //block on manual trigger semaphore
         if(xSemaphoreTake(xBattCheckTrig, 50) == pdTRUE)
         {
             //check the battery voltage
             VoltageCheck();
-            xBATTTimerSet = 0;
-            xTimerReset(xBATTTimer, 0);
             //wait for result before moving on
             xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
             //check against reference value of 2402 (~1.935V over resistor)
@@ -393,6 +392,8 @@ void dsIOSTATUS (void * parameters)
                 //low battery state, send the message to the main task
                 xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
             }
+            xBATTTimerSet = 0;
+            xTimerReset(xBATTTimer, 0);
         }
         else //if not a manual trigger, then check timer and do the periodic if the time is right
         {
@@ -400,8 +401,6 @@ void dsIOSTATUS (void * parameters)
             {
                 //check the battery voltage
                 VoltageCheck();
-                xBATTTimerSet = 0;
-                xTimerReset(xBATTTimer, 0);
                 //wait for result before moving on
                 xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
                 //check against reference value of 2402 (~1.935V over resistor)
@@ -410,6 +409,8 @@ void dsIOSTATUS (void * parameters)
                     //low battery state, send the message to the main task
                     xQueueSendToBack(xDeviceIN_Queue, outbuffer, 10);
                 }
+                xBATTTimerSet = 0;
+                xTimerReset(xBATTTimer, 0);
             }
         }
     }
@@ -481,7 +482,7 @@ void dsioStatOff(void)
 }
 void dsioStatTGL(void)
 {
-    PORTC.DIRTGL = PIN0_bm;
+    PORTC.OUTTGL = PIN0_bm;
 }
 //interrupts go here
 
@@ -514,8 +515,8 @@ ISR(PORTD_PORT_vect)
 
 ISR(ADC0_RESRDY_vect)
 {
-    volatile uint16_t res[1];
+    uint16_t res[1];
     res[0] = ADC0.RES; //this should also clear the interrupt flag
-    ADC0.MUXPOS = ADC_MUXPOS_GND_gc;
     xQueueSendToBackFromISR(xSTAT_Queue, res, NULL);
+    ADC0.MUXPOS = ADC_MUXPOS_GND_gc;
 }

@@ -132,6 +132,8 @@ void prvWirelessInitTask( void * parameters )
     FlashAll[0] = 0xfe; //all but status
     FlashAll[1] = 'O'; //Off
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
+    //set initialization flag
+    xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
 

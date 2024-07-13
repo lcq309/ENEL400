@@ -83,7 +83,6 @@ int main(int argc, char** argv) {
     LTCHIn(); //latch input register
     GLOBAL_Channel = ShiftIn(); //grab channel
     
-    
     //setup modules
     
     COMMSetup();
@@ -113,6 +112,8 @@ void prvWirelessInitTask( void * parameters )
     FlashAll[0] = 'S'; //Status
     FlashAll[1] = 'S'; //Solid
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
+    //set initialization flag
+    xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
 
@@ -1070,7 +1071,7 @@ void prvXSCTask( void * parameters )
         //update indicators if needed
         if(updateIND == 1)
         {
-            if(lowbatt == 1)
+            if(lowbatt != 0)
             {
                 buffer[0] = 'S'; //status indicator
                 buffer[1] = 'F'; //flash status
