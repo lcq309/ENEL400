@@ -55,7 +55,7 @@ void DSIOSetup()
     xTaskCreate(dsIOSTATUS, "STAT", 150, NULL, mainSTAT_TASK_PRIORITY, NULL);
     
     //setup timers
-    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
     xBATTTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vBattCheckTimerFunc);
     
     //setup the semaphore

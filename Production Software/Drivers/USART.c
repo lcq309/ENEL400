@@ -20,8 +20,7 @@ void USART0_init(void)
     //Calculate baud rate
     USART0.BAUD = (double)((64 * (double)CPU_F)/(16 * (double)USART0BAUD)); //calculate baud rate and set
     USART0.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | \
-            USART_PMODE_EVEN_gc; //set asynch, 8bit frames, even parity
-    USART0.CTRLC &= ~USART_SBMODE_bm; //ensure single stop bit is set
+            USART_PMODE_EVEN_gc | USART_SBMODE_bm; //set asynch, 8bit frames, even parity
     //note that parity mode may need to be changed for certain vendor devices
     //Set tx pin as an output
     PORTA.DIRSET = PIN0_bm; //port A pin 0 is txd for USART 0

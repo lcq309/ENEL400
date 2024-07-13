@@ -70,6 +70,9 @@ uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never
 
 int main(int argc, char** argv) {
     
+    //set clock speed
+    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL.OSCHFCTRLA | CLKCTRL_FRQSEL_24M_gc);
+    
     //setup tasks
     xTaskCreate(prvWirelessInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvXSCTask, "XSC", 700, NULL, mainWXC_TASK_PRIORITY, NULL);
@@ -84,7 +87,7 @@ int main(int argc, char** argv) {
     GLOBAL_Channel = ShiftIn(); //grab channel
     
     //setup modules
-    USART0BAUD = 57600;
+    USART0BAUD = 9600;
     COMMSetup();
     DSIOSetup();
     
