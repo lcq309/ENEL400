@@ -43,7 +43,7 @@ uint8_t GLOBAL_Channel = 0;
 uint8_t GLOBAL_DeviceType = '2';
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
@@ -71,7 +71,7 @@ uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never
 int main(int argc, char** argv) {
     
     //set clock speed
-    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL.OSCHFCTRLA | CLKCTRL_FRQSEL_24M_gc);
+    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
     
     //setup tasks
     xTaskCreate(prvWirelessInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
     GLOBAL_Channel = ShiftIn(); //grab channel
     
     //setup modules
-    USART0BAUD = 9600;
+    USART0BAUD = 115200;
     COMMSetup();
     DSIOSetup();
     
@@ -108,7 +108,7 @@ void prvWirelessInitTask( void * parameters )
     //start flashing indicators
     uint8_t FlashAll[2] = {0xff, 'F'};
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
-    vTaskDelay(2000);
+    vTaskDelay(6000);
     FlashAll[0] = 0xfe; //all but status
     FlashAll[1] = 'O'; //Off
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);

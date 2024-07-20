@@ -1096,3 +1096,8 @@ Production Software/Devices/485PitLight.X/defmplabxtrace.log.inx
 /Software/Hardware verification testing/Lap Count Controller/Lap Count Controller.X/.generated_files/flags/default
 /Production Software/Devices/XBSecCont.X/.generated_files/flags/default
 /Production Software/Devices/XBSecLight.X/.generated_files/flags/default
+Production Software/Devices/485SecLight.X/nbproject/Makefile-genesis.properties
+Production Software/Devices/485StopCard.X/nbproject/Makefile-genesis.properties
+Production Software/Devices/Coordinator.X/nbproject/Makefile-genesis.properties
+*.properties
+/Production Software/Devices/XBSecCont.X/queuelogs

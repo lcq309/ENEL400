@@ -18,9 +18,9 @@ void USART0_init(void)
     //start by disabling global interrupts (if they are enabled)
     SREG &= ~CPU_I_bm; //set interrupt enable to zero to disable global interrupts
     //Calculate baud rate
-    USART0.BAUD = (double)((64 * (double)CPU_F)/(16 * (double)USART0BAUD)); //calculate baud rate and set
+    USART0.BAUD = ((64 * (float)CPU_F)/(16 * (float)USART0BAUD)) + 0.5; //calculate baud rate and set
     USART0.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | \
-            USART_PMODE_EVEN_gc | USART_SBMODE_bm; //set asynch, 8bit frames, even parity
+            USART_PMODE_EVEN_gc; //set asynch, 8bit frames, even parity
     //note that parity mode may need to be changed for certain vendor devices
     //Set tx pin as an output
     PORTA.DIRSET = PIN0_bm; //port A pin 0 is txd for USART 0

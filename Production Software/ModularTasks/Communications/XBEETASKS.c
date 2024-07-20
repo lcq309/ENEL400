@@ -62,12 +62,13 @@ void COMMSetup()
     xTaskCreate(modCOMMInTask, "COMMIN", 400, NULL, mainCOMMIN_TASK_PRIORITY, NULL);
     
     //setup timers
-    xOFFSETTimer = xTimerCreate("OFFS", 32, pdTRUE, 0, vOFFSETTimerFunc);
-    xPeriodicJoinTimer = xTimerCreate("JOIN", 50, pdTRUE, 0, vPeriodicJoinTimerFunc);
+    xOFFSETTimer = xTimerCreate("OFFS", 118, pdTRUE, 0, vOFFSETTimerFunc);
+    xPeriodicJoinTimer = xTimerCreate("JOIN", 30000, pdTRUE, 0, vPeriodicJoinTimerFunc);
     
     //initialize USART0
     
     USART0_init();
+    USART0.CTRLA |= USART_TXCIE_bm;
 }
 
 void modCOMMOutTask (void * parameters)
@@ -354,8 +355,8 @@ void vOFFSETTimerFunc( TimerHandle_t xTimer )
     //if current offset is greater than or equal to device ID
     if(TimerCounter >= GLOBAL_DeviceID)
     {
-        //start periodical timer
-        TimerCounter = 0xff;
+       //start periodical timer
+       TimerCounter = 0;
        xTimerStart(xPeriodicJoinTimer, portMAX_DELAY);
        xTimerStop(xOFFSETTimer, portMAX_DELAY);
     }
@@ -365,17 +366,11 @@ void vOFFSETTimerFunc( TimerHandle_t xTimer )
 
 void vPeriodicJoinTimerFunc( TimerHandle_t xTimer )
 {
-    if(TimerCounter >= 120)
-    {
-        //send 3x net join to comms out stream
-        uint8_t output[2] = {'T', 'J'};
-        xQueueSendToBack(xDeviceIN_Queue, output, 15);
-        //notify the device
-        xSemaphoreGive(xNotify);
-        TimerCounter = 0;
-    }
-    else
-        TimerCounter++;
+    //send 3x net join to comms out stream
+    uint8_t output[2] = {'T', 'J'};
+    xQueueSendToBack(xDeviceIN_Queue, output, 15);
+    //notify the device
+    xSemaphoreGive(xNotify);
 }
 //interrupts go here
 
