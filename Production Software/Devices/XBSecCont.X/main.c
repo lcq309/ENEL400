@@ -39,7 +39,7 @@ struct DeviceTracker
 
 //define global variables
 uint8_t GLOBAL_DeviceID = 0;
-uint8_t GLOBAL_Channel = 0;
+uint8_t GLOBAL_Channel = 1;
 uint8_t GLOBAL_DeviceType = '2';
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -70,9 +70,6 @@ uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never
 
 int main(int argc, char** argv) {
     
-    //set clock speed
-    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
-    
     //setup tasks
     xTaskCreate(prvWirelessInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvXSCTask, "XSC", 700, NULL, mainWXC_TASK_PRIORITY, NULL);
@@ -84,7 +81,7 @@ int main(int argc, char** argv) {
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
     LTCHIn(); //latch input register
-    GLOBAL_Channel = ShiftIn(); //grab channel
+//    GLOBAL_Channel = ShiftIn(); //grab channel
     
     //setup modules
     USART0BAUD = 115200;

@@ -128,8 +128,8 @@ void prvWirelessInitTask( void * parameters )
     //start flashing indicators
     uint8_t FlashAll[2] = {'Y', 'F'};
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
-    vTaskDelay(2000);
-    FlashAll[0] = 0xfe; //all but status
+    vTaskDelay(6000);
+    FlashAll[0] = 0xff; //all but status
     FlashAll[1] = 'O'; //Off
     xQueueSendToBack(xIND_Queue, FlashAll, portMAX_DELAY);
     //set initialization flag

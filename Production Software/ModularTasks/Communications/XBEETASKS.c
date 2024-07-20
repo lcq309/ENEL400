@@ -40,6 +40,10 @@
 void COMMSetup()
 {
     
+    //set clock speed (this is here because it is most important for communications)
+    
+    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
+    
     //setup buffers
     
     xCOMM_in_Stream = xStreamBufferCreate(50,1); //50 bytes, triggers when a byte is added
@@ -174,7 +178,7 @@ void modCOMMInTask (void * parameters)
     uint8_t buffer[MAX_MESSAGE_SIZE];
     uint8_t byte_buffer[1];
     uint8_t length = 0;
-    uint8_t size = 0;
+    volatile uint8_t size = 0;
     uint8_t pos = 0;
     uint8_t check = 0; //check for message failure
     
@@ -280,7 +284,7 @@ void modCOMMInTask (void * parameters)
                                     buffer[0] = i;
                                     for(uint8_t x = 0; x < size - 15; x++)
                                         buffer[x + 1] = buffer[x + 15]; //move the message forwards in the buffer
-                                    size = size - 15; //resize to remove the header
+                                    size = size - 14; //resize to remove the header
                                     //send to device buffer
                                     xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                                     //notify the device
@@ -331,8 +335,10 @@ void modCOMMInTask (void * parameters)
                 //send message to the device, with the index entry at the front
                 buffer[0] = GLOBAL_TableLength - 1;
                 for(uint8_t x = 0; x < size - 15; x++)
+                {
                     buffer[x + 1] = buffer[x + 15]; //move the message forwards in the buffer
-                size = size - 15; //resize to remove the header
+                }
+                size = size - 14; //resize to remove the header + 1 for the index
                 //send to device buffer
                 xMessageBufferSend(xDevice_Buffer, buffer, size, 50);
                 //notify the device
@@ -368,7 +374,7 @@ void vPeriodicJoinTimerFunc( TimerHandle_t xTimer )
 {
     //send 3x net join to comms out stream
     uint8_t output[2] = {'T', 'J'};
-    xQueueSendToBack(xDeviceIN_Queue, output, 15);
+     xQueueSendToBack(xDeviceIN_Queue, output, 15);
     //notify the device
     xSemaphoreGive(xNotify);
 }

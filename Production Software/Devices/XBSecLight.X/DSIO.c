@@ -53,7 +53,7 @@ void DSIOSetup()
     
     //setup timers
 
-    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
     xSTATTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vCircCheckTimerFunc);
     xBATTTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vBattCheckTimerFunc);
     
@@ -110,6 +110,7 @@ void dsIOOutTask (void * parameters)
                     RED = received[1];
                     break;
                 case 0xff: //All indicators
+                case 0xfe: //All but status
                     GREEN = received[1];
                     YELLOW = received[1];
                     BLUE = received[1];
