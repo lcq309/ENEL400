@@ -191,6 +191,8 @@ void prvWiredInitTask( void * parameters )
     
     //enable transmit complete interrupt
     USART0.CTRLA |= USART_TXCIE_bm;
+    USART1.CTRLA |= USART_TXCIE_bm;
+    USART2.CTRLA |= USART_TXCIE_bm;
     
     //take the mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
@@ -360,7 +362,7 @@ void prv485INTask( void * parameters )
                         //block for no more than 50 cycles
                         if(xSemaphoreTake(xXBEE_MUTEX, 50) == pdTRUE)
                         {
-                            xMessageBufferSend(xXBEE_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
+                            xMessageBufferSend(xXBEE_out_Buffer, message_buffer, length, 0); //do not block, if the buffer is full then just discard the message
                             xSemaphoreGive(xXBEE_MUTEX);
                         }
                     }
@@ -480,7 +482,7 @@ void prvXBEEOUTTask( void * parameters )
         if(size != 0) //generate header based on the information from the message, then truncate the message and load both into the stream
         {
             //message starts at byte 12 of input
-            length = size + 4; //add header to length
+            length = size + 5; //add header to length
             header_buffer[0] = 0x7e; //start delimiter
             header_buffer[1] = 0x00; //length MSB
             header_buffer[2] = length; //length LSB
@@ -550,7 +552,7 @@ void prvXBEEINTask( void * parameters )
     uint8_t outbuffer[MAX_MESSAGE_SIZE];
     uint8_t byte_buffer[1];
     uint8_t length = 0;
-    uint8_t size = 0;
+    volatile uint8_t size = 0;
     uint8_t pos = 0;
     uint8_t check = 0; //check for message failure
     
@@ -607,14 +609,11 @@ void prvXBEEINTask( void * parameters )
                  *  Byte 1 = MSB of length (probably always 0) [size doesn't change]
                  *  Byte 2 = LSB of length (we will change this to match the size) [size doesn't change]
                  *  Byte 3 = Message type (discarded for wired) [size - 1]
-                 *  Byte 4 = frame ID (always 0) [size - 1]
                  *  Byte 5 = Start of wireless address (move to output) [size doesn't change]
                  *  -
                  *  Byte 12 = End of wireless address (move to output) [size doesn't change]
                  *  Byte 13 = start of 16 bit address (always unknown) [size - 1]
                  *  Byte 14 = end of 16 bit address (always unknown) [size - 1]
-                 *  Byte 15 = Broadcast radius (always 0x0) [size - 1]
-                 *  Byte 16 = Broadcast option (always 0x0) [size - 1]
                  *  Byte 17 = Wired address (move to output) [size doesn't change]
                  *  Byte 18 = Channel (move to output) [size doesn't change]
                  *  Byte 19 = Device Type (move to output) [size doesn't change]
@@ -633,23 +632,23 @@ void prvXBEEINTask( void * parameters )
                  * overall size change is - 4 for header differences
                  */
                 //change size
-                size = size - 4;
+                size = size - 2;
                 //reassemble the message in the output buffer
                 outbuffer[0] = 'I'; //always inbound
-                outbuffer[1] = buffer[17]; //wired address
-                outbuffer[2] = buffer[18]; //channel number
-                outbuffer[3] = buffer[19]; //device type
-                outbuffer[4] = buffer[5]; //start of wireless address
-                outbuffer[5] = buffer[6];
-                outbuffer[6] = buffer[7];
-                outbuffer[7] = buffer[8];
-                outbuffer[8] = buffer[9];
-                outbuffer[9] = buffer[10];
-                outbuffer[10] = buffer[11];
-                outbuffer[11] = buffer[12]; //end of wireless address
-                for(uint8_t i = 12; i < size - 1; i++) //move message to the correct spot, remove the checksum
+                outbuffer[1] = buffer[12]; //wired address
+                outbuffer[2] = buffer[13]; //channel number
+                outbuffer[3] = buffer[14]; //device type
+                outbuffer[4] = buffer[1]; //start of wireless address
+                outbuffer[5] = buffer[2];
+                outbuffer[6] = buffer[3];
+                outbuffer[7] = buffer[4];
+                outbuffer[8] = buffer[5];
+                outbuffer[9] = buffer[6];
+                outbuffer[10] = buffer[7];
+                outbuffer[11] = buffer[8]; //end of wireless address
+                for(uint8_t i = 12; i < size + 2; i++) //move message to the correct spot
                 {
-                    outbuffer[i] = buffer[i + 8];
+                    outbuffer[i] = buffer[i + 3];
                 }
                 //now the outbuffer should be loaded with the correct message, move to routing
                 if(outbuffer[2] == 0) //channel zero always goes to menu

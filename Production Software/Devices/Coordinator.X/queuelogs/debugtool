@@ -1,1049 +1,162 @@
-979 1716595730442 XXXX 1716595730442, Thread 979: XXXX 1716595730442, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595730543 XXXX 1716595730543, Thread 979: XXXX 1716595730543, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595730544 XXXX 1716595730544, Thread 979: XXXX 1716595730544, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595730643 XXXX 1716595730643, Thread 979: XXXX 1716595730643, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595730644 XXXX 1716595730644, Thread 979: XXXX 1716595730644, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595730744 XXXX 1716595730744, Thread 979: XXXX 1716595730744, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595730745 XXXX 1716595730745, Thread 979: XXXX 1716595730745, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595730844 XXXX 1716595730844, Thread 979: XXXX 1716595730844, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595730845 XXXX 1716595730845, Thread 979: XXXX 1716595730845, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595730944 XXXX 1716595730944, Thread 979: XXXX 1716595730944, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595730945 XXXX 1716595730945, Thread 979: XXXX 1716595730945, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731044 XXXX 1716595731044, Thread 979: XXXX 1716595731044, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731045 XXXX 1716595731045, Thread 979: XXXX 1716595731045, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731145 XXXX 1716595731145, Thread 979: XXXX 1716595731145, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731146 XXXX 1716595731146, Thread 979: XXXX 1716595731146, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731245 XXXX 1716595731245, Thread 979: XXXX 1716595731245, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731246 XXXX 1716595731246, Thread 979: XXXX 1716595731246, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731345 XXXX 1716595731345, Thread 979: XXXX 1716595731345, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731346 XXXX 1716595731346, Thread 979: XXXX 1716595731346, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731446 XXXX 1716595731446, Thread 979: XXXX 1716595731446, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731447 XXXX 1716595731447, Thread 979: XXXX 1716595731447, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731547 XXXX 1716595731547, Thread 979: XXXX 1716595731547, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731548 XXXX 1716595731548, Thread 979: XXXX 1716595731548, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731648 XXXX 1716595731648, Thread 979: XXXX 1716595731648, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731649 XXXX 1716595731649, Thread 979: XXXX 1716595731649, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731749 XXXX 1716595731749, Thread 979: XXXX 1716595731749, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731750 XXXX 1716595731750, Thread 979: XXXX 1716595731750, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731850 XXXX 1716595731850, Thread 979: XXXX 1716595731850, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731851 XXXX 1716595731851, Thread 979: XXXX 1716595731851, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595731952 XXXX 1716595731952, Thread 979: XXXX 1716595731952, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595731953 XXXX 1716595731953, Thread 979: XXXX 1716595731953, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732052 XXXX 1716595732052, Thread 979: XXXX 1716595732052, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732052 XXXX 1716595732052, Thread 979: XXXX 1716595732052, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732154 XXXX 1716595732154, Thread 979: XXXX 1716595732154, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732155 XXXX 1716595732155, Thread 979: XXXX 1716595732155, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732254 XXXX 1716595732254, Thread 979: XXXX 1716595732254, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732255 XXXX 1716595732255, Thread 979: XXXX 1716595732255, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732355 XXXX 1716595732355, Thread 979: XXXX 1716595732355, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732356 XXXX 1716595732356, Thread 979: XXXX 1716595732356, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732456 XXXX 1716595732456, Thread 979: XXXX 1716595732456, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732457 XXXX 1716595732457, Thread 979: XXXX 1716595732457, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732557 XXXX 1716595732557, Thread 979: XXXX 1716595732557, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732557 XXXX 1716595732557, Thread 979: XXXX 1716595732557, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732657 XXXX 1716595732657, Thread 979: XXXX 1716595732657, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732657 XXXX 1716595732657, Thread 979: XXXX 1716595732657, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732758 XXXX 1716595732758, Thread 979: XXXX 1716595732758, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732759 XXXX 1716595732759, Thread 979: XXXX 1716595732759, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732859 XXXX 1716595732859, Thread 979: XXXX 1716595732859, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732860 XXXX 1716595732860, Thread 979: XXXX 1716595732860, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595732959 XXXX 1716595732959, Thread 979: XXXX 1716595732959, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595732959 XXXX 1716595732959, Thread 979: XXXX 1716595732959, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733061 XXXX 1716595733061, Thread 979: XXXX 1716595733061, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733062 XXXX 1716595733062, Thread 979: XXXX 1716595733062, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733161 XXXX 1716595733161, Thread 979: XXXX 1716595733161, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733162 XXXX 1716595733162, Thread 979: XXXX 1716595733162, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733262 XXXX 1716595733262, Thread 979: XXXX 1716595733262, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733263 XXXX 1716595733263, Thread 979: XXXX 1716595733263, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733362 XXXX 1716595733362, Thread 979: XXXX 1716595733362, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733363 XXXX 1716595733363, Thread 979: XXXX 1716595733363, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733462 XXXX 1716595733462, Thread 979: XXXX 1716595733462, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733463 XXXX 1716595733463, Thread 979: XXXX 1716595733463, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733562 XXXX 1716595733562, Thread 979: XXXX 1716595733562, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733563 XXXX 1716595733563, Thread 979: XXXX 1716595733563, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733663 XXXX 1716595733663, Thread 979: XXXX 1716595733663, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733664 XXXX 1716595733664, Thread 979: XXXX 1716595733664, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733764 XXXX 1716595733764, Thread 979: XXXX 1716595733764, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733765 XXXX 1716595733765, Thread 979: XXXX 1716595733765, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733864 XXXX 1716595733864, Thread 979: XXXX 1716595733864, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733864 XXXX 1716595733864, Thread 979: XXXX 1716595733864, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595733966 XXXX 1716595733966, Thread 979: XXXX 1716595733966, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595733967 XXXX 1716595733967, Thread 979: XXXX 1716595733967, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734067 XXXX 1716595734067, Thread 979: XXXX 1716595734067, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734067 XXXX 1716595734067, Thread 979: XXXX 1716595734067, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734168 XXXX 1716595734168, Thread 979: XXXX 1716595734168, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734169 XXXX 1716595734169, Thread 979: XXXX 1716595734169, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734268 XXXX 1716595734268, Thread 979: XXXX 1716595734268, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734269 XXXX 1716595734269, Thread 979: XXXX 1716595734269, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734369 XXXX 1716595734369, Thread 979: XXXX 1716595734369, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734370 XXXX 1716595734370, Thread 979: XXXX 1716595734370, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734469 XXXX 1716595734469, Thread 979: XXXX 1716595734469, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734470 XXXX 1716595734470, Thread 979: XXXX 1716595734470, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734569 XXXX 1716595734569, Thread 979: XXXX 1716595734569, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734570 XXXX 1716595734570, Thread 979: XXXX 1716595734570, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734670 XXXX 1716595734670, Thread 979: XXXX 1716595734670, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734670 XXXX 1716595734670, Thread 979: XXXX 1716595734670, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734771 XXXX 1716595734771, Thread 979: XXXX 1716595734771, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734772 XXXX 1716595734772, Thread 979: XXXX 1716595734772, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734871 XXXX 1716595734871, Thread 979: XXXX 1716595734871, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734872 XXXX 1716595734872, Thread 979: XXXX 1716595734872, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595734972 XXXX 1716595734972, Thread 979: XXXX 1716595734972, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595734973 XXXX 1716595734973, Thread 979: XXXX 1716595734973, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735072 XXXX 1716595735072, Thread 979: XXXX 1716595735072, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735073 XXXX 1716595735073, Thread 979: XXXX 1716595735073, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735173 XXXX 1716595735173, Thread 979: XXXX 1716595735173, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735174 XXXX 1716595735174, Thread 979: XXXX 1716595735174, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735274 XXXX 1716595735274, Thread 979: XXXX 1716595735274, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735275 XXXX 1716595735275, Thread 979: XXXX 1716595735275, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735374 XXXX 1716595735374, Thread 979: XXXX 1716595735374, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735375 XXXX 1716595735375, Thread 979: XXXX 1716595735375, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735474 XXXX 1716595735474, Thread 979: XXXX 1716595735474, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735475 XXXX 1716595735475, Thread 979: XXXX 1716595735475, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735574 XXXX 1716595735574, Thread 979: XXXX 1716595735574, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735575 XXXX 1716595735575, Thread 979: XXXX 1716595735575, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735675 XXXX 1716595735675, Thread 979: XXXX 1716595735675, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735676 XXXX 1716595735676, Thread 979: XXXX 1716595735676, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735775 XXXX 1716595735775, Thread 979: XXXX 1716595735775, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735776 XXXX 1716595735776, Thread 979: XXXX 1716595735776, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735876 XXXX 1716595735876, Thread 979: XXXX 1716595735876, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735877 XXXX 1716595735877, Thread 979: XXXX 1716595735877, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595735977 XXXX 1716595735977, Thread 979: XXXX 1716595735977, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595735978 XXXX 1716595735978, Thread 979: XXXX 1716595735978, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736077 XXXX 1716595736077, Thread 979: XXXX 1716595736077, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736077 XXXX 1716595736077, Thread 979: XXXX 1716595736077, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736178 XXXX 1716595736178, Thread 979: XXXX 1716595736178, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736179 XXXX 1716595736179, Thread 979: XXXX 1716595736179, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736279 XXXX 1716595736279, Thread 979: XXXX 1716595736279, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736279 XXXX 1716595736279, Thread 979: XXXX 1716595736279, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736380 XXXX 1716595736380, Thread 979: XXXX 1716595736380, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736381 XXXX 1716595736381, Thread 979: XXXX 1716595736381, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736481 XXXX 1716595736481, Thread 979: XXXX 1716595736481, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736482 XXXX 1716595736482, Thread 979: XXXX 1716595736482, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736581 XXXX 1716595736581, Thread 979: XXXX 1716595736581, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736581 XXXX 1716595736581, Thread 979: XXXX 1716595736581, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736682 XXXX 1716595736682, Thread 979: XXXX 1716595736682, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736683 XXXX 1716595736683, Thread 979: XXXX 1716595736683, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736783 XXXX 1716595736783, Thread 979: XXXX 1716595736783, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736784 XXXX 1716595736784, Thread 979: XXXX 1716595736784, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736884 XXXX 1716595736884, Thread 979: XXXX 1716595736884, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736885 XXXX 1716595736885, Thread 979: XXXX 1716595736885, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595736984 XXXX 1716595736984, Thread 979: XXXX 1716595736984, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595736985 XXXX 1716595736985, Thread 979: XXXX 1716595736985, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737084 XXXX 1716595737084, Thread 979: XXXX 1716595737084, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737085 XXXX 1716595737085, Thread 979: XXXX 1716595737085, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737185 XXXX 1716595737185, Thread 979: XXXX 1716595737185, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737186 XXXX 1716595737186, Thread 979: XXXX 1716595737186, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737286 XXXX 1716595737286, Thread 979: XXXX 1716595737286, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737287 XXXX 1716595737287, Thread 979: XXXX 1716595737287, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737386 XXXX 1716595737386, Thread 979: XXXX 1716595737386, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737387 XXXX 1716595737387, Thread 979: XXXX 1716595737387, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737487 XXXX 1716595737487, Thread 979: XXXX 1716595737487, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737488 XXXX 1716595737488, Thread 979: XXXX 1716595737488, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737588 XXXX 1716595737588, Thread 979: XXXX 1716595737588, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737589 XXXX 1716595737589, Thread 979: XXXX 1716595737589, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737690 XXXX 1716595737690, Thread 979: XXXX 1716595737690, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737691 XXXX 1716595737691, Thread 979: XXXX 1716595737691, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737790 XXXX 1716595737790, Thread 979: XXXX 1716595737790, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737790 XXXX 1716595737790, Thread 979: XXXX 1716595737790, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737891 XXXX 1716595737891, Thread 979: XXXX 1716595737891, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737892 XXXX 1716595737892, Thread 979: XXXX 1716595737892, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595737992 XXXX 1716595737992, Thread 979: XXXX 1716595737992, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595737993 XXXX 1716595737993, Thread 979: XXXX 1716595737993, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738092 XXXX 1716595738092, Thread 979: XXXX 1716595738092, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738093 XXXX 1716595738093, Thread 979: XXXX 1716595738093, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738193 XXXX 1716595738193, Thread 979: XXXX 1716595738193, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738194 XXXX 1716595738194, Thread 979: XXXX 1716595738194, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738294 XXXX 1716595738294, Thread 979: XXXX 1716595738294, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738295 XXXX 1716595738295, Thread 979: XXXX 1716595738295, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738394 XXXX 1716595738394, Thread 979: XXXX 1716595738394, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738395 XXXX 1716595738395, Thread 979: XXXX 1716595738395, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738494 XXXX 1716595738494, Thread 979: XXXX 1716595738494, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738495 XXXX 1716595738495, Thread 979: XXXX 1716595738495, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738594 XXXX 1716595738594, Thread 979: XXXX 1716595738594, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738595 XXXX 1716595738595, Thread 979: XXXX 1716595738595, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738695 XXXX 1716595738695, Thread 979: XXXX 1716595738695, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738696 XXXX 1716595738696, Thread 979: XXXX 1716595738696, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738796 XXXX 1716595738796, Thread 979: XXXX 1716595738796, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738797 XXXX 1716595738797, Thread 979: XXXX 1716595738797, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738897 XXXX 1716595738897, Thread 979: XXXX 1716595738897, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738897 XXXX 1716595738897, Thread 979: XXXX 1716595738897, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595738998 XXXX 1716595738998, Thread 979: XXXX 1716595738998, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595738999 XXXX 1716595738999, Thread 979: XXXX 1716595738999, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739099 XXXX 1716595739099, Thread 979: XXXX 1716595739099, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739099 XXXX 1716595739099, Thread 979: XXXX 1716595739099, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739200 XXXX 1716595739200, Thread 979: XXXX 1716595739200, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739200 XXXX 1716595739200, Thread 979: XXXX 1716595739200, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739300 XXXX 1716595739300, Thread 979: XXXX 1716595739300, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739301 XXXX 1716595739301, Thread 979: XXXX 1716595739301, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739400 XXXX 1716595739400, Thread 979: XXXX 1716595739400, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739401 XXXX 1716595739401, Thread 979: XXXX 1716595739401, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739502 XXXX 1716595739502, Thread 979: XXXX 1716595739502, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739502 XXXX 1716595739502, Thread 979: XXXX 1716595739502, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739603 XXXX 1716595739603, Thread 979: XXXX 1716595739603, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739603 XXXX 1716595739603, Thread 979: XXXX 1716595739603, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739704 XXXX 1716595739704, Thread 979: XXXX 1716595739704, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739705 XXXX 1716595739705, Thread 979: XXXX 1716595739705, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739804 XXXX 1716595739804, Thread 979: XXXX 1716595739804, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739805 XXXX 1716595739805, Thread 979: XXXX 1716595739805, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595739905 XXXX 1716595739905, Thread 979: XXXX 1716595739905, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595739906 XXXX 1716595739906, Thread 979: XXXX 1716595739906, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740005 XXXX 1716595740005, Thread 979: XXXX 1716595740005, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740005 XXXX 1716595740005, Thread 979: XXXX 1716595740005, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740106 XXXX 1716595740106, Thread 979: XXXX 1716595740106, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740107 XXXX 1716595740107, Thread 979: XXXX 1716595740107, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740206 XXXX 1716595740206, Thread 979: XXXX 1716595740206, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740207 XXXX 1716595740207, Thread 979: XXXX 1716595740207, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740306 XXXX 1716595740306, Thread 979: XXXX 1716595740306, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740306 XXXX 1716595740306, Thread 979: XXXX 1716595740306, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740407 XXXX 1716595740407, Thread 979: XXXX 1716595740407, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740408 XXXX 1716595740408, Thread 979: XXXX 1716595740408, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740507 XXXX 1716595740507, Thread 979: XXXX 1716595740507, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740508 XXXX 1716595740508, Thread 979: XXXX 1716595740508, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740608 XXXX 1716595740608, Thread 979: XXXX 1716595740608, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740609 XXXX 1716595740609, Thread 979: XXXX 1716595740609, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740708 XXXX 1716595740708, Thread 979: XXXX 1716595740708, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740708 XXXX 1716595740708, Thread 979: XXXX 1716595740708, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740808 XXXX 1716595740808, Thread 979: XXXX 1716595740808, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740809 XXXX 1716595740809, Thread 979: XXXX 1716595740809, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595740908 XXXX 1716595740908, Thread 979: XXXX 1716595740908, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595740908 XXXX 1716595740908, Thread 979: XXXX 1716595740908, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741009 XXXX 1716595741009, Thread 979: XXXX 1716595741009, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741009 XXXX 1716595741009, Thread 979: XXXX 1716595741009, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741110 XXXX 1716595741110, Thread 979: XXXX 1716595741110, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741110 XXXX 1716595741110, Thread 979: XXXX 1716595741110, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741212 XXXX 1716595741212, Thread 979: XXXX 1716595741212, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741212 XXXX 1716595741212, Thread 979: XXXX 1716595741212, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741313 XXXX 1716595741313, Thread 979: XXXX 1716595741313, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741314 XXXX 1716595741314, Thread 979: XXXX 1716595741314, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741414 XXXX 1716595741414, Thread 979: XXXX 1716595741414, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741415 XXXX 1716595741415, Thread 979: XXXX 1716595741415, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741514 XXXX 1716595741514, Thread 979: XXXX 1716595741514, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741515 XXXX 1716595741515, Thread 979: XXXX 1716595741515, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741614 XXXX 1716595741614, Thread 979: XXXX 1716595741614, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741615 XXXX 1716595741615, Thread 979: XXXX 1716595741615, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741715 XXXX 1716595741715, Thread 979: XXXX 1716595741715, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741716 XXXX 1716595741716, Thread 979: XXXX 1716595741716, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741815 XXXX 1716595741815, Thread 979: XXXX 1716595741815, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741816 XXXX 1716595741816, Thread 979: XXXX 1716595741816, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595741916 XXXX 1716595741916, Thread 979: XXXX 1716595741916, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595741917 XXXX 1716595741917, Thread 979: XXXX 1716595741917, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742016 XXXX 1716595742016, Thread 979: XXXX 1716595742016, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742017 XXXX 1716595742017, Thread 979: XXXX 1716595742017, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742117 XXXX 1716595742117, Thread 979: XXXX 1716595742117, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742118 XXXX 1716595742118, Thread 979: XXXX 1716595742118, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742218 XXXX 1716595742218, Thread 979: XXXX 1716595742218, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742219 XXXX 1716595742219, Thread 979: XXXX 1716595742219, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742319 XXXX 1716595742319, Thread 979: XXXX 1716595742319, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742320 XXXX 1716595742320, Thread 979: XXXX 1716595742320, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742419 XXXX 1716595742419, Thread 979: XXXX 1716595742419, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742420 XXXX 1716595742420, Thread 979: XXXX 1716595742420, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742519 XXXX 1716595742519, Thread 979: XXXX 1716595742519, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742520 XXXX 1716595742520, Thread 979: XXXX 1716595742520, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742619 XXXX 1716595742619, Thread 979: XXXX 1716595742619, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742620 XXXX 1716595742620, Thread 979: XXXX 1716595742620, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742719 XXXX 1716595742719, Thread 979: XXXX 1716595742719, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742719 XXXX 1716595742719, Thread 979: XXXX 1716595742719, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742820 XXXX 1716595742820, Thread 979: XXXX 1716595742820, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742821 XXXX 1716595742821, Thread 979: XXXX 1716595742821, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595742921 XXXX 1716595742921, Thread 979: XXXX 1716595742921, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595742922 XXXX 1716595742922, Thread 979: XXXX 1716595742922, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743022 XXXX 1716595743022, Thread 979: XXXX 1716595743022, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743022 XXXX 1716595743022, Thread 979: XXXX 1716595743022, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743122 XXXX 1716595743122, Thread 979: XXXX 1716595743122, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743122 XXXX 1716595743122, Thread 979: XXXX 1716595743122, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743222 XXXX 1716595743222, Thread 979: XXXX 1716595743222, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743222 XXXX 1716595743222, Thread 979: XXXX 1716595743222, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743322 XXXX 1716595743322, Thread 979: XXXX 1716595743322, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743322 XXXX 1716595743322, Thread 979: XXXX 1716595743322, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743422 XXXX 1716595743422, Thread 979: XXXX 1716595743422, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743422 XXXX 1716595743422, Thread 979: XXXX 1716595743422, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743522 XXXX 1716595743522, Thread 979: XXXX 1716595743522, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743522 XXXX 1716595743522, Thread 979: XXXX 1716595743522, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743623 XXXX 1716595743623, Thread 979: XXXX 1716595743623, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743624 XXXX 1716595743624, Thread 979: XXXX 1716595743624, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743724 XXXX 1716595743724, Thread 979: XXXX 1716595743724, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743724 XXXX 1716595743724, Thread 979: XXXX 1716595743724, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743825 XXXX 1716595743825, Thread 979: XXXX 1716595743825, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743826 XXXX 1716595743826, Thread 979: XXXX 1716595743826, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595743925 XXXX 1716595743925, Thread 979: XXXX 1716595743925, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595743925 XXXX 1716595743925, Thread 979: XXXX 1716595743925, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744026 XXXX 1716595744026, Thread 979: XXXX 1716595744026, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744026 XXXX 1716595744026, Thread 979: XXXX 1716595744026, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744126 XXXX 1716595744126, Thread 979: XXXX 1716595744126, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744127 XXXX 1716595744127, Thread 979: XXXX 1716595744127, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744227 XXXX 1716595744227, Thread 979: XXXX 1716595744227, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744228 XXXX 1716595744228, Thread 979: XXXX 1716595744228, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744328 XXXX 1716595744328, Thread 979: XXXX 1716595744328, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744329 XXXX 1716595744329, Thread 979: XXXX 1716595744329, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744429 XXXX 1716595744429, Thread 979: XXXX 1716595744429, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744430 XXXX 1716595744430, Thread 979: XXXX 1716595744430, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744530 XXXX 1716595744530, Thread 979: XXXX 1716595744530, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744531 XXXX 1716595744531, Thread 979: XXXX 1716595744531, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744631 XXXX 1716595744631, Thread 979: XXXX 1716595744631, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744632 XXXX 1716595744632, Thread 979: XXXX 1716595744632, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744731 XXXX 1716595744731, Thread 979: XXXX 1716595744731, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744732 XXXX 1716595744732, Thread 979: XXXX 1716595744732, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744832 XXXX 1716595744832, Thread 979: XXXX 1716595744832, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744832 XXXX 1716595744832, Thread 979: XXXX 1716595744832, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595744933 XXXX 1716595744933, Thread 979: XXXX 1716595744933, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595744934 XXXX 1716595744934, Thread 979: XXXX 1716595744934, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745033 XXXX 1716595745033, Thread 979: XXXX 1716595745033, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745034 XXXX 1716595745034, Thread 979: XXXX 1716595745034, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745134 XXXX 1716595745134, Thread 979: XXXX 1716595745134, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745135 XXXX 1716595745135, Thread 979: XXXX 1716595745135, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745234 XXXX 1716595745234, Thread 979: XXXX 1716595745234, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745235 XXXX 1716595745235, Thread 979: XXXX 1716595745235, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745334 XXXX 1716595745334, Thread 979: XXXX 1716595745334, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745335 XXXX 1716595745335, Thread 979: XXXX 1716595745335, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745434 XXXX 1716595745434, Thread 979: XXXX 1716595745434, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745434 XXXX 1716595745434, Thread 979: XXXX 1716595745434, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745535 XXXX 1716595745535, Thread 979: XXXX 1716595745535, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745536 XXXX 1716595745536, Thread 979: XXXX 1716595745536, Exiting Thread 979: Commands::runScriptBasic  
+642 1721527882233 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool is null
 
-979 1716595745561 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:HaltTarget
-979 1716595745561 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-979 1716595745561 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-979 1716595745561 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-979 1716595745561 XXXX 1716595745561, Thread 979: XXXX 1716595745561, Entering Thread 979: Commands::runScriptBasic, script name = Halt, timeOut = -1 ms  
-979 1716595745562 XXXX 1716595745562, Thread 979: XXXX 1716595745562, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745562 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:HaltTarget
-979 1716595745562 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-979 1716595745562 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-979 1716595745562 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-979 1716595745562 XXXX 1716595745562, Thread 979: XXXX 1716595745562, Entering Thread 979: Commands::runScriptBasic, script name = GetHaltStatus, timeOut = -1 ms  
-979 1716595745563 XXXX 1716595745563, Thread 979: XXXX 1716595745563, Exiting Thread 979: Commands::runScriptBasic  
+642 1721527882233 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetFirmwareInfo
+642 1721527882233 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
+642 1721527882233 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
+642 1721527882233 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
+642 1721527882233 XXXX 1721527882233, Thread 642: com.Send returned false 
+642 1721527882233 XXXX 1721527882233, Thread 642: execCommand: exception after writeSideChanel null 
+642 1721527882233 GEN4_CONNECT_DIAGNOSTICS:Removing plug and play observer com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@2dbf8b66
+642 1721527882233 GEN4_CONNECT_DIAGNOSTICS:Begin PlugNPlayObservers list dump:
+642 1721527882233 GEN4_CONNECT_DIAGNOSTICS:End PlugNPlayObservers list dump:
+642 1721527882284 GEN4_CONNECT_DIAGNOSTICS:Calling RIDbgToolCom.Disconnect
+642 1721527882284 GEN4_CONNECT_DIAGNOSTICS:Calling MPLABCommTool.Detach to remove tool from plug and play list
+642 1721527882284 GEN4_CONNECT_DIAGNOSTICS:Calling RIDbgToolCom.DisconnectFromMPlabComm
+642 1721527882284 GEN4_CONNECT_DIAGNOSTICS:Calling MPLABCommTool.Disconnect
+651 1721527897611 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool is NOT null
+651 1721527897611 GEN4_CONNECT_DIAGNOSTICS:AttachedToolPID = 9036, AttachedToolVID = 4d8
+651 1721527897611 GEN4_CONNECT_DIAGNOSTICS:transport type = USB
+651 1721527897611 GEN4_CONNECT_DIAGNOSTICS:AttachedToolPID = 9036, AttachedToolVID = 4d8
+651 1721527897614 GEN4_CONNECT_DIAGNOSTICS:Before MPLABCommTool.Connect()
+651 1721527897614 GEN4_CONNECT_DIAGNOSTICS:After MPLABCommTool.Connect()
+651 1721527897614 GEN4_CONNECT_DIAGNOSTICS:Adding new plug and play observer com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@2572c9c
+651 1721527897614 GEN4_CONNECT_DIAGNOSTICS:Begin PlugNPlayObservers list dump:
+651 1721527897614 GEN4_CONNECT_DIAGNOSTICS:com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@2572c9c
+651 1721527897614 GEN4_CONNECT_DIAGNOSTICS:End PlugNPlayObservers list dump:
+651 1721527897615 GEN4_CONNECT_DIAGNOSTICS:Registering for alternate PNP notifications. CommPnPCriteria.cPIDList = [9035], CommPnPCriteria.cSerialNumber = 020026702ryn015809
 
-979 1716595745564 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:GetPC
-979 1716595745564 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-979 1716595745564 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-979 1716595745564 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-979 1716595745564 XXXX 1716595745564, Thread 979: XXXX 1716595745564, Entering Thread 979: Commands::runScriptBasic, script name = GetPC, timeOut = -1 ms  
-979 1716595745565 XXXX 1716595745565, Thread 979: XXXX 1716595745565, Exiting Thread 979: Commands::runScriptBasic  
-979 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:GetPC
-979 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-979 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 d8c
-979 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897638 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:init
+651 1721527897638 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897638 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: Values:
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: pcAddress = 7fffffffffffffff, Vpp = 5.00, useRowEraseIfVoltageIsLow = false, voltageBelowWhichUseRowErase = 0.00, deviceName = AVR128DA28, programmerType = AVR
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: MemInfo values:
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = ffff, exists = true, startAddr = 00000000, endAddr = 0001ffff, rowSize = 0200, rowEraseSize = 0200, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00821050, endAddr = 00831043, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00001400, endAddr = 000015ff, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00001080, endAddr = 0000109f, rowSize = 0020, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0200, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 7fffffff, exists = true, startAddr = 00001100, endAddr = 0000117f, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: CfgRequiredBitsMask Values:
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001100, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001101, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001102, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001104, Mask = 0000ffff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001106, Mask = 0000ffff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001110, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001111, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001112, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001113, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001114, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001115, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001116, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001117, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001118, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001119, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111a, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111b, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111c, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111d, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111e, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111f, Mask = 00000000
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821050, Mask = 000000ff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821051, Mask = 000000ff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821052, Mask = 00000007
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821055, Mask = 000000ed
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821056, Mask = 00000007
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821057, Mask = 000000ff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821058, Mask = 000000ff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00831040, Mask = ffffffff
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 BasicInfo: Values:
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 BasicInfo: InputStream = com.microchip.mplab.libs.toolpacksupport.EquatableFileInputStream@aea60031, ToolFlavor = PIC32C
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:init
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 none
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4DebugInterface
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4DebugInterfaceImpl@37a0b20f
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:GetPC
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745565 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745565 XXXX 1716595745565, Thread 2690: XXXX 1716595745565, Entering Thread 2690: Commands::runScriptBasic, script name = GetPC, timeOut = -1 ms  
-2690 1716595745566 XXXX 1716595745566, Thread 2690: XXXX 1716595745566, Exiting Thread 2690: Commands::runScriptBasic  
-2690 1716595745566 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:GetPC
-2690 1716595745566 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745566 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 d8c
-2690 1716595745566 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ProgramInterface
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4ProgramInterfaceImpl@3d112a88
+651 1721527897639 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ConnectInterface
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.PK4ToolsController.PK4ConnectInterfaceImpl@619d27a
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 FileRegs
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 3d
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 3e
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745570 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745570 XXXX 1716595745570, Thread 2690: XXXX 1716595745570, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745570 XXXX 1716595745570, Thread 2690: XXXX 1716595745570, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745572 XXXX 1716595745572, Thread 2690: XXXX 1716595745572, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745572 XXXX 1716595745572, Thread 2690: XXXX 1716595745572, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745572 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745572 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745572 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745572 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ControllerDiagnosticsInterface
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4ControllerDiagnosticsInterfaceImpl@4bdd3844
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 ProgrammerToGo
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.ProgrammerToGoImpl@795fcbfa
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 NMMR
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 1c
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 1d
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745574 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745574 XXXX 1716595745574, Thread 2690: XXXX 1716595745574, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745574 XXXX 1716595745574, Thread 2690: XXXX 1716595745574, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745576 XXXX 1716595745576, Thread 2690: XXXX 1716595745576, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745576 XXXX 1716595745576, Thread 2690: XXXX 1716595745576, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Status
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 null
+651 1721527897640 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:EstablishCommunincations
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 com.microchip.mplab.mdbcore.PK5Tool.PK5Com@261585c6
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:EstablishCommunincations
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 true
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
 
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 NMMR
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 1c
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 1d
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745576 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745576 XXXX 1716595745576, Thread 2690: XXXX 1716595745576, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745576 XXXX 1716595745576, Thread 2690: XXXX 1716595745576, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745578 XXXX 1716595745578, Thread 2690: XXXX 1716595745578, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745578 XXXX 1716595745578, Thread 2690: XXXX 1716595745578, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 FileRegs
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 18
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 19
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745578 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745578 XXXX 1716595745578, Thread 2690: XXXX 1716595745578, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745578 XXXX 1716595745578, Thread 2690: XXXX 1716595745578, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745580 XXXX 1716595745580, Thread 2690: XXXX 1716595745580, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745580 XXXX 1716595745580, Thread 2690: XXXX 1716595745580, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745580 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745580 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745580 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745580 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 FileRegs
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 18
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 19
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745582 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745582 XXXX 1716595745582, Thread 2690: XXXX 1716595745582, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745582 XXXX 1716595745582, Thread 2690: XXXX 1716595745582, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745584 XXXX 1716595745584, Thread 2690: XXXX 1716595745584, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745584 XXXX 1716595745584, Thread 2690: XXXX 1716595745584, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 FileRegs
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 18
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 19
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745584 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745584 XXXX 1716595745584, Thread 2690: XXXX 1716595745584, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745584 XXXX 1716595745584, Thread 2690: XXXX 1716595745584, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745586 XXXX 1716595745586, Thread 2690: XXXX 1716595745586, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745586 XXXX 1716595745586, Thread 2690: XXXX 1716595745586, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:IsTargetInDebugMode
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:IsTargetInDebugMode
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:DebugReadTargetMemory
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 FileRegs
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 4917
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 4918
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Length = 2
-2690 1716595745586 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2690 1716595745586 XXXX 1716595745586, Thread 2690: XXXX 1716595745586, Entering Thread 2690: Commands::runScriptWithUpload, script name = ReadMem8  
-2690 1716595745586 XXXX 1716595745586, Thread 2690: XXXX 1716595745586, Entering Thread 2690: ToolCommUsb::readTransfer, sideData is 0x23 bytes long, transferDataLength is 0x2 bytes long  
-2690 1716595745588 XXXX 1716595745588, Thread 2690: XXXX 1716595745588, Exiting Thread 2690: ToolCommUsb::readTransfer,  cr.status = 0x0  
-2690 1716595745588 XXXX 1716595745588, Thread 2690: XXXX 1716595745588, Exiting Thread 2690: Commands::runScriptWithUpload  
-2690 1716595745588 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:DebugReadTargetMemory
-2690 1716595745588 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2690 1716595745588 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 true
-2690 1716595745588 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-2685 1716595745696 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool is null
-
-2685 1716595745696 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Pre:EndDebugSession
-2685 1716595745696 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload
-2685 1716595745696 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 null
-2685 1716595745696 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Payload End
-2685 1716595745696 XXXX 1716595745696, Thread 2685: XXXX 1716595745696, Entering Thread 2685: Commands::runScriptBasic, script name = ExitDebugMode, timeOut = -1 ms  
-2685 1716595745697 XXXX 1716595745697, Thread 2685: XXXX 1716595745697, Exiting Thread 2685: Commands::runScriptBasic  
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Post:EndDebugSession
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return Value
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 none
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_DEBUG_INT_LOG_AVR128DA28 Return End
-
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetFirmwareInfo
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
-2685 1716595745697 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:GetFirmwareInfo
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 FirmwareInfo: Values:
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 FirmwareInfo: boot = false, bootVer = 00.00.10, apVer = 02.01.38, fpgaVer = ff.ff.ff, scriptVer = 00.06.71, macAddress = 0504983777653804954485349485256, devID = a1020e01, devID1 = 2, devSN0 = ffffffff, devSN1 = ffffffff, serialNumber = 020026702RYN015809, appCommitID = null, scriptCommitID = 74cdf38a4d, PCB_ID = 2
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:SetPowerInfo
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 PowerInfo: Values:
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 PowerInfo: shotDownSystem = true, isToolPower = false, voltage = 0.000000, useVppFirst = false, useLowVoltageProgramming = true, useMaintainActivePower = false
-2685 1716595745704 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-2685 1716595745704 XXXX 1716595745704, Thread 2685: XXXX 1716595745704, Entering Thread 2685: Commands::runScriptBasic with script contents. contents[0] = 0x39, ...  
-2685 1716595745704 XXXX 1716595745704, Thread 2685: XXXX 1716595745704, Exiting Thread 2685: Commands::runScriptBasic  
-2685 1716595745704 XXXX 1716595745704, Thread 2685: XXXX 1716595745704, Entering Thread 2685: Commands::runScriptBasic with script contents. contents[0] = 0x44, ...  
-2685 1716595745718 XXXX 1716595745718, Thread 2685: XXXX 1716595745718, Exiting Thread 2685: Commands::runScriptBasic  
-2685 1716595745718 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:SetPowerInfo
-2685 1716595745718 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-2685 1716595745718 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 none
-2685 1716595745718 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-2685 1716595745718 GEN4_CONNECT_DIAGNOSTICS:Removing plug and play observer com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@7e7c5d12
-2685 1716595745718 GEN4_CONNECT_DIAGNOSTICS:Begin PlugNPlayObservers list dump:
-2685 1716595745718 GEN4_CONNECT_DIAGNOSTICS:End PlugNPlayObservers list dump:
-2685 1716595745768 GEN4_CONNECT_DIAGNOSTICS:Calling RIDbgToolCom.Disconnect
-2685 1716595745768 GEN4_CONNECT_DIAGNOSTICS:Calling MPLABCommTool.Detach to remove tool from plug and play list
-2685 1716595745768 GEN4_CONNECT_DIAGNOSTICS:Calling RIDbgToolCom.DisconnectFromMPlabComm
-2685 1716595745768 GEN4_CONNECT_DIAGNOSTICS:Calling MPLABCommTool.Disconnect
-3826 1716595748833 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool is NOT null
-3826 1716595748833 GEN4_CONNECT_DIAGNOSTICS:AttachedToolPID = 9036, AttachedToolVID = 4d8
-3826 1716595748833 GEN4_CONNECT_DIAGNOSTICS:transport type = USB
-3826 1716595748833 GEN4_CONNECT_DIAGNOSTICS:AttachedToolPID = 9036, AttachedToolVID = 4d8
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:Before MPLABCommTool.Connect()
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:After MPLABCommTool.Connect()
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool.Connect() returned MPLABCOMM_NO_ERROR
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:Attaching to MPLABCommTool plugnplay
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:Adding new plug and play observer com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@42e70fd6
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:Begin PlugNPlayObservers list dump:
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@42e70fd6
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:End PlugNPlayObservers list dump:
-3826 1716595748836 GEN4_CONNECT_DIAGNOSTICS:Registering for alternate PNP notifications. CommPnPCriteria.cPIDList = [9035], CommPnPCriteria.cSerialNumber = 020026702ryn015809
-
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:init
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: Values:
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: pcAddress = 7fffffffffffffff, Vpp = 5.00, useRowEraseIfVoltageIsLow = false, voltageBelowWhichUseRowErase = 0.00, deviceName = AVR128DA28, programmerType = AVR
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: MemInfo values:
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = ffff, exists = true, startAddr = 00000000, endAddr = 0001ffff, rowSize = 0200, rowEraseSize = 0200, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00821050, endAddr = 00831043, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00001400, endAddr = 000015ff, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00001080, endAddr = 0000109f, rowSize = 0020, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0200, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 7fffffff, exists = true, startAddr = 00001100, endAddr = 0000117f, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: CfgRequiredBitsMask Values:
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001100, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001101, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001102, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001104, Mask = 0000ffff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001106, Mask = 0000ffff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001110, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001111, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001112, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001113, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001114, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001115, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001116, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001117, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001118, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001119, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111a, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111b, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111c, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111d, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111e, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111f, Mask = 00000000
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821050, Mask = 000000ff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821051, Mask = 000000ff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821052, Mask = 00000007
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821055, Mask = 000000ed
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821056, Mask = 00000007
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821057, Mask = 000000ff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821058, Mask = 000000ff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00831040, Mask = ffffffff
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 BasicInfo: Values:
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 BasicInfo: InputStream = com.microchip.mplab.libs.toolpacksupport.EquatableFileInputStream@aea60031, ToolFlavor = PIC32C
-3826 1716595748857 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:init
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 none
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4DebugInterface
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4DebugInterfaceImpl@68ac20e4
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ProgramInterface
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4ProgramInterfaceImpl@3cca8060
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ConnectInterface
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.PK4ToolsController.PK4ConnectInterfaceImpl@46a9b190
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ControllerDiagnosticsInterface
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4ControllerDiagnosticsInterfaceImpl@37d34de1
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 ProgrammerToGo
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.ProgrammerToGoImpl@3e71e0ff
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Status
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 null
-3826 1716595748858 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:EstablishCommunincations
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 com.microchip.mplab.mdbcore.PK5Tool.PK5Com@13a075ac
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:EstablishCommunincations
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 true
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetFirmwareInfo
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
-3826 1716595748860 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748868 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:GetFirmwareInfo
-3826 1716595748868 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595748868 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 FirmwareInfo: Values:
-3826 1716595748868 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 FirmwareInfo: boot = false, bootVer = 00.00.10, apVer = 02.01.38, fpgaVer = ff.ff.ff, scriptVer = 00.06.71, macAddress = 0504983777653804954485349485256, devID = a1020e01, devID1 = 2, devSN0 = ffffffff, devSN1 = ffffffff, serialNumber = 020026702RYN015809, appCommitID = null, scriptCommitID = 74cdf38a4d, PCB_ID = 2
-3826 1716595748868 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-3826 1716595748868 XXXX 1716595748868, Thread 3826: XXXX 1716595748868, Entering Thread 3826: Commands::runScriptWithUpload with script contents. contents[0] = 0x5e, ...  
-3826 1716595748868 XXXX 1716595748868, Thread 3826: XXXX 1716595748868, Entering Thread 3826: ToolCommUsb::readTransfer, sideData is 0xd bytes long, transferDataLength is 0x4 bytes long  
-3826 1716595748870 XXXX 1716595748870, Thread 3826: XXXX 1716595748870, Exiting Thread 3826: ToolCommUsb::readTransfer,  cr.status = 0x0  
-3826 1716595748870 XXXX 1716595748870, Thread 3826: XXXX 1716595748870, Exiting Thread 3826: Commands::runScriptWithUpload  
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:ENTERING: com.microchip.mplab.mdbcore.RI4Tool.ConnectionHandler.CheckForFWUpdates()
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Created FirmwareUpdateHandler com.microchip.mplab.mdbcore.PK5Tool.PK5FirmwareUpdateHandler@5650aed1
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:ENTERING: com.microchip.mplab.mdbcore.RI4Tool.FirmwareUpdateHandler.GetUpdateInfo()
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Parsing file  for firmware updates
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:ENTERING: com.microchip.mplab.mdbcore.RI4Tool.FirmwareUpdateHandler.ri4ParseSelectedVersionsFromJamFile()
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Jame file line = app.hex,020138
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Jame file line = boot.hex,000010
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Jame file line = scripts.xml,000671
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Selected firmware version for Boot = 00.00.10
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:Selected firmware version for ap = 02.01.38
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:EXITING: com.microchip.mplab.mdbcore.RI4Tool.FirmwareUpdateHandler.ri4ParseSelectedVersionsFromJamFile()
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:EXITING: com.microchip.mplab.mdbcore.RI4Tool.FirmwareUpdateHandler.GetUpdateInfo()
-3826 1716595748870 GEN4_CONNECT_DIAGNOSTICS:ENTERING: com.microchip.mplab.mdbcore.RI4Tool.FirmwareUpdateHandler.updateRI4ToolsFirmware(FirmwareInfo, UpdateMessage)
-3826 1716595748873 GEN4_CONNECT_DIAGNOSTICS:appNeedsUpdate returned false
-3826 1716595748873 GEN4_CONNECT_DIAGNOSTICS:EXITING: com.microchip.mplab.mdbcore.RI4Tool.FirmwareUpdateHandler.updateRI4ToolsFirmware(FirmwareInfo, UpdateMessage)
-3826 1716595748873 GEN4_CONNECT_DIAGNOSTICS:EXITING: com.microchip.mplab.mdbcore.RI4Tool.ConnectionHandler.CheckForFWUpdates()
-
-3826 1716595748873 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:SetPowerInfo
-3826 1716595748873 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595748873 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 PowerInfo: Values:
-3826 1716595748874 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 PowerInfo: shotDownSystem = false, isToolPower = false, voltage = 5.000000, useVppFirst = false, useLowVoltageProgramming = true, useMaintainActivePower = false
-3826 1716595748874 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595748874 XXXX 1716595748874, Thread 3826: XXXX 1716595748874, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x39, ...  
-3826 1716595748875 XXXX 1716595748875, Thread 3826: XXXX 1716595748875, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595748875 XXXX 1716595748875, Thread 3826: XXXX 1716595748875, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x46, ...  
-3826 1716595748876 XXXX 1716595748876, Thread 3826: XXXX 1716595748876, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595748876 XXXX 1716595748876, Thread 3826: XXXX 1716595748876, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x44, ...  
-3826 1716595748889 XXXX 1716595748889, Thread 3826: XXXX 1716595748889, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595748889 XXXX 1716595748889, Thread 3826: XXXX 1716595748889, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0xef, ...  
-3826 1716595748899 XXXX 1716595748899, Thread 3826: XXXX 1716595748899, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595748899 XXXX 1716595748899, Thread 3826: XXXX 1716595748899, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x40, ...  
-3826 1716595749297 XXXX 1716595749297, Thread 3826: XXXX 1716595749297, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749297 XXXX 1716595749297, Thread 3826: XXXX 1716595749297, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x47, ...  
-3826 1716595749301 XXXX 1716595749301, Thread 3826: XXXX 1716595749301, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:SetPowerInfo
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 none
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:SetLEDBrightness
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 5
-3826 1716595749301 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595749301 XXXX 1716595749301, Thread 3826: XXXX 1716595749301, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0xcf, ...  
-3826 1716595749303 XXXX 1716595749303, Thread 3826: XXXX 1716595749303, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:SetLEDBrightness
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 none
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:SetToolInfo
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 ToolInfo: Values:
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 ToolInfo: speedLevel = 1, PGCResistance = 4700, PGDResistance = 4700, PGCPullDir = PullDown, PGDPullDir = PullDown, ICSPSelected = Wire2
-3826 1716595749303 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595749303 XXXX 1716595749303, Thread 3826: XXXX 1716595749303, Entering Thread 3826: Commands::runScriptBasic, script name = SetSpeed, timeOut = -1 ms  
-3826 1716595749303 XXXX 1716595749303, Thread 3826: XXXX 1716595749303, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749303 XXXX 1716595749303, Thread 3826: XXXX 1716595749303, Entering Thread 3826: Commands::runScriptBasic, script name = EnterProgMode, timeOut = -1 ms  
-3826 1716595749502 XXXX 1716595749502, Thread 3826: XXXX 1716595749502, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:SetToolInfo
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 none
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetTargetIDInfo
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
-3826 1716595749502 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595749504 XXXX 1716595749504, Thread 3826: XXXX 1716595749504, Entering Thread 3826: Commands::runScriptBasic, script name = GetDeviceID, timeOut = -1 ms  
-3826 1716595749506 XXXX 1716595749506, Thread 3826: XXXX 1716595749506, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749506 XXXX 1716595749506, Thread 3826: XXXX 1716595749506, Entering Thread 3826: Commands::runScriptBasic, script name = ExitProgMode, timeOut = -1 ms  
-3826 1716595749506 XXXX 1716595749506, Thread 3826: XXXX 1716595749506, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749506 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:GetTargetIDInfo
-3826 1716595749506 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595749506 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 TargetIDInfo: Values:
-3826 1716595749506 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 TargetIDInfo: DeviceID = 001e970a
-3826 1716595749506 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Pre:SendOperation
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 OperationInfo: Values:
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 OperationInfo: Type = erase, Mask = 00000000, Erase = false, Production Mode = true
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 TransferInfo: Start = 0, End = 1ffff, Buffer Length = 0, Type = Pgm, Mask = 00000000
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 TransferInfo: Start = 1050, End = 1058, Buffer Length = 0, Type = Cfg, Mask = 00000000
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 TransferInfo: Start = 1040, End = 1043, Buffer Length = 0, Type = Cfg, Mask = 00000000
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 TransferInfo: Start = 1400, End = 15ff, Buffer Length = 0, Type = EEData, Mask = 00000000
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 TransferInfo: Start = 1080, End = 109f, Buffer Length = 0, Type = UserID, Mask = 00000000
-3826 1716595749511 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload End
-3826 1716595749511 XXXX 1716595749511, Thread 3826: XXXX 1716595749511, Entering Thread 3826: Commands::runScriptBasic, script name = EnterProgMode, timeOut = -1 ms  
-3826 1716595749710 XXXX 1716595749710, Thread 3826: XXXX 1716595749710, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749710 XXXX 1716595749710, Thread 3826: XXXX 1716595749710, Entering Thread 3826: Commands::runScriptBasic, script name = EraseChip, timeOut = -1 ms  
-3826 1716595749828 XXXX 1716595749828, Thread 3826: XXXX 1716595749828, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749828 XXXX 1716595749828, Thread 3826: XXXX 1716595749828, Entering Thread 3826: Commands::runScriptBasic, script name = ExitProgMode, timeOut = -1 ms  
-3826 1716595749829 XXXX 1716595749829, Thread 3826: XXXX 1716595749829, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595749829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Post:SendOperation
-3826 1716595749829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return Value
-3826 1716595749829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 None
-3826 1716595749829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return End
-
-3826 1716595749831 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Pre:SendOperation
-3826 1716595749831 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload
-3826 1716595749831 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 OperationInfo: Values:
-3826 1716595749831 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 OperationInfo: Type = write, Mask = 00000000, Erase = false, Production Mode = true
-3826 1716595749831 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 TransferInfo: Start = 0, End = 3bff, Buffer Length = 15360, Type = Pgm, Mask = 00000000
-3826 1716595749831 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload End
-3826 1716595749831 XXXX 1716595749831, Thread 3826: XXXX 1716595749831, Entering Thread 3826: Commands::runScriptBasic, script name = EnterProgMode, timeOut = -1 ms  
-3826 1716595750029 XXXX 1716595750029, Thread 3826: XXXX 1716595750029, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595750030 XXXX 1716595750030, Thread 3826: XXXX 1716595750030, Entering Thread 3826: Commands::runScriptWithDownload, script name = WriteProgmem  
-3826 1716595751432 XXXX 1716595751432, Thread 3826: XXXX 1716595751432, Exiting Thread 3826: Commands::runScriptWithDownload(WriteProgmem)  
-3826 1716595751432 XXXX 1716595751432, Thread 3826: XXXX 1716595751432, Entering Thread 3826: Commands::runScriptWithUpload, script name = ReadProgmem  
-3826 1716595751432 XXXX 1716595751432, Thread 3826: XXXX 1716595751432, Entering Thread 3826: ToolCommUsb::readTransfer, sideData is 0x59 bytes long, transferDataLength is 0x3c00 bytes long  
-3826 1716595751827 XXXX 1716595751827, Thread 3826: XXXX 1716595751827, Exiting Thread 3826: ToolCommUsb::readTransfer,  cr.status = 0x0  
-3826 1716595751827 XXXX 1716595751827, Thread 3826: XXXX 1716595751827, Exiting Thread 3826: Commands::runScriptWithUpload  
-3826 1716595751827 XXXX 1716595751827, Thread 3826: XXXX 1716595751827, Entering Thread 3826: Commands::runScriptBasic, script name = ExitProgMode, timeOut = -1 ms  
-3826 1716595751829 XXXX 1716595751829, Thread 3826: XXXX 1716595751829, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Post:SendOperation
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return Value
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 None
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return End
-
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Pre:endOfOperations
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 null
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload End
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Post:endOfOperations
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return Value
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 None
-3826 1716595751829 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return End
-
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Pre:SendOperation
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 OperationInfo: Values:
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 OperationInfo: Type = releasefromreset, Mask = 00000000, Erase = false, Production Mode = true
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Payload End
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Post:SendOperation
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return Value
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 None
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_PROGRAM_INT_LOG_AVR128DA28 Return End
-3826 1716595751830 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool is null
-
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetFirmwareInfo
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
-3826 1716595751830 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:GetFirmwareInfo
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 FirmwareInfo: Values:
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 FirmwareInfo: boot = false, bootVer = 00.00.10, apVer = 02.01.38, fpgaVer = ff.ff.ff, scriptVer = 00.06.71, macAddress = 0504983777653804954485349485256, devID = a1020e01, devID1 = 2, devSN0 = ffffffff, devSN1 = ffffffff, serialNumber = 020026702RYN015809, appCommitID = null, scriptCommitID = 74cdf38a4d, PCB_ID = 2
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:SetPowerInfo
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 PowerInfo: Values:
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 PowerInfo: shotDownSystem = true, isToolPower = false, voltage = 0.000000, useVppFirst = false, useLowVoltageProgramming = true, useMaintainActivePower = false
-3826 1716595751838 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-3826 1716595751838 XXXX 1716595751838, Thread 3826: XXXX 1716595751838, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x39, ...  
-3826 1716595751839 XXXX 1716595751839, Thread 3826: XXXX 1716595751839, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595751839 XXXX 1716595751839, Thread 3826: XXXX 1716595751839, Entering Thread 3826: Commands::runScriptBasic with script contents. contents[0] = 0x44, ...  
-3826 1716595751852 XXXX 1716595751852, Thread 3826: XXXX 1716595751852, Exiting Thread 3826: Commands::runScriptBasic  
-3826 1716595751852 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:SetPowerInfo
-3826 1716595751852 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-3826 1716595751852 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 none
-3826 1716595751852 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-3826 1716595751852 GEN4_CONNECT_DIAGNOSTICS:Removing plug and play observer com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@42e70fd6
-3826 1716595751852 GEN4_CONNECT_DIAGNOSTICS:Begin PlugNPlayObservers list dump:
-3826 1716595751852 GEN4_CONNECT_DIAGNOSTICS:End PlugNPlayObservers list dump:
-3826 1716595751902 GEN4_CONNECT_DIAGNOSTICS:Calling RIDbgToolCom.Disconnect
-3826 1716595751902 GEN4_CONNECT_DIAGNOSTICS:Calling MPLABCommTool.Detach to remove tool from plug and play list
-3826 1716595751902 GEN4_CONNECT_DIAGNOSTICS:Calling RIDbgToolCom.DisconnectFromMPlabComm
-3826 1716595751902 GEN4_CONNECT_DIAGNOSTICS:Calling MPLABCommTool.Disconnect
-4465 1716595957246 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool is NOT null
-4465 1716595957246 GEN4_CONNECT_DIAGNOSTICS:AttachedToolPID = 9036, AttachedToolVID = 4d8
-4465 1716595957246 GEN4_CONNECT_DIAGNOSTICS:transport type = USB
-4465 1716595957246 GEN4_CONNECT_DIAGNOSTICS:AttachedToolPID = 9036, AttachedToolVID = 4d8
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:Before MPLABCommTool.Connect()
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:After MPLABCommTool.Connect()
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:MPLABCommTool.Connect() returned MPLABCOMM_NO_ERROR
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:Attaching to MPLABCommTool plugnplay
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:Adding new plug and play observer com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@29752a72
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:Begin PlugNPlayObservers list dump:
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:com.microchip.mplab.mdbcore.RI4Tool.RI4ToolBase$RI4PlugNPlayObserver@29752a72
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:End PlugNPlayObservers list dump:
-4465 1716595957248 GEN4_CONNECT_DIAGNOSTICS:Registering for alternate PNP notifications. CommPnPCriteria.cPIDList = [9035], CommPnPCriteria.cSerialNumber = 020026702ryn015809
-
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:init
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: Values:
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: pcAddress = 7fffffffffffffff, Vpp = 5.00, useRowEraseIfVoltageIsLow = false, voltageBelowWhichUseRowErase = 0.00, deviceName = AVR128DA28, programmerType = AVR
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: MemInfo values:
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = ffff, exists = true, startAddr = 00000000, endAddr = 0001ffff, rowSize = 0200, rowEraseSize = 0200, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00821050, endAddr = 00831043, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00001400, endAddr = 000015ff, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 00ff, exists = true, startAddr = 00001080, endAddr = 0000109f, rowSize = 0020, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0200, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 7fffffff, exists = true, startAddr = 00001100, endAddr = 0000117f, rowSize = 0001, rowEraseSize = 0000, addrInc = 0001, widthProgram = 0001
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: mask = 0000, exists = false, startAddr = 00000000, endAddr = 00000000, rowSize = 0000, rowEraseSize = 0000, addrInc = 0000, widthProgram = 0000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 DeviceInfo: CfgRequiredBitsMask Values:
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001100, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001101, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001102, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001104, Mask = 0000ffff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001106, Mask = 0000ffff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001110, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001111, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001112, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001113, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001114, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001115, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001116, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001117, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001118, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00001119, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111a, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111b, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111c, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111d, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111e, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 0000111f, Mask = 00000000
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821050, Mask = 000000ff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821051, Mask = 000000ff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821052, Mask = 00000007
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821055, Mask = 000000ed
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821056, Mask = 00000007
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821057, Mask = 000000ff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00821058, Mask = 000000ff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Address = 00831040, Mask = ffffffff
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 BasicInfo: Values:
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 BasicInfo: InputStream = com.microchip.mplab.libs.toolpacksupport.EquatableFileInputStream@aea60031, ToolFlavor = PIC32C
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:init
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 none
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4DebugInterface
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4DebugInterfaceImpl@54e89213
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ProgramInterface
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4ProgramInterfaceImpl@2d9deec5
-4465 1716595974148 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ConnectInterface
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.PK4ToolsController.PK4ConnectInterfaceImpl@2d3b77be
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 RI4ControllerDiagnosticsInterface
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.RI4ControllerDiagnosticsInterfaceImpl@21671993
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 ProgrammerToGo
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 com.microchip.mplab.libs.RI4ToolsController.implementations.ProgrammerToGoImpl@318f7fa6
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Pre:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Status
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Post:GetInterfaceProvider
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 null
-4465 1716595974149 GEN4_TO_CONTROLLER_LOG:GEN4_INIT_INT_LOG_AVR128DA28 Return End
-3854 1716595974152 XXXX 1716595974152, Thread 3854: XXXX 1716595974152, Entering Thread 3854: Commands::runScriptBasic, script name = ExitDebugMode, timeOut = -1 ms  
-3854 1716595974153 XXXX 1716595974153, Thread 3854: com.Send returned false 
-3854 1716595974154 XXXX 1716595974154, Thread 3854: transfer: exception after writeHeaderAndGetResult null 
-3854 1716595974154 XXXX 1716595974154, Thread 3854: XXXX 1716595974154, Entering Thread 3854: ToolCommUsb::recoverFromProtocolError, type = NO_SCRIPT  
-3854 1716595974155 XXXX 1716595974155, Thread 3854: Send Abort Script Engine Command 
-3854 1716595974155 XXXX 1716595974155, Thread 3854: XXXX 1716595974155, Entering Thread 3854: ToolCommUsb::killScriptEngine  
-3854 1716595974155 XXXX 1716595974155, Thread 3854: com.Send returned false 
-3854 1716595974155 XXXX 1716595974155, Thread 3854: Failed sending Abort Script Engine Command. Set nuclear option = true 
-3854 1716595974155 XXXX 1716595974155, Thread 3854: About to nuke 
-3854 1716595974155 XXXX 1716595974155, Thread 3854: XXXX 1716595974155, Entering Thread 3854: ToolCommUsb::nuclearOption  
-3854 1716595974156 XXXX 1716595974156, Thread 3854: com.Send returned false 
-
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:EstablishCommunincations
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 com.microchip.mplab.mdbcore.PK5Tool.PK5Com@78d939b2
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Post:EstablishCommunincations
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return Value
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 true
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Return End
-
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetFirmwareInfo
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
-4465 1716595974156 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
-4465 1716595974156 XXXX 1716595974156, Thread 4465: com.Send returned false 
-4465 1716595974156 XXXX 1716595974156, Thread 4465: execCommand: exception after writeSideChanel null 
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Pre:GetFirmwareInfo
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 null
+651 1721527897642 GEN4_TO_CONTROLLER_LOG:GEN4_CONNECT_INT_LOG_AVR128DA28 Payload End
+651 1721527897643 XXXX 1721527897643, Thread 651: com.Send returned false 
+651 1721527897643 XXXX 1721527897643, Thread 651: execCommand: exception after writeSideChanel null 
