@@ -101,6 +101,10 @@ static uint8_t table_length = 0; //keep track of how many devices initialize
 
 int main(int argc, char** argv) {
     
+    //set clock speed (this is here because it is most important for communications)
+    
+    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
+    
     //setup tasks
     
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
