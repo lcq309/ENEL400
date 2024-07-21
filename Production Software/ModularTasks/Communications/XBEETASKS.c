@@ -178,7 +178,7 @@ void modCOMMInTask (void * parameters)
     uint8_t buffer[MAX_MESSAGE_SIZE];
     uint8_t byte_buffer[1];
     uint8_t length = 0;
-    volatile uint8_t size = 0;
+    uint8_t size = 0;
     uint8_t pos = 0;
     uint8_t check = 0; //check for message failure
     
@@ -258,12 +258,12 @@ void modCOMMInTask (void * parameters)
                     for(uint8_t i = 0; i < GLOBAL_TableLength; i++)
                     {
                         //wireless address check, start with LSB
-                        for(uint8_t y = 8; y >= 1; y--)
+                        for(int8_t y = 8; y > 0; y--)
                         {
                             if(buffer[y] != GLOBAL_DEVICE_TABLE[i].XBeeADD[y-1]) //if address doesn't match
                             {
+                                matched = 0x90;
                                 y = 0; //end loop
-                                matched = 0x90; //not a match
                             }
                             else
                             {
