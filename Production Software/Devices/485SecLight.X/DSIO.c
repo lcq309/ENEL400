@@ -51,7 +51,7 @@ void DSIOSetup()
     
     //setup timers
 
-    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
     xSTATTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vCircCheckTimerFunc);
     
     //setup the semaphore

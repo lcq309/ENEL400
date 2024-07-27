@@ -430,7 +430,9 @@ void prvWSCTask( void * parameters )
                                         }
                                         break;
 
-                                    default: //if there is a lockout, respond with the lockout colour
+                                    default: //if there is a lockout, respond with the lockout colour and take control
+                                        Requester = 1;
+                                        updateIND = 1;
                                         buffer[0] = lockout;
                                         buffer[1] = ControllerTable[tablePos].index; //respond with controller lockout colour
                                         //this should set the controller as requester 2 with a lockout
@@ -528,7 +530,7 @@ void prvWSCTask( void * parameters )
                                         xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                                         break;
 
-                                    case'b': //blue lockout release will be overridden
+                                    case 'b': //blue lockout release will be overridden
                                     case 'B': //blue lockout will be overridden
                                         ControllerTable[tablePos].status = buffer[1];
                                         updateIND = 1;
@@ -838,9 +840,9 @@ void prvWSCTask( void * parameters )
         }
         if(ForceCheck == 1) //if we are forcing a state check
         {
-            for(uint8_t i = 0; i < numControllers; i++)
+            for(int8_t i = 0; i < numControllers; i++)
                 ControllerTable[i].status = 0;
-            for(uint8_t i = 0; i < numLights; i++)
+            for(int8_t i = 0; i < numLights; i++)
                 LightTable[i].status = 0;
             ForceCheck = 0;
         }
@@ -855,11 +857,11 @@ void prvWSCTask( void * parameters )
                     if(GLOBAL_RetransmissionTimerSet == 1 && GLOBAL_MessageSent == 1)
                     {
                         //check other controllers
-                        for(uint8_t i = 0; i < numControllers; i++)
+                        for(int8_t i = 0; i < numControllers; i++)
                         {
                             if(ControllerTable[i].status != colour_req)
                             {
-                                for(uint8_t y = 0; y < MaxNets; y++)
+                                for(int8_t y = 0; y < MaxNets; y++)
                                 {
                                     if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
                                     {
@@ -880,11 +882,11 @@ void prvWSCTask( void * parameters )
                             }
                         }
                         //check lights
-                        for(uint8_t i = 0; i < numLights; i++)
+                        for(int8_t i = 0; i < numLights; i++)
                         {
                             if(LightTable[i].status != colour_req)
                             {
-                                for(uint8_t y = 0; y < MaxNets; y++)
+                                for(int8_t y = 0; y < MaxNets; y++)
                                 {
                                     if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
                                     {
@@ -909,6 +911,7 @@ void prvWSCTask( void * parameters )
                         {
                             colour_cur = colour_req;
                             updateIND = 1;
+                            ForceCheck = 1;
                         }
                         //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                         else // if something was transmitted, we need to reset the timer.
@@ -956,6 +959,14 @@ void prvWSCTask( void * parameters )
         //if we are requester 1, we should ensure that first the controller lockouts are released
         //as a requester 2, we can return to requester 0 once all lights have confirmed colour
         //at this point, all lights and controllers have confirmed colour change, so we need to start releasing lockouts
+        if(ForceCheck == 1) //if we are forcing a state check
+        {
+            for(int8_t i = 0; i < numControllers; i++)
+                ControllerTable[i].status = 0;
+            for(int8_t i = 0; i < numLights; i++)
+                LightTable[i].status = 0;
+            ForceCheck = 0;
+        }
         switch(Requester)
         {
             case 1:
@@ -1036,6 +1047,7 @@ void prvWSCTask( void * parameters )
                         colour_req = colour_cur;
                         updateIND = 1;
                         Requester = 0;
+                        ForceCheck = 1;
                     }
                     //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
                     else // if something was transmitted, we need to reset the timer.

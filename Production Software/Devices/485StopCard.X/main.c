@@ -976,29 +976,32 @@ void prvWSBTask( void * parameters )
                                         }
                                     }
                                 }
-                                if(ControllerTable[i].status != 'C')
+                            }
+                        for(uint8_t i = 0; i < numControllers; i++)
+                        {
+                            if(ControllerTable[i].status != 'C')
+                            {
+                                for(uint8_t y = 0; y < MaxNets; y++)
                                 {
-                                    for(uint8_t y = 0; y < MaxNets; y++)
+                                    if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
                                     {
-                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                        {
-                                            //send another clear request, and set check_variable
-                                            buffer[0] = 'C';
-                                            buffer[1] = colour_req; //colour_req is the colour we are requesting
-                                            buffer[2] = ControllerTable[i].index; //load with retransmission request
-                                            check_variable = 0;
-                                            NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
-                                            y = MaxNets;
-                                        }
-                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
-                                        {
-                                            //just end loop and move on to next device in table
-                                            y = MaxNets;
-                                        }
+                                        //send another clear request, and set check_variable
+                                        buffer[0] = 'C';
+                                        buffer[1] = colour_req; //colour_req is the colour we are requesting
+                                        buffer[2] = ControllerTable[i].index; //load with retransmission request
+                                        check_variable = 0;
+                                        NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
+                                        y = MaxNets;
+                                    }
+                                    else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
+                                    {
+                                        //just end loop and move on to next device in table
+                                        y = MaxNets;
                                     }
                                 }
                             }
+                        }
                         //if all controllers are confirmed, we can move on to releasing lights
                         if(check_variable == 1)
                         {
