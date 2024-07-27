@@ -261,21 +261,27 @@ void prv485OUTTask( void * parameters )
         length = xMessageBufferReceive(xRS485_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
         //acquire MUTEX after pulling message into internal buffer
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-        xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
-        output_leader[1] = length;
-        xStreamBufferSend(xRS485_out_Stream, output_leader, 2, 0);
-        //pass message to the output buffer
-        xStreamBufferSend(xRS485_out_Stream, output_buffer, length, 0);
-        //set transmit mode
-        RS485TR('T');
-        //enable DRE interrupt to start transmission
-        USART0.CTRLA |= USART_DREIE_bm;
-        //wait for TXcomplete semaphore
-        xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
-        //release MUTEXes
-        xSemaphoreGive(xRoundRobin_MUTEX);
-        xSemaphoreGive(xUSART0_MUTEX);
-        //end of loop, start over by waiting for a new message in the buffer
+        if(xSemaphoreTake(xRoundRobin_MUTEX, 25) == pdTRUE)
+        {
+            output_leader[1] = length;
+            xStreamBufferSend(xRS485_out_Stream, output_leader, 2, 0);
+            //pass message to the output buffer
+            xStreamBufferSend(xRS485_out_Stream, output_buffer, length, 0);
+            //set transmit mode
+            RS485TR('T');
+            //enable DRE interrupt to start transmission
+            USART0.CTRLA |= USART_DREIE_bm;
+            //wait for TXcomplete semaphore
+            xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
+            //release MUTEXes
+            xSemaphoreGive(xRoundRobin_MUTEX);
+            xSemaphoreGive(xUSART0_MUTEX);
+            //end of loop, start over by waiting for a new message in the buffer
+        }
+        else //couldn't acquire round_robin mutex, abort
+        {
+            xSemaphoreGive(xUSART0_MUTEX);
+        }
     }
 }
 
@@ -396,33 +402,41 @@ void prvRoundRobinTask( void * parameters )
         {
             //first, try to secure the RS485 line
             xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-            //then, secure the output
-            xSemaphoreTake(xRoundRobin_MUTEX, portMAX_DELAY);
-            //set target to the current address pointed to by count
-            Ping[3] = GLOBAL_DEVICE_TABLE[count];
-            //pass message into the output buffer
-            xStreamBufferSend(xRS485_out_Stream, Ping, 4, portMAX_DELAY);
-            //set to output mode
-            RS485TR('T');
-            //start transmission by enabling the DRE interrupt
-            USART0.CTRLA |= USART_DREIE_bm;
-            //wait for TXcomplete semaphore
-            xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
-            //release USART MUTEX
-            xSemaphoreGive(xUSART0_MUTEX);
-            //wait for a response from the message stream
-            //receives from round robin buffer, puts into acknowledge array, max length 1, waits max 250 cycles
-            acknowledge[0] = 0; //overwrite to prevent false allowance
-            xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 250);
-            //check response
-            if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
             {
-                vTaskDelay(50);
-                xSemaphoreGive(xRoundRobin_MUTEX);
-            } //break here for debug purposes
-            else
-            xSemaphoreGive(xRoundRobin_MUTEX); //release round robin
-            //end of loop, start again after incrementing
+                //then, try secure the output
+                if(xSemaphoreTake(xRoundRobin_MUTEX, 25) == pdTRUE)
+                {
+                    //set target to the current address pointed to by count
+                    Ping[3] = GLOBAL_DEVICE_TABLE[count];
+                    //pass message into the output buffer
+                    xStreamBufferSend(xRS485_out_Stream, Ping, 4, portMAX_DELAY);
+                    //set to output mode
+                    RS485TR('T');
+                    //start transmission by enabling the DRE interrupt
+                    USART0.CTRLA |= USART_DREIE_bm;
+                    //wait for TXcomplete semaphore
+                    xSemaphoreTake(xRS485TX_SEM, portMAX_DELAY);
+                    //release USART MUTEX
+                    xSemaphoreGive(xUSART0_MUTEX);
+                    //wait for a response from the message stream
+                    //receives from round robin buffer, puts into acknowledge array, max length 1, waits max 250 cycles
+                    acknowledge[0] = 0; //overwrite to prevent false allowance
+                    xMessageBufferReceive(xRoundRobin_Buffer, acknowledge, 1, 250);
+                    //check response
+                    if(GLOBAL_DEVICE_TABLE[count] != acknowledge[0])
+                    {
+                        vTaskDelay(50);
+                        xSemaphoreGive(xRoundRobin_MUTEX);
+                    } //break here for debug purposes
+                    else
+                    xSemaphoreGive(xRoundRobin_MUTEX); //release round robin
+                    //end of loop, start again after incrementing
+                }
+                else //if unable to secure the output, just release the input
+                {
+                    xSemaphoreGive(xUSART0_MUTEX);
+                }
+            }
         }
     }
 }
@@ -805,6 +819,7 @@ ISR(USART0_RXC_vect)
     uint8_t buf[1];
     buf[0] = USART0.RXDATAL;
     xMessageBufferSendFromISR(xRS485_in_Stream, buf, 1, NULL);
+    vPortYieldFromISR();
 }
 ISR(USART0_DRE_vect)
 {
@@ -819,6 +834,7 @@ ISR(USART0_DRE_vect)
     }
     else
         USART0.TXDATAL = buf[0];
+    vPortYieldFromISR();
 }
 ISR(USART0_TXC_vect)
 {
@@ -831,6 +847,7 @@ ISR(USART0_TXC_vect)
     RS485TR('R');
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
+    vPortYieldFromISR();
 }
 
 ISR(USART1_RXC_vect)
@@ -839,6 +856,7 @@ ISR(USART1_RXC_vect)
     uint8_t buf[1];
     buf[0] = USART1.RXDATAL;
     xMessageBufferSendFromISR(xMENU_in_Stream, buf, 1, NULL);
+    vPortYieldFromISR();
 }
 ISR(USART1_DRE_vect)
 {
@@ -853,6 +871,7 @@ ISR(USART1_DRE_vect)
     }
     else
         USART1.TXDATAL = buf[0];
+    vPortYieldFromISR();
 }
 ISR(USART1_TXC_vect)
 {
@@ -862,6 +881,7 @@ ISR(USART1_TXC_vect)
      */
     USART1.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xMENUTX_SEM, NULL);
+    vPortYieldFromISR();
 }
 
 ISR(USART2_RXC_vect)
@@ -870,6 +890,7 @@ ISR(USART2_RXC_vect)
     uint8_t buf[1];
     buf[0] = USART2.RXDATAL;
     xMessageBufferSendFromISR(xXBEE_in_Stream, buf, 1, NULL);
+    vPortYieldFromISR();
 }
 ISR(USART2_DRE_vect)
 {
@@ -884,6 +905,7 @@ ISR(USART2_DRE_vect)
     }
     else
         USART2.TXDATAL = buf[0];
+    vPortYieldFromISR();
 }
 ISR(USART2_TXC_vect)
 {
@@ -893,4 +915,5 @@ ISR(USART2_TXC_vect)
      */
     USART2.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xXBEETX_SEM, NULL);
+    vPortYieldFromISR();
 }
