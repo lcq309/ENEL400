@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     
     //setup timer
     
-    xRetransmitTimer = xTimerCreate("ReTX", 250, pdFALSE, 0, vRetransmitTimerFunc);
+    xRetransmitTimer = xTimerCreate("ReTX", 750, pdFALSE, 0, vRetransmitTimerFunc);
     
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins

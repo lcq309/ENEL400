@@ -47,7 +47,7 @@ void DSIOSetup()
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
-    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
     
     //start the indicator timer
     xTimerStart(xINDTimer, 0);

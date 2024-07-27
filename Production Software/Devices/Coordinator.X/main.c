@@ -261,7 +261,7 @@ void prv485OUTTask( void * parameters )
         length = xMessageBufferReceive(xRS485_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
         //acquire MUTEX after pulling message into internal buffer
         xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
-        if(xSemaphoreTake(xRoundRobin_MUTEX, 25) == pdTRUE)
+        if(xSemaphoreTake(xRoundRobin_MUTEX, 500) == pdTRUE)
         {
             output_leader[1] = length;
             xStreamBufferSend(xRS485_out_Stream, output_leader, 2, 0);
@@ -404,7 +404,7 @@ void prvRoundRobinTask( void * parameters )
             xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
             {
                 //then, try secure the output
-                if(xSemaphoreTake(xRoundRobin_MUTEX, 25) == pdTRUE)
+                if(xSemaphoreTake(xRoundRobin_MUTEX, 500) == pdTRUE)
                 {
                     //set target to the current address pointed to by count
                     Ping[3] = GLOBAL_DEVICE_TABLE[count];
@@ -819,7 +819,6 @@ ISR(USART0_RXC_vect)
     uint8_t buf[1];
     buf[0] = USART0.RXDATAL;
     xMessageBufferSendFromISR(xRS485_in_Stream, buf, 1, NULL);
-    vPortYieldFromISR();
 }
 ISR(USART0_DRE_vect)
 {
@@ -834,7 +833,6 @@ ISR(USART0_DRE_vect)
     }
     else
         USART0.TXDATAL = buf[0];
-    vPortYieldFromISR();
 }
 ISR(USART0_TXC_vect)
 {
@@ -847,7 +845,6 @@ ISR(USART0_TXC_vect)
     RS485TR('R');
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
-    vPortYieldFromISR();
 }
 
 ISR(USART1_RXC_vect)
@@ -856,7 +853,6 @@ ISR(USART1_RXC_vect)
     uint8_t buf[1];
     buf[0] = USART1.RXDATAL;
     xMessageBufferSendFromISR(xMENU_in_Stream, buf, 1, NULL);
-    vPortYieldFromISR();
 }
 ISR(USART1_DRE_vect)
 {
@@ -871,7 +867,6 @@ ISR(USART1_DRE_vect)
     }
     else
         USART1.TXDATAL = buf[0];
-    vPortYieldFromISR();
 }
 ISR(USART1_TXC_vect)
 {
@@ -881,7 +876,6 @@ ISR(USART1_TXC_vect)
      */
     USART1.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xMENUTX_SEM, NULL);
-    vPortYieldFromISR();
 }
 
 ISR(USART2_RXC_vect)
@@ -890,7 +884,6 @@ ISR(USART2_RXC_vect)
     uint8_t buf[1];
     buf[0] = USART2.RXDATAL;
     xMessageBufferSendFromISR(xXBEE_in_Stream, buf, 1, NULL);
-    vPortYieldFromISR();
 }
 ISR(USART2_DRE_vect)
 {
@@ -905,7 +898,6 @@ ISR(USART2_DRE_vect)
     }
     else
         USART2.TXDATAL = buf[0];
-    vPortYieldFromISR();
 }
 ISR(USART2_TXC_vect)
 {
@@ -915,5 +907,4 @@ ISR(USART2_TXC_vect)
      */
     USART2.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xXBEETX_SEM, NULL);
-    vPortYieldFromISR();
 }

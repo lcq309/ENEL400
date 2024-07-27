@@ -844,7 +844,7 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000    0x106d6
+.debug_info     0x0000000000000000    0x106d7
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000     0x2504 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_info    0x0000000000002504      0x852 build/default/production/_ext/83377035/USART.o
@@ -858,8 +858,8 @@ END GROUP
  .debug_info    0x0000000000008a45     0x26c8 build/default/production/_ext/1644529106/tasks.o
  .debug_info    0x000000000000b10d     0x15c4 build/default/production/_ext/1644529106/timers.o
  .debug_info    0x000000000000c6d1     0x17d8 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_info    0x000000000000dea9     0x1ad8 build/default/production/main.o
- .debug_info    0x000000000000f981      0xd55 build/default/production/DSIO.o
+ .debug_info    0x000000000000dea9     0x1ad9 build/default/production/main.o
+ .debug_info    0x000000000000f982      0xd55 build/default/production/DSIO.o
 
 .debug_abbrev   0x0000000000000000     0x3db7
  *(.debug_abbrev)
