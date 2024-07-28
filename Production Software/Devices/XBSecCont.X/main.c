@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     //grab the channel and device ID
     InitShiftIn(); //initialize shift register pins
     LTCHIn(); //latch input register
-//    GLOBAL_Channel = ShiftIn(); //grab channel
+    GLOBAL_Channel = ShiftIn(); //grab channel
     
     //setup modules
     USART0BAUD = 115200;
