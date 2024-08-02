@@ -123,6 +123,31 @@ void modCOMMOutTask (void * parameters)
             //load join message into output
             xStreamBufferSend(xCOMM_out_Stream, netmessage, 14, 0);
         }
+        else if((buffer[size-1] == 254) && (size != 0)) //I'll use this for broadcast
+        {
+            //end of message contains the index of the target device.
+            //reduce length by one, since we won't be sending the index value
+            length = size - 1;
+            length = length + 12; //add header to length
+            header_buffer[0] = 0x7e; //start delimiter
+            header_buffer[1] = length; //length byte
+            header_buffer[2] = 'O'; //outgoing
+            header_buffer[3] = GLOBAL_DeviceID; //sender device ID
+            header_buffer[4] = GLOBAL_Channel; //device channel
+            header_buffer[5] = GLOBAL_DeviceType; //sender device type
+            header_buffer[6] = 0x0;
+            header_buffer[7] = 0x0;
+            header_buffer[8] = 0x0;
+            header_buffer[9] = 0x0;
+            header_buffer[10] = 0x0;
+            header_buffer[11] = 0x0;
+            header_buffer[12] = 0xff;
+            header_buffer[13] = 0xff;
+            //load output header
+            xStreamBufferSend(xCOMM_out_Stream, header_buffer, 14, 0);
+            //load output message
+            xStreamBufferSend(xCOMM_out_Stream, buffer, size - 1, 0);
+        }
         else if(size != 0) //generate header based on the information at the index, and load into the output stream with the message
         {
             //end of message contains the index of the target device.

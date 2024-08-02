@@ -195,6 +195,7 @@ void prvWSBTask( void * parameters )
     volatile uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
+    uint8_t Broadcast = 0; //used to ensure first transmission is a broadcast
     
     /* High level overview
      * 1. check for any commands from pushbutton
@@ -237,6 +238,7 @@ void prvWSBTask( void * parameters )
                             GLOBAL_MessageSent = 1;
                             ForceCheck = 1;
                             Requester = 1;
+                            Broadcast = 1;
                             break;
                         
                         case 'y': //yellow lockout clearing
@@ -248,6 +250,7 @@ void prvWSBTask( void * parameters )
                             colour_req = buffer[1];
                             Requester = 1;
                             ForceCheck = 1;
+                            Broadcast = 1;
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             GLOBAL_MessageSent = 1;
@@ -260,6 +263,7 @@ void prvWSBTask( void * parameters )
                                 colour_req = buffer[1];
                                 Requester = 1;
                                 ForceCheck = 1;
+                                Broadcast = 1;
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                 GLOBAL_MessageSent = 1;
                                 updateIND = 1;
@@ -271,6 +275,7 @@ void prvWSBTask( void * parameters )
                                 buffer[1] = 'W'; //warning flash red
                                 xQueueSendToFront(xIND_Queue, buffer, portMAX_DELAY);
                                 updateIND = 1;
+                                Broadcast = 1;
                             }
                             else if(buffer[1] == 'Y')
                             {
@@ -279,6 +284,7 @@ void prvWSBTask( void * parameters )
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                 GLOBAL_MessageSent = 1;
                                 updateIND = 1;
+                                Broadcast = 1;
                             }
                             else if(buffer[1] == 'R')
                             {
@@ -289,6 +295,7 @@ void prvWSBTask( void * parameters )
                                 GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                                 GLOBAL_MessageSent = 1;
                                 updateIND = 1;
+                                Broadcast = 1;
                             }
                             break;
                     }
@@ -590,6 +597,7 @@ void prvWSBTask( void * parameters )
                 LightTable[i].status = 0;
             ForceCheck = 0;
         }
+        //I need a function that broadcasts the first time, I'll probably need to set a flag and reset it everytime the colour changes.
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
             switch(Requester)
@@ -601,6 +609,37 @@ void prvWSBTask( void * parameters )
                     //for lockout 'Y', normal controller behaviour down to 'C'
                     //for colour_req 'O', turn everything off
                     //check retransmission timers and retransmit if needed
+                    if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1) && (Broadcast == 1))
+                    {
+                        if((lockout == 'R') && (Requester == 1))
+                        {
+                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                            buffer[1] = 254; //load with broadcast command
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            Broadcast = 0;
+                        }
+                        else if((colour_req == 'O') && (lockout != 'R'))
+                        {
+                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                            buffer[1] = 254; //load with broadcast command
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            Broadcast = 0;
+                        }
+                        else if(lockout == 'Y')
+                        {
+                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                            buffer[1] = 254; //load with broadcast command
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            Broadcast = 0;
+                        }
+                        else if((lockout == 'Y') && (colour_cur == 'Y'))
+                        {
+                            buffer[0] = 'C';
+                            buffer[1] = 254; //load with broadcast command
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            Broadcast = 0;
+                        }
+                    }
                     if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))
                     {
                         if((lockout == 'R') && (Requester == 1))
@@ -722,6 +761,7 @@ void prvWSBTask( void * parameters )
                                 lockout = 'Y';
                                 updateIND = 1;
                                 colour_req = 'Y';
+                                Broadcast = 1;
                             }
                             else // if something was transmitted, we need to reset the timer.
                             {
@@ -896,6 +936,7 @@ void prvWSBTask( void * parameters )
                             //if all colours are matching, we can set colour_cur to colour_req
                             if(check_variable == 1)
                             {
+                                Broadcast = 1;
                                 colour_cur = colour_req;
                                 updateIND = 1;
                             }
