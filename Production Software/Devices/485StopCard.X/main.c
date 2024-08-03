@@ -639,6 +639,7 @@ void prvWSBTask( void * parameters )
                             xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
                             Broadcast = 0;
                         }
+                        GLOBAL_RetransmissionTimerSet = 0;
                     }
                     if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))
                     {
