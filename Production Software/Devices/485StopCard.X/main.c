@@ -178,21 +178,21 @@ void prvWSBTask( void * parameters )
      * 
      */
     struct DeviceTracker ControllerTable[30]; //maximum of 30 connected controlled devices (probably not a hard limit)
-    uint8_t numControllers = 0;
-    uint8_t tablePos = 0;
+    int8_t numControllers = 0;
+    int8_t tablePos = 0;
     struct DeviceTracker LightTable[30]; //30 connected lights
-    uint8_t numLights = 0;
+    int8_t numLights = 0;
     struct DeviceTracker SpecialTable[10]; //10 connected special devices (stop button etc)
-    uint8_t numSpecials = 0;
+    int8_t numSpecials = 0;
     struct DeviceTracker MenuTable[5]; //5 connected menu devices
-    uint8_t numMenus = 0;
-    volatile uint8_t lockout = 'C'; //used to track lockout status ('R'ed, 'Y'ellow, 'C'lear)
+    int8_t numMenus = 0;
+    uint8_t lockout = 'C'; //used to track lockout status ('R'ed, 'Y'ellow, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'Y'; //requested colour
-    volatile uint8_t colour_cur = 'Y'; //current confirmed colour
-    volatile uint8_t colour_err = 0; //error tracking colour
+    uint8_t colour_cur = 'Y'; //current confirmed colour
+    uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
     uint8_t Broadcast = 0; //used to ensure first transmission is a broadcast
@@ -250,7 +250,6 @@ void prvWSBTask( void * parameters )
                             colour_req = buffer[1];
                             Requester = 1;
                             ForceCheck = 1;
-                            Broadcast = 1;
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             GLOBAL_MessageSent = 1;
@@ -598,6 +597,36 @@ void prvWSBTask( void * parameters )
             ForceCheck = 0;
         }
         //I need a function that broadcasts the first time, I'll probably need to set a flag and reset it everytime the colour changes.
+        if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1) && (Broadcast == 1))
+        {
+            if((lockout == 'R') && (Requester == 1))
+            {
+                buffer[0] = colour_req; //colour_req is the colour we are requesting
+                buffer[1] = 254; //load with broadcast command
+                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+            }
+            else if((colour_req == 'O') && (lockout != 'R') && (Requester == 1))
+            {
+                buffer[0] = colour_req; //colour_req is the colour we are requesting
+                buffer[1] = 254; //load with broadcast command
+                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+            }
+            else if(lockout == 'Y' && (Requester == 1))
+            {
+                buffer[0] = colour_req; //colour_req is the colour we are requesting
+                buffer[1] = 254; //load with broadcast command
+                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+            }
+            else if((lockout == 'Y') && (colour_cur == 'Y') && (Requester == 1))
+            {
+                buffer[0] = 'C';
+                buffer[1] = 254; //load with broadcast command
+                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+            }
+            GLOBAL_RetransmissionTimerSet = 0;
+            xTimerReset(xRetransmitTimer, portMAX_DELAY);
+            Broadcast = 0;
+        }
         if((colour_cur != colour_req) && (colour_cur != (colour_req + 32))) //this also allows the lowercase through, since it will only be the lowercase form once all devices have confirmed.
         {
             switch(Requester)
@@ -609,38 +638,6 @@ void prvWSBTask( void * parameters )
                     //for lockout 'Y', normal controller behaviour down to 'C'
                     //for colour_req 'O', turn everything off
                     //check retransmission timers and retransmit if needed
-                    if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1) && (Broadcast == 1))
-                    {
-                        if((lockout == 'R') && (Requester == 1))
-                        {
-                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                            buffer[1] = 254; //load with broadcast command
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                            Broadcast = 0;
-                        }
-                        else if((colour_req == 'O') && (lockout != 'R'))
-                        {
-                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                            buffer[1] = 254; //load with broadcast command
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                            Broadcast = 0;
-                        }
-                        else if(lockout == 'Y')
-                        {
-                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                            buffer[1] = 254; //load with broadcast command
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                            Broadcast = 0;
-                        }
-                        else if((lockout == 'Y') && (colour_cur == 'Y'))
-                        {
-                            buffer[0] = 'C';
-                            buffer[1] = 254; //load with broadcast command
-                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                            Broadcast = 0;
-                        }
-                        GLOBAL_RetransmissionTimerSet = 0;
-                    }
                     if((GLOBAL_RetransmissionTimerSet == 1) && (GLOBAL_MessageSent == 1))
                     {
                         if((lockout == 'R') && (Requester == 1))

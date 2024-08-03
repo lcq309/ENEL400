@@ -645,6 +645,20 @@ void prvXBEEINTask( void * parameters )
                  * 
                  * overall size change is - 4 for header differences
                  */
+                //check against checksum
+                 for(uint8_t i = 3; i < 20; i++)
+                {
+                    checksumcalc += header_buffer[i];
+                    
+                }
+                for(uint8_t i = 0; i < size; i++)
+                {
+                    checksumcalc += buffer[i];
+                }
+                size++; //add a spot for the checksum
+                buffer[size - 1] = 0xff - (checksumcalc & 0xff);
+                //load output message (includes checksum on end, replacing the index)
+                xStreamBufferSend(xXBEE_out_Stream, buffer, size, 0);
                 //change size
                 size = size - 2;
                 //reassemble the message in the output buffer
