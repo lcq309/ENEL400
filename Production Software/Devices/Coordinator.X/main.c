@@ -589,7 +589,7 @@ void prvXBEEINTask( void * parameters )
                 length = byte_buffer[0]; // load loop iterator
                 size = length; //save length for use later
                 //loop and assemble message until length = 0;`1
-                volatile uint32_t checksumcalc = 0;
+                uint32_t checksumcalc = 0;
                 while(length > 0)
                 {
                     check = xStreamBufferReceive(xXBEE_in_Stream, byte_buffer, 1, 10);
