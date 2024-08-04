@@ -605,12 +605,6 @@ void prvWSBTask( void * parameters )
                 buffer[1] = 254; //load with broadcast command
                 xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
             }
-            else if((colour_req == 'O') && (lockout != 'R') && (Requester == 1))
-            {
-                buffer[0] = colour_req; //colour_req is the colour we are requesting
-                buffer[1] = 254; //load with broadcast command
-                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-            }
             else if(lockout == 'Y' && (Requester == 1))
             {
                 buffer[0] = colour_req; //colour_req is the colour we are requesting
@@ -769,89 +763,12 @@ void prvWSBTask( void * parameters )
                         }
                         else if((colour_req == 'O') && (lockout != 'R'))
                         {
-                            for(uint8_t i = 0; i < numSpecials; i++)
-                            {
-                                if(SpecialTable[i].status != 'O')
-                                {
-                                    for(uint8_t y = 0; y < MaxNets; y++)
-                                    {
-                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                        {
-                                            y = MaxNets;
-                                            //send another colour change request, and set check_variable
-                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
-                                            check_variable = 0;
-                                            NetSent[y] = GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net; //update NetSent table
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        }
-                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[SpecialTable[i].index].Net) //already sent to this network, do not transmit
-                                        {
-                                            //just end loop and move on to next device in table
-                                            y = MaxNets;
-                                        }
-                                    }
-                                }
-                            }
-                            for(uint8_t i = 0; i < numControllers; i++)
-                            {
-                                if(ControllerTable[i].status != 'O')
-                                {
-                                    for(uint8_t y = 0; y < MaxNets; y++)
-                                    {
-                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                        {
-                                            y = MaxNets;
-                                            //send another colour change request, and set check_variable
-                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                            buffer[1] = ControllerTable[i].index; //load with retransmission request
-                                            check_variable = 0;
-                                            NetSent[y] = GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net; //update NetSent table
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        }
-                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[ControllerTable[i].index].Net) //already sent to this network, do not transmit
-                                        {
-                                            //just end loop and move on to next device in table
-                                            y = MaxNets;
-                                        }
-                                    }
-                                }
-                            }
-                            for(uint8_t i = 0; i < numLights; i++)
-                            {
-                                if(LightTable[i].status != 'O')
-                                {
-                                    for(uint8_t y = 0; y < MaxNets; y++)
-                                    {
-                                        if(NetSent[y] == 0) //if a null is found, end the loop early and send the message
-                                        {
-                                            y = MaxNets;
-                                            //send another colour change request, and set check_variable
-                                            buffer[0] = colour_req; //colour_req is the colour we are requesting
-                                            buffer[1] = LightTable[i].index; //load with retransmission request
-                                            check_variable = 0;
-                                            NetSent[y] = GLOBAL_DEVICE_TABLE[LightTable[i].index].Net; //update NetSent table
-                                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                                        }
-                                        else if(NetSent[y] == GLOBAL_DEVICE_TABLE[LightTable[i].index].Net) //already sent to this network, do not transmit
-                                        {
-                                            //just end loop and move on to next device in table
-                                            y = MaxNets;
-                                        }
-                                    }
-                                }
-                            }
-                            if(check_variable == 1)
-                            {
-                                colour_cur = colour_req;
-                                updateIND = 1;
-                            }
-                            //reset transmission timer, might also add a separate check to ensure that a transmission has actually occurred.
-                            else // if something was transmitted, we need to reset the timer.
-                            {
-                                GLOBAL_RetransmissionTimerSet = 0;
-                                xTimerReset(xRetransmitTimer, portMAX_DELAY);
-                            }
+                            buffer[0] = colour_req; //colour_req is the colour we are requesting
+                            buffer[1] = 254; //load with broadcast command
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            colour_cur = colour_req;
+                            updateIND = 1;
                         }
                         else if(lockout == 'Y')
                         {

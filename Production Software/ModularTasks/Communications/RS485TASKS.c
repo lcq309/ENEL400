@@ -123,7 +123,7 @@ void modCOMMOutTask (void * parameters)
             //load join message into output
             xStreamBufferSend(xCOMM_out_Stream, netmessage, 14, 0);
         }
-        else if((buffer[size-1] == 254) && (size != 0)) //I'll use this for broadcast
+        else if((buffer[size - 1] == 0xfe) && (size != 0)) //I'll use this for broadcast
         {
             //end of message contains the index of the target device.
             //reduce length by one, since we won't be sending the index value
