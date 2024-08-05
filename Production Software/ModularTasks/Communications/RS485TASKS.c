@@ -228,6 +228,10 @@ void modCOMMInTask (void * parameters)
         xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
         if(byte_buffer[0] == 0x7E)
         {
+            for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+            {
+                buffer[i] = 0;
+            }
             pos = 0;
             //next byte is length, grab length for message construction loop
             check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 10);
@@ -285,7 +289,7 @@ void modCOMMInTask (void * parameters)
                     for(uint8_t i = 0; i < GLOBAL_TableLength; i++)
                     {
                         //wireless address check, start with LSB
-                        for(uint8_t y = 11; y >= 4; y--)
+                        for(int8_t y = 11; y >= 4; y--)
                         {
                             if(buffer[y] != GLOBAL_DEVICE_TABLE[i].XBeeADD[y-4]) //if address doesn't match
                             {

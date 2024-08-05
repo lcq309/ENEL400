@@ -15,7 +15,7 @@
     
     //Timer Counters
     
-    volatile uint16_t TimerCounter = 0;
+    uint16_t TimerCounter = 0;
     
     //Semaphores
     SemaphoreHandle_t xTXC; //transmission complete flag
