@@ -257,6 +257,8 @@ void prv485OUTTask( void * parameters )
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
+        for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+            output_buffer[i] = 0;
         //wait until a message arrives in the buffer
         length = xMessageBufferReceive(xRS485_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
         //acquire MUTEX after pulling message into internal buffer
@@ -590,6 +592,8 @@ void prvXBEEINTask( void * parameters )
                 size = length; //save length for use later
                 //loop and assemble message until length = 0;`1
                 uint32_t checksumcalc = 0;
+                for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+                    buffer[i] = 0;
                 while(length > 0)
                 {
                     check = xStreamBufferReceive(xXBEE_in_Stream, byte_buffer, 1, 10);
@@ -658,6 +662,8 @@ void prvXBEEINTask( void * parameters )
                     //change size
                     size = size - 2;
                     //reassemble the message in the output buffer
+                    for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+                    outbuffer[i] = 0;
                     outbuffer[0] = 'I'; //always inbound
                     outbuffer[1] = buffer[12]; //wired address
                     outbuffer[2] = buffer[13]; //channel number
@@ -669,7 +675,7 @@ void prvXBEEINTask( void * parameters )
                     outbuffer[8] = buffer[5];
                     outbuffer[9] = buffer[6];
                     outbuffer[10] = buffer[7];
-                    outbuffer[11] = buffer[8]; //end of wireless address
+                    outbuffer[11] = buffer[8]; //end of wireless address]
                     for(uint8_t i = 12; i < size + 2; i++) //move message to the correct spot
                     {
                         outbuffer[i] = buffer[i + 3];
