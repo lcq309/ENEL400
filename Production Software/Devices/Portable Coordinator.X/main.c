@@ -1,15 +1,15 @@
 /* 
- * Coordinator
+ * Portable Coordinator
  * Author:  Michael King
  * 
- * Created on March 18, 2024
+ * Created on August 9, 2024
  * 
- * This is meant to be a wired network coordinator device, this device is responsible
+ * This is meant to be a portable wired network coordinator device, this device is responsible
  * for creating and driving the wired network.
  * this is quite different from the function of other devices on the wired network,
  * so the networking code for this device is unique and separate from all other devices.
- * 
- * modified on July 10, 2024 to include wireless and menu tasks
+ * It needs to check battery level, control a status light, and it does not have
+ * a menu. it needs to keep track of menus on the network to send it's battery messages.
  */
 
 #define MAX_MESSAGE_SIZE 200 //maximum message size allowable
@@ -27,7 +27,7 @@
 #include "stream_buffer.h"
 #include "message_buffer.h"
 #include "ShiftReg.h"
-
+#include "ADC.h"
 /*
  * Define device specific tasks
  * - Device Specific
@@ -41,15 +41,39 @@ struct DeviceTracker
     uint8_t status;
 };
 
+//timer handles
+TimerHandle_t xBATTTimer;
+TimerHandle_t xINDTimer;
+
+//timer globals
+uint8_t xBATTTimerSet = 0;
+uint8_t xINDTimerSet;
+
 //define priorities
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define mainSTAT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 
+
+QueueHandle_t xIND_Queue;
+QueueHandle_t xDeviceIN_Queue;
+QueueHandle_t xSTAT_Queue;
+    
 //helper function prototype
 void RS485TR(uint8_t dir);
+void VoltageCheck(void);
+
+void dsioStatOn(void);
+void dsioStatOff(void);
+void dsioStatTGL(void);
+
+//timer callback functions
+void vINDTimerFunc( TimerHandle_t xTimer ); 
+void vBattCheckTimerFunc( TimerHandle_t xTimer );
 
 //Event Groups
 EventGroupHandle_t xEventInit;
@@ -64,36 +88,38 @@ void prvRoundRobinTask( void * parameters );
 void prvXBEEOUTTask( void * parameters );
 void prvXBEEINTask( void * parameters );
 
-//menu tasks
-void prvMENUOUTTask( void * parameters );
-void prvMENUINTask( void * parameters );
+//status tasks
+void dsioOUTTask( void * parameters );
+void dsIOSTATUS( void * parameters );
+
+//Queue handles
+
+QueueHandle_t xDeviceIN_Queue; //check replies from the menu devices
+QueueHandle_t xSTAT_Queue; //from the battery check register
 
 //stream handles
+
 //wired
 static StreamBufferHandle_t xRS485_in_Stream = NULL;
 static StreamBufferHandle_t xRS485_out_Stream = NULL;
 static MessageBufferHandle_t xRS485_out_Buffer = NULL;
 static MessageBufferHandle_t xRoundRobin_Buffer = NULL;
+
 //wireless
 static StreamBufferHandle_t xXBEE_in_Stream = NULL;
 static StreamBufferHandle_t xXBEE_out_Stream = NULL;
 static MessageBufferHandle_t xXBEE_out_Buffer = NULL;
-//menu
-static StreamBufferHandle_t xMENU_in_Stream = NULL;
-static StreamBufferHandle_t xMENU_out_Stream = NULL;
-static StreamBufferHandle_t xMENU_out_Buffer = NULL;
 
 //Mutexes
 static SemaphoreHandle_t xUSART0_MUTEX = NULL;
 static SemaphoreHandle_t xRoundRobin_MUTEX = NULL;
 static SemaphoreHandle_t x485_MUTEX = NULL;
 static SemaphoreHandle_t xXBEE_MUTEX = NULL;
-static SemaphoreHandle_t xMENU_MUTEX = NULL;
 
 //Semaphores
 static SemaphoreHandle_t xRS485TX_SEM = NULL;
 static SemaphoreHandle_t xXBEETX_SEM = NULL;
-static SemaphoreHandle_t xMENUTX_SEM = NULL;
+SemaphoreHandle_t xBattCheckTrig;
 
 //Device Table
 static uint8_t GLOBAL_DEVICE_TABLE[LIST_LENGTH];
@@ -115,8 +141,8 @@ int main(int argc, char** argv) {
     xTaskCreate(prvXBEEOUTTask, "XBO", 600, NULL, mainOUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvXBEEINTask, "XBI", 600, NULL, mainIN_TASK_PRIORITY, NULL);
     
-    xTaskCreate(prvMENUOUTTask, "MO", 600, NULL, mainOUT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvMENUINTask, "MI", 600, NULL, mainIN_TASK_PRIORITY, NULL);
+    xTaskCreate(dsioOUTTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(dsIOSTATUS, "STAT", 250, NULL, mainSTAT_TASK_PRIORITY, NULL);
     //setup modules (no modules for the coordinator)
     
     //setup event group
@@ -126,8 +152,9 @@ int main(int argc, char** argv) {
     //setup USART
     
     USART0_init();
-    USART1_init();
     USART2_init();
+    
+    PORTD.DIRSET = PIN6_bm;
     
     //USART 485 control pin
     
@@ -145,25 +172,38 @@ int main(int argc, char** argv) {
     xXBEE_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1);
     xXBEE_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE * 2);
     
-    xMENU_in_Stream = xStreamBufferCreate(20, 1); //size of 20 bytes, 1 byte trigger
-    xMENU_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1);
-    xMENU_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE * 2);
-    
     //setup mutex(es)
     
     xUSART0_MUTEX = xSemaphoreCreateMutex();
     xRoundRobin_MUTEX = xSemaphoreCreateMutex();
     x485_MUTEX = xSemaphoreCreateMutex();
     xXBEE_MUTEX = xSemaphoreCreateMutex();
-    xMENU_MUTEX = xSemaphoreCreateMutex();
     
     //setup semaphore
     
     xRS485TX_SEM = xSemaphoreCreateBinary();
     xXBEETX_SEM = xSemaphoreCreateBinary();
-    xMENUTX_SEM = xSemaphoreCreateBinary();
     
+    
+    //setup the semaphore
+    xBattCheckTrig = xSemaphoreCreateBinary();
+    xSemaphoreGive(xBattCheckTrig);
+    
+    //prepare ADC
+    ADC_init();
+    
+    //setup queues
+    xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
+    xSTAT_Queue = xQueueCreate(1, 1 * sizeof(uint16_t)); // messages from RESRDY
+    xIND_Queue = xQueueCreate(4, 2 * sizeof(uint8_t)); // up to 4 Indicator Commands held
+    
+    //setup timers
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
+    xBATTTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vBattCheckTimerFunc);
     //done with pre-scheduler initialization, start scheduler
+        
+    //start the indicator timer
+    xTimerStart(xINDTimer, 0);
     
     vTaskStartScheduler();
     return (EXIT_SUCCESS);
@@ -184,10 +224,12 @@ void prvWiredInitTask( void * parameters )
     uint8_t byte_buffer[1];
     uint8_t length = 0;
     uint8_t buffer[2];
+    uint8_t outbuffer[2] = {'S', 'F'};
     
     //wait half a second to ensure all wired devices are active
     
     vTaskDelay(500);
+    xQueueSendToBack(xIND_Queue, outbuffer, 10);
     
     //enable transmit complete interrupt
     USART0.CTRLA |= USART_TXCIE_bm;
@@ -241,7 +283,9 @@ void prvWiredInitTask( void * parameters )
     xSemaphoreGive(xUSART0_MUTEX);
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
-    vTaskDelay(100); //wait for 100ms to ensure that the  
+    outbuffer[1] = 'S';
+    xQueueSendToBack(xIND_Queue, outbuffer, 10); //set status light to solid
+    vTaskDelay(100); //wait for 100ms
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
@@ -376,12 +420,6 @@ void prv485INTask( void * parameters )
                     }
                     else if(message_buffer[2] == 0) //send to menu controller (if attached)
                     {
-                        //this will need to grab the MUTEX for the menu buffer and send the message
-                        if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
-                        {
-                            xMessageBufferSend(xMENU_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0);
-                            xSemaphoreGive(xMENU_MUTEX);
-                        }
                     }
                     xSemaphoreGive(xUSART0_MUTEX);
                     break;
@@ -683,12 +721,6 @@ void prvXBEEINTask( void * parameters )
                     //now the outbuffer should be loaded with the correct message, move to routing
                     if(outbuffer[2] == 0) //channel zero always goes to menu
                     {
-                        //this will need to grab the MUTEX for the menu buffer and send the message
-                        if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
-                        {
-                            xMessageBufferSend(xMENU_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
-                            xSemaphoreGive(xMENU_MUTEX);
-                        }
                         if(outbuffer[3] == 'M') //if the device type is menu, then also transmit on wired network
                         {
                             if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
@@ -713,105 +745,170 @@ void prvXBEEINTask( void * parameters )
     }
 }
 
-//menu tasks
-
-void prvMENUOUTTask( void * parameters )
+void dsIOSTATUS (void * parameters)
 {
-    //pass messages from either wireless or wired network on to menu
-    uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
-    uint8_t output_leader[2] = {0x7e, 0}; //output leader
-    uint8_t length = 0;  //message length
-    //this is fairly simple, just output the message buffer when the bus is available.
-    //message length should be taken directly from the stream receive.
-    //wait for initialization
-    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
-        //wait until a message arrives in the buffer
-        length = xMessageBufferReceive(xMENU_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
-        output_leader[1] = length;
-        xStreamBufferSend(xMENU_out_Stream, output_leader, 2, 0);
-        //pass message to the output buffer
-        xStreamBufferSend(xMENU_out_Stream, output_buffer, length, 0);
-        //enable DRE interrupt to start transmission
-        USART1.CTRLA |= USART_DREIE_bm;
-        //wait for TXcomplete semaphore
-        xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
-        //end of loop, start over by waiting for a new message in the buffer
-    }
-}
-
-void prvMENUINTask( void * parameters )
-{
-    /* listen for messages from menu
-     * - there may be multiple messages in a stream, process them appropriately based on destination
-     * = for messages targeted outbound, send them to the wireless task
-     * = for messages targeted inbound, send them to the 485 task
-     * 
-     * 1. wait until message start is received, start collecting and building messages
-     * 2. route messages to appropriate destination task
-     */
-    uint8_t message_buffer[MAX_MESSAGE_SIZE];
-    uint8_t byte_buffer[1];
-    uint8_t length = 0; //message length from header
-    //wait for initialization
-    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
-    for(;;)
-    {
-        //wait for something to appear on the bus
-        if(xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 200) == 0)
+        volatile uint8_t output = 0;
+        uint8_t outbuffer[2] = {'S', 'F'};
+        uint16_t received[1];
+        //block on manual trigger semaphore
+        if(xSemaphoreTake(xBattCheckTrig, 50) == pdTRUE)
         {
-            byte_buffer[0] = 0x0;
-        }
-        //check for start delimiter
-        if(byte_buffer[0] == 0x7e)
-        {
-            //next byte should be length
-            xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 50); //at worst, this will collect garbage, but it shouldn't lock up
-            length = byte_buffer[0];
-        }
-        else
-            length = 0; //just ignore this message, something went wrong
-        
-        //now we know the message length(if there is a message)
-        for(uint8_t i = 0; i < length; i++)
-        {
-            //assemble the message byte by byte until the length is reached
-            if(xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 10) != 0)
-                message_buffer[i] = byte_buffer[0];
-            //if nothing is received, cancel message receipt. Something went wrong
-            else
-                length = 0;
-            //this if/else statement constitutes collision recovery code.
-            //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
-        }
-        //now the full message should be within the message buffer, perform routing
-        if(length != 0)
-        {
-            uint8_t wirelesscheck = 0;
-            switch(message_buffer[0])
+            //check the battery voltage
+            VoltageCheck();
+            //wait for result before moving on
+            xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
+            //check against reference value of 2402 (~1.935V over resistor)
+            if(received[0] < 2402)
             {
-                case 'O': //outbound message, route to XBEE task
-                    if(xSemaphoreTake(xXBEE_MUTEX, 50) == pdTRUE)
-                    {
-                        xMessageBufferSend(xXBEE_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
-                        xSemaphoreGive(xXBEE_MUTEX);
-                    }
-                    break;
-                    
-                case 'I': //inbound message, route to 485 task
-                    if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
-                    {
-                        xMessageBufferSend(xRS485_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
-                        xSemaphoreGive(x485_MUTEX);
-                    }
-                    break;
+                //low battery state, send the message to the main task
+                xQueueSendToBack(xIND_Queue, outbuffer, 10);
+            }
+            xBATTTimerSet = 0;
+            xTimerReset(xBATTTimer, 0);
+        }
+        else //if not a manual trigger, then check timer and do the periodic if the time is right
+        {
+            if(xBATTTimerSet == 1)
+            {
+                //check the battery voltage
+                VoltageCheck();
+                //wait for result before moving on
+                xQueueReceive(xSTAT_Queue, received, portMAX_DELAY); //check output after starting the sample, but before blocking
+                //check against reference value of 2402 (~1.935V over resistor)
+                if(received[0] < 2402)
+                {
+                    //low battery state, send the message to the main task
+                    xQueueSendToBack(xIND_Queue, outbuffer, 10);
+                }
+                xBATTTimerSet = 0;
+                xTimerReset(xBATTTimer, 0);
             }
         }
-        
     }
 }
+
+void dsioOUTTask (void * parameters)
+{
+    //blink, flash, solid, etc.
+    //this controls the three indicators on the console
+    //blink should be somewhat slow, flash should be faster (mostly used for blue, initialization, and maybe errors)
+    
+    //indicator state buffers initialized to zero
+    static uint8_t STAT = 0;
+    
+    //time buffers for flash and latches
+    static uint8_t flash = 0; 
+    static uint8_t blink = 0; 
+    static uint8_t ms250 = 0;
+    
+    //receiver buffer
+    uint8_t received[2];
+    
+    //running loop
+    for(;;)
+    {
+        //first, check for commands from other tasks (hold for 50ms)
+        if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
+        {
+        switch(received[0]) //first check the intended target
+        {
+            case 0x0: //do nothing/no target
+                break;
+            case 'S': //Stat indicator
+                STAT = received[1];
+                break;
+                
+            case 0xff: //All indicators
+                STAT = received[1];
+                break;
+        }
+        }
+        //if timer has triggered, increment ms250 and reset flash and blink timers
+        if(xINDTimerSet == 1)
+        {
+            ms250++;
+            if(ms250 == 5)
+            {
+                ms250 = 0;
+                blink = 0;
+            }
+            flash = 0;
+            xINDTimerSet = 0;
+        }
+        //process stat
+        switch(STAT)
+        {
+            case 'B': //blink
+                if(blink == 0 && ms250 == 0)
+                    dsioStatTGL();
+                break;
+
+            case 'F': //flash
+                if(flash == 0)
+                    dsioStatTGL();
+                break;
+
+            case 'D': //double flash
+                if(flash == 0)
+                {
+                    dsioStatOn();
+                    vTaskDelay(5);
+                    dsioStatTGL();
+                    vTaskDelay(5);
+                    dsioStatTGL();
+                    vTaskDelay(5);
+                    dsioStatOff();
+                }
+                break;
+
+            case 'W': //warning flash (used for lockout warning)
+                dsioStatOn();
+                vTaskDelay(5);
+                dsioStatTGL();
+                vTaskDelay(5);
+                dsioStatTGL();
+                vTaskDelay(5);
+                dsioStatTGL();
+                vTaskDelay(5);
+                dsioStatTGL();
+                vTaskDelay(5);
+                dsioStatTGL();
+                vTaskDelay(5);
+                dsioStatTGL();
+                vTaskDelay(5);
+                dsioStatOff();
+                break;
+
+            case 'S': //solid
+                dsioStatOn();
+                break;
+
+            case 'O': //off
+                dsioStatOff();
+                break;
+        }
+        //set blink and flash
+        blink = 1;
+        flash = 1;
+    }
+}
+
 //helper functions:
+
+void dsioStatOn(void)
+{
+    PORTD.OUTSET = PIN6_bm;
+}
+void dsioStatOff(void)
+{
+    PORTD.OUTCLR = PIN6_bm;
+}
+void dsioStatTGL(void)
+{
+    PORTD.OUTTGL = PIN6_bm;
+}
 
 //RS485 in/out
 void RS485TR(uint8_t dir)
@@ -828,6 +925,22 @@ void RS485TR(uint8_t dir)
         default: //incorrect command
             break;
     }
+}
+
+void vINDTimerFunc( TimerHandle_t xTimer )
+{
+    xINDTimerSet = 1;
+}
+
+void vBattCheckTimerFunc( TimerHandle_t xTimer )
+{
+    xBATTTimerSet = 1;
+}
+
+void VoltageCheck(void)
+{
+    ADC0.MUXPOS = ADC_MUXPOS_AIN0_gc;
+    ADC0.COMMAND = 0x1;
 }
 
 ISR(USART0_RXC_vect)
@@ -864,37 +977,6 @@ ISR(USART0_TXC_vect)
     xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
 }
 
-ISR(USART1_RXC_vect)
-{
-    //move the data receive register into the stream for the input task, this clears the interrupt automatically
-    uint8_t buf[1];
-    buf[0] = USART1.RXDATAL;
-    xMessageBufferSendFromISR(xMENU_in_Stream, buf, 1, NULL);
-}
-ISR(USART1_DRE_vect)
-{
-    /* Data Register empty Interrupt
-     * 1. pull from output stream buffer and put in TX register until clear
-     * 2. disable interrupt after end of message
-     */
-    uint8_t buf[1];
-    if(xStreamBufferReceiveFromISR(xMENU_out_Stream, buf, 1, NULL) == 0) //if end of message
-    {
-        USART1.CTRLA &= ~USART_DREIE_bm; //disable interrupt
-    }
-    else
-        USART1.TXDATAL = buf[0];
-}
-ISR(USART1_TXC_vect)
-{
-    /* Transmission complete interrupts
-     * 1. set semaphore
-     * 2. clear interrupt flag
-     */
-    USART1.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
-    xSemaphoreGiveFromISR(xMENUTX_SEM, NULL);
-}
-
 ISR(USART2_RXC_vect)
 {
     //move the data receive register into the stream for the input task, this clears the interrupt automatically
@@ -924,4 +1006,12 @@ ISR(USART2_TXC_vect)
      */
     USART2.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xXBEETX_SEM, NULL);
+}
+
+ISR(ADC0_RESRDY_vect)
+{
+    uint16_t res[1];
+    res[0] = ADC0.RES; //this should also clear the interrupt flag
+    xQueueSendToBackFromISR(xSTAT_Queue, res, NULL);
+    ADC0.MUXPOS = ADC_MUXPOS_GND_gc;
 }
