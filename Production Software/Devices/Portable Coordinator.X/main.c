@@ -55,7 +55,7 @@ uint8_t xINDTimerSet;
 #define mainOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainROUNDROBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-#define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainSTAT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 
 
@@ -199,7 +199,7 @@ int main(int argc, char** argv) {
     
     //setup timers
     xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
-    xBATTTimer = xTimerCreate("STAT", 500, pdFALSE, 0, vBattCheckTimerFunc);
+    xBATTTimer = xTimerCreate("STAT", 750, pdFALSE, 0, vBattCheckTimerFunc);
     //done with pre-scheduler initialization, start scheduler
         
     //start the indicator timer
@@ -228,8 +228,8 @@ void prvWiredInitTask( void * parameters )
     
     //wait half a second to ensure all wired devices are active
     
-    vTaskDelay(500);
     xQueueSendToBack(xIND_Queue, outbuffer, 10);
+    vTaskDelay(500);
     
     //enable transmit complete interrupt
     USART0.CTRLA |= USART_TXCIE_bm;
@@ -284,8 +284,8 @@ void prvWiredInitTask( void * parameters )
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
     outbuffer[1] = 'S';
-    xQueueSendToBack(xIND_Queue, outbuffer, 10); //set status light to solid
     vTaskDelay(100); //wait for 100ms
+    xQueueSendToBack(xIND_Queue, outbuffer, 10); //set status light to solid
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
@@ -810,20 +810,20 @@ void dsioOUTTask (void * parameters)
     for(;;)
     {
         //first, check for commands from other tasks (hold for 50ms)
-        if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
+        if(xQueueReceive(xIND_Queue, received, 50) == pdTRUE)
         {
-        switch(received[0]) //first check the intended target
-        {
-            case 0x0: //do nothing/no target
-                break;
-            case 'S': //Stat indicator
-                STAT = received[1];
-                break;
-                
-            case 0xff: //All indicators
-                STAT = received[1];
-                break;
-        }
+            switch(received[0]) //first check the intended target
+            {
+                case 0x0: //do nothing/no target
+                    break;
+                case 'S': //Stat indicator
+                    STAT = received[1];
+                    break;
+
+                case 0xff: //All indicators
+                    STAT = received[1];
+                    break;
+            }
         }
         //if timer has triggered, increment ms250 and reset flash and blink timers
         if(xINDTimerSet == 1)

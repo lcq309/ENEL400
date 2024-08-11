@@ -28,8 +28,8 @@
 void DSIOSetup()
 {
     //485 R/W pin setup
-    PORTD.DIRSET = PIN7_bm;
-    PORTD.OUTCLR = PIN7_bm;
+    PORTA.DIRSET = PIN2_bm;
+    PORTA.OUTCLR = PIN2_bm;
     
     //output shift register setup
     
@@ -46,7 +46,7 @@ void DSIOSetup()
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
-    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
     
     //start the indicator timer
     xTimerStart(xINDTimer, 0);
@@ -59,9 +59,9 @@ void dsIOOutTask (void * parameters)
     //blink should be somewhat slow, flash should be faster (mostly used for blue, initialization, and maybe errors)
     
     //digit state buffer initialized to zero.
-    static uint8_t DigitOne = 0;
-    static uint8_t DigitTwo = 0;
-    static uint8_t displaytype = 0; //flashing, solid, off
+    uint8_t DigitOne = 0;
+    uint8_t DigitTwo = 0;
+    volatile uint8_t displaytype = 0; //flashing, solid, off
     uint8_t state = 0; //for flashing and tracking the current state
     
     //time buffers for flash and latches
@@ -84,12 +84,12 @@ void dsIOOutTask (void * parameters)
     for(;;)
     {
         //first, check for commands from other tasks (hold for 50ms)
-        if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
+        if(xQueueReceive(xIND_Queue, received, 50) == pdTRUE)
         {
             //set the digits and mode
-            received[0] = DigitOne;
-            received[1] = DigitTwo;
-            received[2] = displaytype;
+            DigitTwo = received[0];
+            DigitOne = received[1];
+            displaytype = received[2];
         }
         //if timer has triggered, increment ms250 and reset flash and blink timers
         if(xINDTimerSet == 1)
@@ -150,10 +150,10 @@ void RS485TR(uint8_t dir)
     switch(dir)
     {
         case 'T': //transmit
-            PORTD.OUTSET = PIN7_bm;
+            PORTA.OUTSET = PIN2_bm;
             break;
         case 'R': //receive
-            PORTD.OUTCLR = PIN7_bm;
+            PORTA.OUTCLR = PIN2_bm;
             break;
         default: //incorrect command
             break;

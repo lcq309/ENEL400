@@ -210,7 +210,7 @@
         <property key="communication.speed" value="0.500"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
         <property key="hwtoolclock.frcindebug" value="false"/>
@@ -228,9 +228,7 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="F:/GitHub/ENEL400/Production Software/Devices/Coordinator.X/debug/default/Coordinator_ptg"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programmerToGoImageName" value="Coordinator_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
@@ -256,7 +254,7 @@
                   value="toolpack.updateoptions.uselatestoolpack"/>
         <property key="toolpack.updateoptions.packversion"
                   value="Press to select which tool pack to use"/>
-        <property key="voltagevalue" value="5.0"/>
+        <property key="voltagevalue" value="3.3"/>
       </PK5Tool>
       <Tool>
         <property key="AutoSelectMemRanges" value="auto"/>
@@ -291,7 +289,7 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="false"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programmerToGoFilePath"
                   value="F:/GitHub/ENEL400/Production Software/Devices/Coordinator.X/debug/default/Coordinator_ptg"/>
         <property key="programmerToGoImageName" value="Coordinator_ptg"/>
@@ -319,7 +317,7 @@
                   value="toolpack.updateoptions.uselatestoolpack"/>
         <property key="toolpack.updateoptions.packversion"
                   value="Press to select which tool pack to use"/>
-        <property key="voltagevalue" value="5.0"/>
+        <property key="voltagevalue" value="3.3"/>
       </Tool>
       <XC8-CO>
         <property key="coverage-enable" value=""/>

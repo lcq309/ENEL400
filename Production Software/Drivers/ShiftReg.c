@@ -17,25 +17,24 @@ void ShiftOut(uint8_t out)
             PORTA.OUTSET = DT2;
         else
             PORTA.OUTCLR = DT2;
-        _delay_us(10); // delay to allow pin to change state
+        vTaskDelay(1);
         PORTC.OUTSET = CLK2; // advance clock
-        _delay_us(50); // delay for clock time
+        vTaskDelay(1);
         PORTC.OUTCLR = CLK2;
-        _delay_us(50);
     }
 }
 void CLROut(void)
 //pulse CLR pin low
 {
     PORTC.OUTCLR = CLR2;
-    _delay_us(50);
+    vTaskDelay(1);
     PORTC.OUTSET = CLR2;
 }
 void LTCHOut(void)
 //pulse latch to move from shift register to output
 {
     PORTC.OUTSET = LTCH2;
-    _delay_us(50);
+    vTaskDelay(1);
     PORTC.OUTCLR = LTCH2;
 }
 
@@ -266,8 +265,11 @@ uint8_t ShiftTranslate (uint8_t in)
         case 'z':
             result = 40;
             break;
+        case ' ':
+            result = 0;
+            break;
         default:
-            result = 0x8;
+            result = 0xff;
             break;
     }
     return result;

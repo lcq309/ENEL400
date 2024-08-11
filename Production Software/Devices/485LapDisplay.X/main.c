@@ -43,9 +43,8 @@ uint8_t GLOBAL_DeviceType = 'l'; //Lap count controller, 'l' is the display.
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-#define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
-#define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainWLD_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define mainWLD_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 
 #define MaxNets 40
 
@@ -65,6 +64,7 @@ void vRetransmitTimerFunc( TimerHandle_t xTimer );
 //timer global
 
 uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never transmit
+
 
 int main(int argc, char** argv) {
     
@@ -111,7 +111,7 @@ void prvWiredInitTask( void * parameters )
     //take the mutex
     xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //start flashing indicators
-    uint8_t FlashAll[3] = {'8', '8', 'F'}; //flash all segments
+    uint8_t FlashAll[3] = {'~', '~', 'F'}; //flash all segments
     xQueueSendToFront(xIND_Queue, FlashAll, portMAX_DELAY);
     
     //wait and listen for the correct ping
@@ -221,7 +221,6 @@ void prvWLDTask( void * parameters )
                             //send the network join message
                             ; //this needs to be here to avoid an error on NetJoin.
                             uint8_t NetJoin[1] = {0xff};
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
