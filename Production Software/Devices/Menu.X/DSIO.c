@@ -15,10 +15,12 @@
     //timer globals
     
     uint8_t xINDTimerSet = 0;
+    uint8_t xPBTimerSet = 0;
     
     //timer handles
     
     TimerHandle_t xINDTimer;
+    TimerHandle_t xPBTimer;
     
     //queue handles
 
@@ -28,19 +30,20 @@
     
     //stream buffer
 
-    StreamBufferHandle_t xNEXTION_out_Buffer;
-    StreamBufferHandle_t xNEXTION_in_Buffer;
+    StreamBufferHandle_t xI2C_out_Buffer;
     
     //Semaphore
     
-    SemaphoreHandle_t xNEXTION_Sem;
+    SemaphoreHandle_t xI2C_Sem;
     
 void DSIOSetup()
 {
-    //USART_init
-    USART1_init();
-    USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | \
-            USART_PMODE_DISABLED_gc; //disable parity for Nextion
+    //485 R/W pin setup
+    PORTD.DIRSET = PIN7_bm;
+    PORTD.OUTCLR = PIN7_bm;
+    
+    //I2C setup
+    I2C_init();
     
     //setup Queues
     
@@ -48,10 +51,9 @@ void DSIOSetup()
     xIND_Queue = xQueueCreate(4, 3 * sizeof(uint8_t)); // up to 4 Indicator Commands held
     xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
     
-    //setup stream buffers
+    //setup stream buffer
     
-    xNEXTION_out_Buffer = xStreamBufferCreate(100,1); //100 bytes, triggers when a byte is added
-    xNEXTION_in_Buffer = xStreamBufferCreate(20,1);
+    xI2C_out_Buffer = xStreamBufferCreate(20,1); //20 bytes, triggers when a byte is added
     
     //setup tasks
     
@@ -60,48 +62,10 @@ void DSIOSetup()
     
     //setup timers
     xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
+    xPBTimer = xTimerCreate("PBDB", 200, pdFALSE, 0, vPBTimerFunc);
     
     //start the indicator timer
     xTimerStart(xINDTimer, 0);
-}
-
-void NextionInTask (void * parameters)
-{
-    uint8_t message_buffer[50];
-    uint8_t byte_buffer[1];
-    uint8_t length = 0; //message length from header
-    //wait for initialization
-    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
-    for(;;)
-    {
-        //wait for something to appear on the bus
-        if(xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 200) == 0)
-        {
-            byte_buffer[0] = 0x0;
-        }
-        //check for start delimiter
-        if(byte_buffer[0] == 0x7e)
-        {
-            //next byte should be length
-            xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 50); //at worst, this will collect garbage, but it shouldn't lock up
-            length = byte_buffer[0];
-        }
-        else
-            length = 0; //just ignore this message, something went wrong
-        
-        //now we know the message length(if there is a message)
-        for(uint8_t i = 0; i < length; i++)
-        {
-            //assemble the message byte by byte until the length is reached
-            if(xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 10) != 0)
-                message_buffer[i] = byte_buffer[0];
-            //if nothing is received, cancel message receipt. Something went wrong
-            else
-                length = 0;
-            //this if/else statement constitutes collision recovery code.
-            //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
-        }
-    }
 }
 
 void dsIOInTask (void * parameters)
@@ -280,6 +244,23 @@ void dsIOOutTask (void * parameters)
     
 }
 
+//RS485 in/out
+void RS485TR(uint8_t dir)
+{
+    //set transceiver direction
+    switch(dir)
+    {
+        case 'T': //transmit
+            PORTD.OUTSET = PIN7_bm;
+            break;
+        case 'R': //receive
+            PORTD.OUTCLR = PIN7_bm;
+            break;
+        default: //incorrect command
+            break;
+    }
+}
+
 //timer callback functions
 
 void vINDTimerFunc( TimerHandle_t xTimer )
@@ -287,35 +268,66 @@ void vINDTimerFunc( TimerHandle_t xTimer )
     xINDTimerSet = 1;
 }
 
+void vPBTimerFunc( TimerHandle_t xTimer )
+{
+    xPBTimerSet = 0;
+}
 //interrupts go here
 
-ISR(USART1_RXC_vect)
+ISR(PORTD_PORT_vect)
 {
-    /* Receive complete interrupt
-     * move received byte into byte buffer for RS485 in task
+    /* PORTD interrupt:
+     * 1. check which line the interrupt is on
+     * 2. clear the interrupt
+     * 3. send the button colour to the button task
      */
-    uint8_t buf[1];
-    buf[0] = USART1.RXDATAL;
-    xStreamBufferSendFromISR(xNEXTION_in_Buffer, buf, 1, NULL);
+    //1. check which pin the interrupt is on
+    uint8_t pb[1] = {0};
+    switch(PORTD.INTFLAGS)
+    {
+        case PIN6_bm: //button 1
+            PORTD.INTFLAGS = PIN6_bm; //reset interrupt
+            pb[0] = 'U'; //up
+            break;
+        case PIN5_bm: //button 2
+            PORTD.INTFLAGS = PIN5_bm; //reset interrupt
+            pb[0] = 'D'; //down
+            break;
+        case PIN1_bm: //button 1
+            PORTD.INTFLAGS = PIN1_bm; //reset interrupt
+            pb[0] = 'L'; //last
+            break;    
+        case PIN2_bm: //button 3
+            PORTD.INTFLAGS = PIN2_bm; //reset interrupt
+            pb[0] = 'H'; //halfway
+            break;
+        case PIN3_bm: //button 4
+            PORTD.INTFLAGS = PIN3_bm;
+            pb[0] = 'Z'; //zero
+        default:
+            PORTD.INTFLAGS = 0xff;
+    }
+    xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
 }
-ISR(USART1_DRE_vect)
+
+ISR(TWI0_TWIM_vect)
 {
-    /* Data Register empty Interrupt
-     * 1. pull from output stream buffer and put in TX register until clear
-     * 2. disable interrupt
-     */
-    uint8_t buf[1];
-    if(xStreamBufferReceiveFromISR(xNEXTION_out_Buffer, buf, 1, NULL) == 0) //if end of message
-        USART1.CTRLA &= ~USART_DREIE_bm; //disable interrupt
-    else
-        USART1.TXDATAL = buf[0];
-}
-ISR(USART1_TXC_vect)
-{
-    /* Transmission complete interrupts
-     * 1. set semaphore
-     * 2. clear interrupt flag
-     */
-    USART1.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
-    xSemaphoreGiveFromISR(xNEXTION_Sem, NULL); //send notification to output task
+    uint8_t byte[1] = {0};
+    if(TWI0.MSTATUS & TWI_WIF_bm) //if this is the write interrupt
+    {
+        if(xStreamBufferReceiveFromISR(xI2C_out_Buffer, byte, 1, NULL) != 0)
+        {
+            //if something was in the buffer
+            TWI0.MDATA = byte[0];
+        }
+        else
+        {
+            //disable the interrupt
+            TWI0.MCTRLA &= ~TWI_WIEN_bm;
+            //after sending the message, send a STOP over the bus by writing to MCMD field
+            TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
+            //notify the task
+            xSemaphoreGiveFromISR(xI2C_Sem, NULL);
+        }
+    }
 }

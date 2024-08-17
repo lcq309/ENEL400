@@ -6,8 +6,8 @@
       <itemPath>../../Drivers/USART.h</itemPath>
       <itemPath>../../Drivers/ShiftReg.c</itemPath>
       <itemPath>../../Drivers/ShiftReg.h</itemPath>
-      <itemPath>../../Drivers/ADC.c</itemPath>
-      <itemPath>../../Drivers/ADC.h</itemPath>
+      <itemPath>../../Drivers/I2C.c</itemPath>
+      <itemPath>../../Drivers/I2C.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="FreeRTOS" projectFiles="true">
       <logicalFolder name="f1" displayName="AVR_AVRDx" projectFiles="true">
@@ -52,12 +52,20 @@
                    displayName="Linker Files"
                    projectFiles="true">
     </logicalFolder>
+    <logicalFolder name="f3" displayName="Modular Tasks" projectFiles="true">
+      <logicalFolder name="f1" displayName="Communications" projectFiles="true">
+        <itemPath>../../ModularTasks/Communications/MENUTASKS.c</itemPath>
+        <itemPath>../../ModularTasks/Communications/MENUTASKS.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
       <itemPath>FreeRTOSConfig/FreeRTOSConfig.h</itemPath>
       <itemPath>clk_config.h</itemPath>
+      <itemPath>DSIO.c</itemPath>
+      <itemPath>FreeRTOSConfig/DSIO.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -123,7 +131,7 @@
         <property key="define-macros" value=""/>
         <property key="disable-optimizations" value="false"/>
         <property key="extra-include-directories"
-                  value="..\..\Drivers;..\..\FreeRTOS\include;FreeRTOSConfig;..\..\FreeRTOS\AVR_AVRDx"/>
+                  value="..\..\Drivers;..\..\FreeRTOS\include;FreeRTOSConfig;..\..\FreeRTOS\AVR_AVRDx;..\..\ModularTasks\Communications"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
@@ -210,7 +218,7 @@
         <property key="communication.speed" value="0.500"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
         <property key="hwtoolclock.frcindebug" value="false"/>
@@ -228,8 +236,10 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="true"/>
-        <property key="programmerToGoImageName" value="Coordinator_ptg"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmerToGoFilePath"
+                  value="F:/GitHub/ENEL400/Production Software/Devices/485SecCont.X/debug/default/485SecCont_ptg"/>
+        <property key="programmerToGoImageName" value="485SecCont_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.ledbrightness" value="5"/>
@@ -271,7 +281,7 @@
         <property key="communication.speed" value="0.500"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
         <property key="hwtoolclock.frcindebug" value="false"/>
@@ -289,10 +299,10 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="true"/>
+        <property key="poweroptions.powerenable" value="false"/>
         <property key="programmerToGoFilePath"
-                  value="F:/GitHub/ENEL400/Production Software/Devices/Coordinator.X/debug/default/Coordinator_ptg"/>
-        <property key="programmerToGoImageName" value="Coordinator_ptg"/>
+                  value="F:/GitHub/ENEL400/Production Software/Devices/485SecCont.X/debug/default/485SecCont_ptg"/>
+        <property key="programmerToGoImageName" value="485SecCont_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.ledbrightness" value="5"/>
