@@ -23,13 +23,16 @@
     //queue handles
 
     QueueHandle_t xPB_Queue;
-    QueueHandle_t xIND_Queue;
     QueueHandle_t xDeviceIN_Queue;
     
     //stream buffer
 
     StreamBufferHandle_t xNEXTION_out_Buffer;
     StreamBufferHandle_t xNEXTION_in_Buffer;
+    
+    //message buffers
+    
+    MessageBufferHandle_t xIND_Buffer;
     
     //Semaphore
     
@@ -44,13 +47,13 @@ void DSIOSetup()
     
     //setup Queues
     
-    xPB_Queue = xQueueCreate(1, sizeof(uint8_t)); //up to 1 button presses held
-    xIND_Queue = xQueueCreate(4, 3 * sizeof(uint8_t)); // up to 4 Indicator Commands held
-    xDeviceIN_Queue = xQueueCreate(3, 2 * sizeof(uint8_t)); // intertask messages to the device specific task
+    xPB_Queue = xQueueCreate(2, 2 * sizeof(uint8_t)); //up to 2 touchscreen messages held
+    xDeviceIN_Queue = xQueueCreate(3, 3 * sizeof(uint8_t)); // intertask messages to the device specific task
     
     //setup stream buffers
     
-    xNEXTION_out_Buffer = xStreamBufferCreate(100,1); //100 bytes, triggers when a byte is added
+    xIND_Buffer = xMessageBufferCreate(50,1);
+    xNEXTION_out_Buffer = xStreamBufferCreate(40,1); //40 bytes, triggers when a byte is added
     xNEXTION_in_Buffer = xStreamBufferCreate(20,1);
     
     //setup tasks
@@ -67,7 +70,7 @@ void DSIOSetup()
 
 void NextionInTask (void * parameters)
 {
-    uint8_t message_buffer[50];
+    uint8_t message_buffer[2];
     uint8_t byte_buffer[1];
     uint8_t length = 0; //message length from header
     //wait for initialization
@@ -82,9 +85,7 @@ void NextionInTask (void * parameters)
         //check for start delimiter
         if(byte_buffer[0] == 0x7e)
         {
-            //next byte should be length
-            xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 50); //at worst, this will collect garbage, but it shouldn't lock up
-            length = byte_buffer[0];
+            length = 2;
         }
         else
             length = 0; //just ignore this message, something went wrong
@@ -101,180 +102,51 @@ void NextionInTask (void * parameters)
             //this if/else statement constitutes collision recovery code.
             //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
         }
+        //pass the message on to the input task
+        xQueueSend(xPB_Queue, message_buffer, portMAX_DELAY);
     }
 }
 
 void dsIOInTask (void * parameters)
 {
-    //initialize inputs
-    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm | PIN1_bm;
-    //Then I will set up the multi-configure register for port D.
-    PORTD.PINCONFIG = 0x3 | PORT_PULLUPEN_bm; //enable falling edge interrupt and pullup
-    //update configuration for selected pins
-    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm | PIN1_bm;
-    
-    //for now, this just reads button presses with a half second debounce delay to avoid spam.
-    //block until a button press occurs, then check anti spam timer and reset timer
     //initialization complete, enter looping section.
-    uint8_t input[1];
-    uint8_t output[2] = {'P', 0}; //P for pushbutton in intertask messages
+    uint8_t input[2];
+    uint8_t output[3] = {'P', 0, 0}; //P for pushbutton in intertask messages
     for(;;)
     {
         //wait for input
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
-        if(xPBTimerSet == 0)
-        {
-            output[1] = input[0];
-            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
-            xSemaphoreGive(xNotify);
-            //send message to inter-task queue
-            xPBTimerSet = 1; //set software debounce
-            xTimerReset(xPBTimer, portMAX_DELAY);
-        }
+        output[1] = input[0];
+        output[2] = input[1];
+        xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
+        xSemaphoreGive(xNotify);
     }
     
 }
 
 void dsIOOutTask (void * parameters)
 {
-    //setup the display
-    //setup the display
-    volatile uint8_t Byte[1];
-    
-    Byte[0] = (0x20 | 1); //enable oscillator
-    xStreamBufferSend(xI2C_out_Buffer, Byte, 1, 10);
-    //with the message loaded, load the address buffer with the address for the display
-    TWI0.MADDR = I2C_ADDR;
-    //start message sending by enabling the interrupt
-    TWI0.MCTRLA |= TWI_WIEN_bm;
-    //wait for message to finish sending
-    xSemaphoreTake(xI2C_Sem, 50);
-    
-    //set brightness to max
-    Byte[0] = (0xE0 | 15);            
-    xStreamBufferSend(xI2C_out_Buffer, Byte, 1, 10);
-    TWI0.MADDR = I2C_ADDR;
-    TWI0.MCTRLA |= TWI_WIEN_bm;
-    //wait for message to finish sending
-    xSemaphoreTake(xI2C_Sem, 50);
-    
-    //No Blink, enable display
-    Byte[0] = (0x80 | 0 << 1 | 1);
-    xStreamBufferSend(xI2C_out_Buffer, Byte, 1, 10);
-    TWI0.MADDR = I2C_ADDR;
-    TWI0.MCTRLA |= TWI_WIEN_bm;
-    //wait for message to finish sending
-    xSemaphoreTake(xI2C_Sem, 50);
-    //blink, flash, solid, etc.
-    //this controls the three indicators on the console
-    //blink should be somewhat slow, flash should be faster (mostly used for blue, initialization, and maybe errors)
-    
-    //digit state buffer initialized to zero.
-    static uint8_t DigitOne = 0;
-    static uint8_t DigitTwo = 0;
-    static uint8_t displaytype = 0; //flashing, solid, off
-    static uint8_t state = 0; //for flashing
-    
-    //time buffers for flash and latches
-    static uint8_t flash = 0; 
-    static uint8_t blink = 0; 
-    static uint8_t ms250 = 0;
-    
     //receiver buffer
-    uint8_t received[3];
-
-    //output buffer
-    volatile uint8_t output[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    
-    //working digit buffer
-    uint16_t digit = 0;
-    
-    //setup display
-    //first and last digit is always left blank
-    
+    uint8_t received[50];
+    uint8_t EndDelimiter[3] = {0xff,0xff,0xff};
+    uint8_t size = 0;
     
     //running loop
     for(;;)
     {
         //first, check for commands from other tasks (hold for 50ms)
-        if(xQueueReceive(xIND_Queue, received, 20) == pdTRUE)
+        size = xMessageBufferReceive(xIND_Buffer, received, 50, 50);
+        if(size != 0)
         {
-            //set the digits and mode
-            DigitOne = received[0];
-            DigitTwo = received[1];
-            displaytype = received[2];
+            //load the command into the output buffer, then load the end delimiter
+            xStreamBufferSend(xNEXTION_out_Buffer, received, size, 0);
+            xStreamBufferSend(xNEXTION_out_Buffer, EndDelimiter, 3, 0);
+            //start the transmission
+            USART1.CTRLA |= USART_DREIE_bm;
+            //wait for end of transmission
+            xSemaphoreTake(xNEXTION_Sem, portMAX_DELAY);
         }
-        //if timer has triggered, increment ms250 and reset flash and blink timers
-        if(xINDTimerSet == 1)
-        {
-            ms250++;
-            if(ms250 == 5)
-            {
-                ms250 = 0;
-                blink = 0;
-            }
-            flash = 0;
-            xINDTimerSet = 0;
-        }
-        //process based on display mode
-        switch(displaytype)
-        {
-            case 'S': //solid
-                state = 1;
-                break;
-
-            case 'F': //flashing
-                if(flash == 0)
-                {
-                    if(state == 1)
-                        state = 0;
-                    else
-                        state = 1;
-                }
-                break;
-
-            case 'O': //off
-                state = 0;
-                break;
-        }
-        switch(state) //display is either on or off, based on state
-        {
-            case 1: //on
-                //first and last digit is always left blank
-                digit = I2C_translate(DigitOne);
-                output[1] = digit & 0xff;
-                //output[4] = output[3];
-                output[2] = (digit >> 8) & 0xff;
-                digit = I2C_translate(DigitTwo);
-                output[3] = digit & 0xff;
-                //output[6] = output[5];
-                output[4] = (digit >> 8) & 0xff;
-                xStreamBufferSend(xI2C_out_Buffer, output, 9, 10);
-                //with the message loaded, load the address buffer with the address for the display
-                TWI0.MADDR = I2C_ADDR;
-                //start message sending by enabling the interrupt
-                TWI0.MCTRLA |= TWI_WIEN_bm;
-                //wait for message to finish sending
-                xSemaphoreTake(xI2C_Sem, 50);
-                break;
-                
-            case 0: //off
-                for(uint8_t i = 0; i < 18; i++)
-                {
-                    output[i] = 0x0;
-                }
-                xStreamBufferSend(xI2C_out_Buffer, output, 18, 10);
-                //with the message loaded, load the address buffer with the address for the display
-                TWI0.MADDR = I2C_ADDR;
-                //start message sending by enabling the interrupt
-                TWI0.MCTRLA |= TWI_WIEN_bm;
-                //wait for message to finish sending
-                xSemaphoreTake(xI2C_Sem, 50);
-                break;
-        }
-        //set blink and flash
-        blink = 1;
-        flash = 1;
+        
     }
                 vTaskSuspend(NULL);
     

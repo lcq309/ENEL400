@@ -16,6 +16,7 @@
 #include "timers.h"
 #include "I2C.h"
 #include "stream_buffer.h"
+#include "message_buffer.h"
 
 #ifndef DSIO_H
 #define	DSIO_H
@@ -43,11 +44,11 @@ extern "C" {
     //queue handles
 
     extern QueueHandle_t xPB_Queue;
-    extern QueueHandle_t xIND_Queue;
     extern QueueHandle_t xDeviceIN_Queue;
     
     //stream handle
     
+    extern MessageBufferHandle_t xIND_Buffer;
     extern StreamBufferHandle_t xNEXTION_out_Buffer;
     extern StreamBufferHandle_t xNEXTION_in_Buffer;
     
