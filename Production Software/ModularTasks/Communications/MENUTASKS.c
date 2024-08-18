@@ -97,7 +97,6 @@ void modCOMMOutTask (void * parameters)
     uint8_t header_buffer[14];
     uint8_t length = 0;
     uint8_t size = 0;
-    uint8_t PR[4] = {0x7e, 2, 'R', GLOBAL_DeviceID};
     uint8_t netmessage[14] = {0x7e, 12, 0, GLOBAL_DeviceID, GLOBAL_Channel, GLOBAL_DeviceType, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0xFF};
     // header and message bits
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init

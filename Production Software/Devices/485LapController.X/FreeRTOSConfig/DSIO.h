@@ -16,7 +16,6 @@
 #include "timers.h"
 #include "I2C.h"
 #include "stream_buffer.h"
-#include "message_buffer.h"
 
 #ifndef DSIO_H
 #define	DSIO_H
@@ -31,26 +30,27 @@ extern "C" {
     //Semaphores
     
     extern SemaphoreHandle_t xNotify; //defined in the communications module
-    extern SemaphoreHandle_t xNEXTION_Sem;
+    extern SemaphoreHandle_t xI2C_Sem;
     
     //timer globals
     
     extern uint8_t xINDTimerSet;
+    extern uint8_t xPBTimerSet;
     
     //timer handles
     
     extern TimerHandle_t xINDTimer;
+    extern TimerHandle_t xPBTimer;
     
     //queue handles
 
     extern QueueHandle_t xPB_Queue;
+    extern QueueHandle_t xIND_Queue;
     extern QueueHandle_t xDeviceIN_Queue;
     
     //stream handle
     
-    extern MessageBufferHandle_t xIND_Buffer;
-    extern StreamBufferHandle_t xNEXTION_out_Buffer;
-    extern StreamBufferHandle_t xNEXTION_in_Buffer;
+    extern StreamBufferHandle_t xI2C_out_Buffer;
     
     //Event Groups
     extern EventGroupHandle_t xEventInit;
@@ -65,6 +65,12 @@ extern "C" {
     //timer callback functions
     void vINDTimerFunc( TimerHandle_t xTimer );
     void vPBTimerFunc( TimerHandle_t xTimer );
+    
+    /* RS 485 TR
+     * Transceiver control function for transmit or receive.
+     * 'T' should set the transceiver, 'R' should set the receiver.
+     */
+    void RS485TR(uint8_t dir);
     
 #ifdef	__cplusplus
 }

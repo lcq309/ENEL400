@@ -64,7 +64,7 @@ struct ErrorTracker ErrorTable[50];
 //task pointers
 
 void prvWiredInitTask( void * parameters );
-void prvWLCTask( void * parameters );
+void prvMENUTask( void * parameters );
 
 //retransmission timer
 
@@ -113,11 +113,8 @@ void prvWiredInitTask( void * parameters )
      */
     uint8_t PingResponse[4] = {0x7e, 0x02, 'R', GLOBAL_DeviceID};
     
-    //take the mutex
-    xSemaphoreTake(xUSART0_MUTEX, portMAX_DELAY);
     //start flashing indicators
     uint8_t FlashAll[3] = {'1', '4', 'F'}; //flash all segments
-    xQueueSendToFront(xIND_Queue, FlashAll, portMAX_DELAY);
     
     //wait and listen for the correct ping
     uint8_t byte_buffer[1];
@@ -152,8 +149,6 @@ void prvWiredInitTask( void * parameters )
                 received = 1;
                 //load output buffer
                 xStreamBufferSend(xCOMM_out_Stream, PingResponse, 4, portMAX_DELAY);
-                //enable transmitter
-                RS485TR('T');
                 //start transmission by setting TXCIE, and DREIE
                 USART0.CTRLA |= USART_TXCIE_bm;
                 USART0.CTRLA |= USART_DREIE_bm;
@@ -161,9 +156,6 @@ void prvWiredInitTask( void * parameters )
                 xSemaphoreTake(xTXC, portMAX_DELAY);
                 //stop flashing lights
                 FlashAll[2] = 'O'; // O for Off
-                xQueueSendToFront(xIND_Queue, FlashAll, portMAX_DELAY);
-                //release MUTEX
-                xSemaphoreGive(xUSART0_MUTEX);
                 //set initialization flag
                 xEventGroupSetBits(xEventInit, 0x1);
                 //go to sleep until restart
@@ -181,8 +173,12 @@ void prvMENUTask( void * parameters )
     struct DeviceTracker ControllerTable[20]; //maximum of 20 connected controlled devices (probably not a hard limit)
     uint8_t numControllers = 0;
     uint8_t tablePos = 0;
+    uint8_t numWireless = 0;
+    uint8_t numWired = 0;
     struct DeviceTracker DisplayTable[20]; //20 connected lights
     uint8_t numDisplays = 0;
+    struct DeviceTracker LightTable[20]; //20 connected lights
+    uint8_t numLights = 0;
     struct DeviceTracker SpecialTable[10]; //10 connected special devices (stop button etc)
     uint8_t numSpecials = 0;
     struct DeviceTracker MenuTable[5]; //5 connected menu devices
@@ -357,54 +353,186 @@ void prvMENUTask( void * parameters )
             {
                 case 'S': //sector controller
                     //add matching code here
+                    for(uint8_t i = 0; i < numControllers; i++)
+                    {
+                        if(ControllerTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numControllers;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table and check if the wireless address is matching anything
+                    {
+                        ControllerTable[numControllers].index = buffer[0];
+                        tablePos = numControllers;
+                        if(GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Type == '1')
+                            numWired++;
+                        else
+                            numWireless++;
+                        numControllers++;
+                    }
                     break;
                     
                 case 's': //sector light
-                    
+                    for(uint8_t i = 0; i < numLights; i++)
+                    {
+                        if(LightTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numLights;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        LightTable[numLights].index = buffer[0];
+                        tablePos = numLights;
+                        if(GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Type == '3')
+                            numWired++;
+                        else
+                            numWireless++;
+                        numLights++;
+                    }
                     break;
                     
                 case 'P': //pit controller
-                    
+                    for(uint8_t i = 0; i < numControllers; i++)
+                    {
+                        if(ControllerTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numControllers;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table and check if the wireless address is matching anything
+                    {
+                        ControllerTable[numControllers].index = buffer[0];
+                        tablePos = numControllers;
+                        numWired++;
+                        numControllers++;
+                    }
                     break;
                     
                 case 'p': //pit light
-                    
+                    for(uint8_t i = 0; i < numLights; i++)
+                    {
+                        if(LightTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numLights;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        LightTable[numLights].index = buffer[0];
+                        tablePos = numLights;
+                        numWired++;
+                        numLights++;
+                    }
                     break;
                     
                 case 'L': //lap controller
-                    
+                    for(uint8_t i = 0; i < numControllers; i++)
+                    {
+                        if(ControllerTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numControllers;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table and check if the wireless address is matching anything
+                    {
+                        ControllerTable[numControllers].index = buffer[0];
+                        tablePos = numControllers;
+                        numWired++;
+                        numControllers++;
+                    }
                     break;
                     
                 case 'l': //lap display
+                    for(uint8_t i = 0; i < numLights; i++)
+                    {
+                        if(LightTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numLights;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        LightTable[numLights].index = buffer[0];
+                        tablePos = numLights;
+                        numWired++;
+                        numLights++;
+                    }
+                    break;
                     
+                case 'E': //emergency stop
+                    for(uint8_t i = 0; i < numSpecials; i++)
+                    {
+                        if(SpecialTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numSpecials;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        SpecialTable[numSpecials].index = buffer[0];
+                        tablePos = numSpecials;
+                        numWired++;
+                        numSpecials++;
+                    }
                     break;
                     
                 case 'M': //menu
-                    
+                    for(uint8_t i = 0; i < numMenus; i++)
+                    {
+                        if(MenuTable[i].index == buffer[0])
+                        {
+                            match = 1;
+                            tablePos = i;
+                            i = numMenus;
+                        }
+                    }
+                    if(match != 1) //if no match found, add to table
+                    {
+                        MenuTable[numMenus].index = buffer[0];
+                        tablePos = numMenus;
+                        numWired++;
+                        numMenus++;
+                    }
                     break;
             }
         }
-        //message processing now complete, check the status of any colour change request
-        //if all colours are matching colour_req, then change colour_cur into colour_req
         uint8_t check_variable = 1;
     }
     switch(updateIND)
     {
         case 'W': //window update
+            
             break;
             
         case 'C': //error cleared
+            
             break;
             
         case 'E': //error added
+            
             break;
             
             //then the common updates such as device numbers and system stop
             
             //device numbers overwrite
             
-            
             //system stop
+            
     }
         //loop and restart
 } 
