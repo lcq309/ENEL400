@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../../Drivers/USART.c ../../Drivers/ShiftReg.c ../../Drivers/I2C.c ../../FreeRTOS/AVR_AVRDx/port.c ../../FreeRTOS/event_groups.c ../../FreeRTOS/heap_1.c ../../FreeRTOS/list.c ../../FreeRTOS/queue.c ../../FreeRTOS/stream_buffer.c ../../FreeRTOS/tasks.c ../../FreeRTOS/timers.c main.c DSIO.c ../../ModularTasks/Communications/MENUTASKS.c
+SOURCEFILES_QUOTED_IF_SPACED=../../Drivers/USART.c ../../Drivers/ShiftReg.c ../../Drivers/I2C.c ../../FreeRTOS/AVR_AVRDx/port.c ../../FreeRTOS/event_groups.c ../../FreeRTOS/heap_1.c ../../FreeRTOS/list.c ../../FreeRTOS/queue.c ../../FreeRTOS/stream_buffer.c ../../FreeRTOS/tasks.c ../../FreeRTOS/timers.c ../../ModularTasks/Communications/MENUTASKS.c main.c DSIO.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/83377035/USART.o ${OBJECTDIR}/_ext/83377035/ShiftReg.o ${OBJECTDIR}/_ext/83377035/I2C.o ${OBJECTDIR}/_ext/1347852338/port.o ${OBJECTDIR}/_ext/1644529106/event_groups.o ${OBJECTDIR}/_ext/1644529106/heap_1.o ${OBJECTDIR}/_ext/1644529106/list.o ${OBJECTDIR}/_ext/1644529106/queue.o ${OBJECTDIR}/_ext/1644529106/stream_buffer.o ${OBJECTDIR}/_ext/1644529106/tasks.o ${OBJECTDIR}/_ext/1644529106/timers.o ${OBJECTDIR}/main.o ${OBJECTDIR}/DSIO.o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/83377035/USART.o.d ${OBJECTDIR}/_ext/83377035/ShiftReg.o.d ${OBJECTDIR}/_ext/83377035/I2C.o.d ${OBJECTDIR}/_ext/1347852338/port.o.d ${OBJECTDIR}/_ext/1644529106/event_groups.o.d ${OBJECTDIR}/_ext/1644529106/heap_1.o.d ${OBJECTDIR}/_ext/1644529106/list.o.d ${OBJECTDIR}/_ext/1644529106/queue.o.d ${OBJECTDIR}/_ext/1644529106/stream_buffer.o.d ${OBJECTDIR}/_ext/1644529106/tasks.o.d ${OBJECTDIR}/_ext/1644529106/timers.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/DSIO.o.d ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/83377035/USART.o ${OBJECTDIR}/_ext/83377035/ShiftReg.o ${OBJECTDIR}/_ext/83377035/I2C.o ${OBJECTDIR}/_ext/1347852338/port.o ${OBJECTDIR}/_ext/1644529106/event_groups.o ${OBJECTDIR}/_ext/1644529106/heap_1.o ${OBJECTDIR}/_ext/1644529106/list.o ${OBJECTDIR}/_ext/1644529106/queue.o ${OBJECTDIR}/_ext/1644529106/stream_buffer.o ${OBJECTDIR}/_ext/1644529106/tasks.o ${OBJECTDIR}/_ext/1644529106/timers.o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o ${OBJECTDIR}/main.o ${OBJECTDIR}/DSIO.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/83377035/USART.o.d ${OBJECTDIR}/_ext/83377035/ShiftReg.o.d ${OBJECTDIR}/_ext/83377035/I2C.o.d ${OBJECTDIR}/_ext/1347852338/port.o.d ${OBJECTDIR}/_ext/1644529106/event_groups.o.d ${OBJECTDIR}/_ext/1644529106/heap_1.o.d ${OBJECTDIR}/_ext/1644529106/list.o.d ${OBJECTDIR}/_ext/1644529106/queue.o.d ${OBJECTDIR}/_ext/1644529106/stream_buffer.o.d ${OBJECTDIR}/_ext/1644529106/tasks.o.d ${OBJECTDIR}/_ext/1644529106/timers.o.d ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/DSIO.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/83377035/USART.o ${OBJECTDIR}/_ext/83377035/ShiftReg.o ${OBJECTDIR}/_ext/83377035/I2C.o ${OBJECTDIR}/_ext/1347852338/port.o ${OBJECTDIR}/_ext/1644529106/event_groups.o ${OBJECTDIR}/_ext/1644529106/heap_1.o ${OBJECTDIR}/_ext/1644529106/list.o ${OBJECTDIR}/_ext/1644529106/queue.o ${OBJECTDIR}/_ext/1644529106/stream_buffer.o ${OBJECTDIR}/_ext/1644529106/tasks.o ${OBJECTDIR}/_ext/1644529106/timers.o ${OBJECTDIR}/main.o ${OBJECTDIR}/DSIO.o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o
+OBJECTFILES=${OBJECTDIR}/_ext/83377035/USART.o ${OBJECTDIR}/_ext/83377035/ShiftReg.o ${OBJECTDIR}/_ext/83377035/I2C.o ${OBJECTDIR}/_ext/1347852338/port.o ${OBJECTDIR}/_ext/1644529106/event_groups.o ${OBJECTDIR}/_ext/1644529106/heap_1.o ${OBJECTDIR}/_ext/1644529106/list.o ${OBJECTDIR}/_ext/1644529106/queue.o ${OBJECTDIR}/_ext/1644529106/stream_buffer.o ${OBJECTDIR}/_ext/1644529106/tasks.o ${OBJECTDIR}/_ext/1644529106/timers.o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o ${OBJECTDIR}/main.o ${OBJECTDIR}/DSIO.o
 
 # Source Files
-SOURCEFILES=../../Drivers/USART.c ../../Drivers/ShiftReg.c ../../Drivers/I2C.c ../../FreeRTOS/AVR_AVRDx/port.c ../../FreeRTOS/event_groups.c ../../FreeRTOS/heap_1.c ../../FreeRTOS/list.c ../../FreeRTOS/queue.c ../../FreeRTOS/stream_buffer.c ../../FreeRTOS/tasks.c ../../FreeRTOS/timers.c main.c DSIO.c ../../ModularTasks/Communications/MENUTASKS.c
+SOURCEFILES=../../Drivers/USART.c ../../Drivers/ShiftReg.c ../../Drivers/I2C.c ../../FreeRTOS/AVR_AVRDx/port.c ../../FreeRTOS/event_groups.c ../../FreeRTOS/heap_1.c ../../FreeRTOS/list.c ../../FreeRTOS/queue.c ../../FreeRTOS/stream_buffer.c ../../FreeRTOS/tasks.c ../../FreeRTOS/timers.c ../../ModularTasks/Communications/MENUTASKS.c main.c DSIO.c
 
 
 
@@ -154,6 +154,12 @@ ${OBJECTDIR}/_ext/1644529106/timers.o: ../../FreeRTOS/timers.c  .generated_files
 	@${RM} ${OBJECTDIR}/_ext/1644529106/timers.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/_ext/1644529106/timers.o.d" -MT "${OBJECTDIR}/_ext/1644529106/timers.o.d" -MT ${OBJECTDIR}/_ext/1644529106/timers.o -o ${OBJECTDIR}/_ext/1644529106/timers.o ../../FreeRTOS/timers.c 
 	
+${OBJECTDIR}/_ext/2083278984/MENUTASKS.o: ../../ModularTasks/Communications/MENUTASKS.c  .generated_files/flags/default/f38e6b74d277debc8eaf36a1086c3e21cf4d2d2d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/_ext/2083278984" 
+	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d 
+	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o -o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o ../../ModularTasks/Communications/MENUTASKS.c 
+	
 ${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/bc8e4f68626562a7829437d5393939bd351bb307 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
@@ -165,12 +171,6 @@ ${OBJECTDIR}/DSIO.o: DSIO.c  .generated_files/flags/default/277bcace5753c96cd3be
 	@${RM} ${OBJECTDIR}/DSIO.o.d 
 	@${RM} ${OBJECTDIR}/DSIO.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/DSIO.o.d" -MT "${OBJECTDIR}/DSIO.o.d" -MT ${OBJECTDIR}/DSIO.o -o ${OBJECTDIR}/DSIO.o DSIO.c 
-	
-${OBJECTDIR}/_ext/2083278984/MENUTASKS.o: ../../ModularTasks/Communications/MENUTASKS.c  .generated_files/flags/default/f38e6b74d277debc8eaf36a1086c3e21cf4d2d2d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/_ext/2083278984" 
-	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d 
-	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o -o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o ../../ModularTasks/Communications/MENUTASKS.c 
 	
 else
 ${OBJECTDIR}/_ext/83377035/USART.o: ../../Drivers/USART.c  .generated_files/flags/default/9a3ca64f04534b6f540c321c5d8bface7ee0f21f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
@@ -239,6 +239,12 @@ ${OBJECTDIR}/_ext/1644529106/timers.o: ../../FreeRTOS/timers.c  .generated_files
 	@${RM} ${OBJECTDIR}/_ext/1644529106/timers.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/_ext/1644529106/timers.o.d" -MT "${OBJECTDIR}/_ext/1644529106/timers.o.d" -MT ${OBJECTDIR}/_ext/1644529106/timers.o -o ${OBJECTDIR}/_ext/1644529106/timers.o ../../FreeRTOS/timers.c 
 	
+${OBJECTDIR}/_ext/2083278984/MENUTASKS.o: ../../ModularTasks/Communications/MENUTASKS.c  .generated_files/flags/default/ce9eb3342665643c3798a72aabdb464b7baf42b1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}/_ext/2083278984" 
+	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d 
+	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o -o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o ../../ModularTasks/Communications/MENUTASKS.c 
+	
 ${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/c82f0d9c3d4faeafb96bb52434b7514ae1cab2b4 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
@@ -250,12 +256,6 @@ ${OBJECTDIR}/DSIO.o: DSIO.c  .generated_files/flags/default/ec0b70e390610359dad7
 	@${RM} ${OBJECTDIR}/DSIO.o.d 
 	@${RM} ${OBJECTDIR}/DSIO.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/DSIO.o.d" -MT "${OBJECTDIR}/DSIO.o.d" -MT ${OBJECTDIR}/DSIO.o -o ${OBJECTDIR}/DSIO.o DSIO.c 
-	
-${OBJECTDIR}/_ext/2083278984/MENUTASKS.o: ../../ModularTasks/Communications/MENUTASKS.c  .generated_files/flags/default/ce9eb3342665643c3798a72aabdb464b7baf42b1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}/_ext/2083278984" 
-	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d 
-	@${RM} ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -I"../../Drivers" -I"../../FreeRTOS/include" -I"FreeRTOSConfig" -I"../../FreeRTOS/AVR_AVRDx" -I"../../ModularTasks/Communications" -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mno-const-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT "${OBJECTDIR}/_ext/2083278984/MENUTASKS.o.d" -MT ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o -o ${OBJECTDIR}/_ext/2083278984/MENUTASKS.o ../../ModularTasks/Communications/MENUTASKS.c 
 	
 endif
 

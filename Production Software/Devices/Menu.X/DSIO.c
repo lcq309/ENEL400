@@ -52,7 +52,7 @@ void DSIOSetup()
     
     //setup stream buffers
     
-    xIND_Buffer = xMessageBufferCreate(50,1);
+    xIND_Buffer = xMessageBufferCreate(50);
     xNEXTION_out_Buffer = xStreamBufferCreate(40,1); //40 bytes, triggers when a byte is added
     xNEXTION_in_Buffer = xStreamBufferCreate(20,1);
     
