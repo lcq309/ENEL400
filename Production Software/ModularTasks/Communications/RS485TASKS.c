@@ -123,7 +123,7 @@ void modCOMMOutTask (void * parameters)
             //load join message into output
             xStreamBufferSend(xCOMM_out_Stream, netmessage, 14, 0);
         }
-        else if((buffer[size-1] == 254) && (size != 0)) //I'll use this for broadcast
+        else if((buffer[size - 1] == 0xfe) && (size != 0)) //I'll use this for broadcast
         {
             //end of message contains the index of the target device.
             //reduce length by one, since we won't be sending the index value
@@ -228,6 +228,10 @@ void modCOMMInTask (void * parameters)
         xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
         if(byte_buffer[0] == 0x7E)
         {
+            for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+            {
+                buffer[i] = 0;
+            }
             pos = 0;
             //next byte is length, grab length for message construction loop
             check = xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, 10);
@@ -285,7 +289,7 @@ void modCOMMInTask (void * parameters)
                     for(uint8_t i = 0; i < GLOBAL_TableLength; i++)
                     {
                         //wireless address check, start with LSB
-                        for(uint8_t y = 11; y >= 4; y--)
+                        for(int8_t y = 11; y >= 4; y--)
                         {
                             if(buffer[y] != GLOBAL_DEVICE_TABLE[i].XBeeADD[y-4]) //if address doesn't match
                             {

@@ -213,8 +213,7 @@ void prvWLCTask( void * parameters )
     {
         xSemaphoreTake(xNotify, 200); //wait for a message to come in from anywhere
         //internal source commands processing
-        uint8_t breakloop = 0; //used to break the loop when yellow lockout is set
-        while((xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE) && (breakloop == 0))
+        while(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
         {
             //check message source
             switch(buffer[0])
@@ -242,9 +241,19 @@ void prvWLCTask( void * parameters )
                             break;
 
                         case 'D': //decrement
-                            LapNum--;
-                            DigitOne = (LapNum / 10) + 0x30;
-                            DigitTwo = (LapNum % 10) + 0x30; //should result in an ascii 0 through 9.
+                            if(LapNum > 0)
+                            {
+                                LapNum--;
+                                DigitOne = (LapNum / 10) + 0x30;
+                                DigitTwo = (LapNum % 10) + 0x30; //should result in an ascii 0 through 9.
+                            }
+                            else if (LapNum == 0)
+                            {
+                                DigitOne = ' ';
+                                DigitTwo = ' ';
+                            }
+                            else
+                                LapNum = 0;
                             Requester = 1; //we are initiating this change
                             ForceCheck = 1;
                             updateIND = 1; //update the indicators
@@ -261,7 +270,7 @@ void prvWLCTask( void * parameters )
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
                             break;
                             
-                        case 'L':
+                        case 'L': //last lap
                             LapNum++;
                             DigitOne = 'L';
                             DigitTwo = 'L';
@@ -269,7 +278,17 @@ void prvWLCTask( void * parameters )
                             ForceCheck = 1;
                             updateIND = 1; //update the indicators
                             GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            break;
                             
+                        case 'Z': //zero
+                            LapNum = 0;
+                            DigitOne = '0';
+                            DigitTwo = '0';
+                            Requester = 1; //we are initiating this change
+                            ForceCheck = 1;
+                            updateIND = 1; //update the indicators
+                            GLOBAL_RetransmissionTimerSet = 1; //update indicator checks immediately
+                            break;
                     }
                     break;
                     
@@ -281,7 +300,6 @@ void prvWLCTask( void * parameters )
                             //send the network join message
                             ; //this needs to be here to avoid an error on NetJoin.
                             uint8_t NetJoin[1] = {0xff};
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
@@ -297,6 +315,10 @@ void prvWLCTask( void * parameters )
         }
         //check for messages from COMMS
         length = 0;
+        for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+        {
+            buffer[i] = 0;
+        }
         length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
@@ -392,7 +414,7 @@ void prvWLCTask( void * parameters )
                         {
                             default: //anything else should just be state confirmations
                                 if((DigitOne == buffer[2]) && (DigitTwo == buffer[3]))
-                                    ControllerTable[tablePos].status = 'C';
+                                    DisplayTable[tablePos].status = 'C';
                                 break;
                         }
                     }

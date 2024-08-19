@@ -257,6 +257,8 @@ void prv485OUTTask( void * parameters )
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
+        for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+            output_buffer[i] = 0;
         //wait until a message arrives in the buffer
         length = xMessageBufferReceive(xRS485_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
         //acquire MUTEX after pulling message into internal buffer
@@ -569,7 +571,6 @@ void prvXBEEINTask( void * parameters )
     volatile uint8_t size = 0;
     uint8_t pos = 0;
     uint8_t check = 0; //check for message failure
-    
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); // wait for init
     
     for(;;)
@@ -589,13 +590,17 @@ void prvXBEEINTask( void * parameters )
                 xStreamBufferReceive(xXBEE_in_Stream, byte_buffer, 1, 10);
                 length = byte_buffer[0]; // load loop iterator
                 size = length; //save length for use later
-                //loop and assemble message until length = 0;
+                //loop and assemble message until length = 0;`1
+                uint32_t checksumcalc = 0;
+                for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+                    buffer[i] = 0;
                 while(length > 0)
                 {
                     check = xStreamBufferReceive(xXBEE_in_Stream, byte_buffer, 1, 10);
                     if(check > 0)
                     {
                         buffer[pos] = byte_buffer[0];
+                        checksumcalc += byte_buffer[0];
                         pos++;
                         length--;
                     }
@@ -604,6 +609,13 @@ void prvXBEEINTask( void * parameters )
                         length = 0;
                         buffer[0] = 0;
                     }
+                }
+                xStreamBufferReceive(xXBEE_in_Stream, byte_buffer, 1, 10); //this should be the checksum
+                checksumcalc += byte_buffer[0]; // last two digits should be 0xff
+                if((checksumcalc & 0xff) != 0xff) //if the checksum fails
+                {
+                    buffer[0] = 0;
+                    size = 0;
                 }
             }
             else
@@ -645,49 +657,54 @@ void prvXBEEINTask( void * parameters )
                  * 
                  * overall size change is - 4 for header differences
                  */
-                //change size
-                size = size - 2;
-                //reassemble the message in the output buffer
-                outbuffer[0] = 'I'; //always inbound
-                outbuffer[1] = buffer[12]; //wired address
-                outbuffer[2] = buffer[13]; //channel number
-                outbuffer[3] = buffer[14]; //device type
-                outbuffer[4] = buffer[1]; //start of wireless address
-                outbuffer[5] = buffer[2];
-                outbuffer[6] = buffer[3];
-                outbuffer[7] = buffer[4];
-                outbuffer[8] = buffer[5];
-                outbuffer[9] = buffer[6];
-                outbuffer[10] = buffer[7];
-                outbuffer[11] = buffer[8]; //end of wireless address
-                for(uint8_t i = 12; i < size + 2; i++) //move message to the correct spot
+                //check against checksum
                 {
-                    outbuffer[i] = buffer[i + 3];
-                }
-                //now the outbuffer should be loaded with the correct message, move to routing
-                if(outbuffer[2] == 0) //channel zero always goes to menu
-                {
-                    //this will need to grab the MUTEX for the menu buffer and send the message
-                    if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
+                    //change size
+                    size = size - 2;
+                    //reassemble the message in the output buffer
+                    for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+                    outbuffer[i] = 0;
+                    outbuffer[0] = 'I'; //always inbound
+                    outbuffer[1] = buffer[12]; //wired address
+                    outbuffer[2] = buffer[13]; //channel number
+                    outbuffer[3] = buffer[14]; //device type
+                    outbuffer[4] = buffer[1]; //start of wireless address
+                    outbuffer[5] = buffer[2];
+                    outbuffer[6] = buffer[3];
+                    outbuffer[7] = buffer[4];
+                    outbuffer[8] = buffer[5];
+                    outbuffer[9] = buffer[6];
+                    outbuffer[10] = buffer[7];
+                    outbuffer[11] = buffer[8]; //end of wireless address]
+                    for(uint8_t i = 12; i < size + 2; i++) //move message to the correct spot
                     {
-                        xMessageBufferSend(xMENU_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
-                        xSemaphoreGive(xMENU_MUTEX);
+                        outbuffer[i] = buffer[i + 3];
                     }
-                    if(outbuffer[3] == 'M') //if the device type is menu, then also transmit on wired network
+                    //now the outbuffer should be loaded with the correct message, move to routing
+                    if(outbuffer[2] == 0) //channel zero always goes to menu
+                    {
+                        //this will need to grab the MUTEX for the menu buffer and send the message
+                        if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
+                        {
+                            xMessageBufferSend(xMENU_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                            xSemaphoreGive(xMENU_MUTEX);
+                        }
+                        if(outbuffer[3] == 'M') //if the device type is menu, then also transmit on wired network
+                        {
+                            if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
+                            {
+                                xMessageBufferSend(xRS485_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                                xSemaphoreGive(x485_MUTEX);
+                            }
+                        }
+                    }
+                    else //all other cases transmit over the wired network
                     {
                         if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
                         {
                             xMessageBufferSend(xRS485_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
                             xSemaphoreGive(x485_MUTEX);
                         }
-                    }
-                }
-                else //all other cases transmit over the wired network
-                {
-                    if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
-                    {
-                        xMessageBufferSend(xRS485_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
-                        xSemaphoreGive(x485_MUTEX);
                     }
                 }
                 break;

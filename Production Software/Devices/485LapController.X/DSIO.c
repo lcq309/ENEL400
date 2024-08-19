@@ -15,10 +15,12 @@
     //timer globals
     
     uint8_t xINDTimerSet = 0;
+    uint8_t xPBTimerSet = 0;
     
     //timer handles
     
     TimerHandle_t xINDTimer;
+    TimerHandle_t xPBTimer;
     
     //queue handles
 
@@ -59,7 +61,8 @@ void DSIOSetup()
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     
     //setup timers
-    xINDTimer = xTimerCreate("INDT", 50, pdTRUE, 0, vINDTimerFunc);
+    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
+    xPBTimer = xTimerCreate("PBDB", 200, pdFALSE, 0, vPBTimerFunc);
     
     //start the indicator timer
     xTimerStart(xINDTimer, 0);
@@ -68,15 +71,12 @@ void DSIOSetup()
 void dsIOInTask (void * parameters)
 {
     //initialize inputs
-    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm;
-    PORTC.DIRCLR = PIN3_bm;
+    PORTD.DIRCLR = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm | PIN1_bm;
     //Then I will set up the multi-configure register for port D.
     PORTD.PINCONFIG = 0x3 | PORT_PULLUPEN_bm; //enable falling edge interrupt and pullup
     //update configuration for selected pins
-    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm;
-    // single pin configuration for PORT C
-    PORTC.PIN3CTRL |= PORT_PULLUPEN_bm | 0x3;
-            
+    PORTD.PINCTRLUPD = PIN6_bm | PIN5_bm | PIN3_bm | PIN2_bm | PIN1_bm;
+    
     //for now, this just reads button presses with a half second debounce delay to avoid spam.
     //block until a button press occurs, then check anti spam timer and reset timer
     //initialization complete, enter looping section.
@@ -86,10 +86,15 @@ void dsIOInTask (void * parameters)
     {
         //wait for input
         xQueueReceive(xPB_Queue, input, portMAX_DELAY);
-        output[1] = input[0];
-        xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
-        xSemaphoreGive(xNotify);
-        //send message to inter-task queue
+        if(xPBTimerSet == 0)
+        {
+            output[1] = input[0];
+            xQueueSendToBack(xDeviceIN_Queue, output, portMAX_DELAY);
+            xSemaphoreGive(xNotify);
+            //send message to inter-task queue
+            xPBTimerSet = 1; //set software debounce
+            xTimerReset(xPBTimer, portMAX_DELAY);
+        }
     }
     
 }
@@ -235,6 +240,8 @@ void dsIOOutTask (void * parameters)
         blink = 1;
         flash = 1;
     }
+                vTaskSuspend(NULL);
+    
 }
 
 //RS485 in/out
@@ -261,6 +268,10 @@ void vINDTimerFunc( TimerHandle_t xTimer )
     xINDTimerSet = 1;
 }
 
+void vPBTimerFunc( TimerHandle_t xTimer )
+{
+    xPBTimerSet = 0;
+}
 //interrupts go here
 
 ISR(PORTD_PORT_vect)
@@ -282,26 +293,19 @@ ISR(PORTD_PORT_vect)
             PORTD.INTFLAGS = PIN5_bm; //reset interrupt
             pb[0] = 'D'; //down
             break;
-        case PIN3_bm: //button 3
-            PORTD.INTFLAGS = PIN3_bm; //reset interrupt
+        case PIN1_bm: //button 1
+            PORTD.INTFLAGS = PIN1_bm; //reset interrupt
+            pb[0] = 'L'; //last
+            break;    
+        case PIN2_bm: //button 3
+            PORTD.INTFLAGS = PIN2_bm; //reset interrupt
             pb[0] = 'H'; //halfway
             break;
-        case PIN2_bm: //button 4
-            PORTD.INTFLAGS = PIN2_bm;
+        case PIN3_bm: //button 4
+            PORTD.INTFLAGS = PIN3_bm;
             pb[0] = 'Z'; //zero
-    }
-    xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
-}
-
-ISR(PORTC_PORT_vect)
-{
-    uint8_t pb[1] = {0};
-    switch(PORTC.INTFLAGS)
-    {
-        case PIN3_bm: //button 1
-            PORTC.INTFLAGS = PIN3_bm; //reset interrupt
-            pb[0] = 'L'; //last
-            break;
+        default:
+            PORTD.INTFLAGS = 0xff;
     }
     xQueueSendToBackFromISR(xPB_Queue, pb, NULL);
 }

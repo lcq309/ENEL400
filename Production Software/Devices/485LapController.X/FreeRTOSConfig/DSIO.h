@@ -35,10 +35,12 @@ extern "C" {
     //timer globals
     
     extern uint8_t xINDTimerSet;
+    extern uint8_t xPBTimerSet;
     
     //timer handles
     
     extern TimerHandle_t xINDTimer;
+    extern TimerHandle_t xPBTimer;
     
     //queue handles
 
@@ -61,7 +63,8 @@ extern "C" {
     void DSIOSetup(void);
     
     //timer callback functions
-    void vINDTimerFunc( TimerHandle_t xTimer ); 
+    void vINDTimerFunc( TimerHandle_t xTimer );
+    void vPBTimerFunc( TimerHandle_t xTimer );
     
     /* RS 485 TR
      * Transceiver control function for transmit or receive.

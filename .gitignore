@@ -1106,3 +1106,6 @@ Software/Hardware verification testing/Button Module/Button Module.X/.generated_
 Software/Hardware verification testing/Button Module/Button Module.X/.generated_files/flags/default/affd062ec14607e8299f95c873986d4b5dc6728d
 Software/Hardware verification testing/Button Module/Button Module.X/.generated_files/flags/default/f9455849688fe198f59683d59b45ead06e8de21d
 Software/Hardware verification testing/Button Module/Button Module.X/.generated_files/flags/default/f9e49b6eef0472a4ccb922192e723650e5543f67
+/Production Software/Devices/Portable Coordinator.X/.generated_files
+Production Software/Devices/Portable Coordinator.X/dist/default/debug/Portable_Coordinator.X.debug.map
+/Production Software/Devices/Menu.X/.generated_files

@@ -196,8 +196,8 @@ void prvWSCTask( void * parameters )
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
-    volatile uint8_t colour_cur = 'O'; //current confirmed colour
-    volatile uint8_t colour_err = 0; //error tracking colour
+    uint8_t colour_cur = 'O'; //current confirmed colour
+    uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
     
@@ -336,6 +336,10 @@ void prvWSCTask( void * parameters )
         }
         //check for messages from COMMS
         length = 0;
+        for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+        {
+            buffer[i] = 0;
+        }
         length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {

@@ -129,21 +129,21 @@ void prvXSCTask( void * parameters )
      * a controller will yield to a controller trying to send a higher priority
      */
     struct DeviceTracker ControllerTable[20]; //maximum of 20 connected controlled devices (probably not a hard limit)
-    uint8_t numControllers = 0;
+    int8_t numControllers = 0;
     uint8_t tablePos = 0;
     struct DeviceTracker LightTable[20]; //20 connected lights
-    uint8_t numLights = 0;
+    int8_t numLights = 0;
     struct DeviceTracker SpecialTable[10]; //10 connected special devices (stop button etc)
-    uint8_t numSpecials = 0;
+    int8_t numSpecials = 0;
     struct DeviceTracker MenuTable[5]; //5 connected menu devices
-    uint8_t numMenus = 0;
+    int8_t numMenus = 0;
     uint8_t lockout = 'C'; //used to track lockout status ('Y'ellow, 'R'ed, 'C'lear)
     uint8_t buffer[MAX_MESSAGE_SIZE]; //messaging buffer
     uint8_t length = 0; //message length
     uint8_t updateIND = 0; //set when an indicator update should occur
     uint8_t colour_req = 'O'; //requested colour
-    volatile uint8_t colour_cur = 'O'; //current confirmed colour
-    volatile uint8_t colour_err = 0; //error tracking colour
+    uint8_t colour_cur = 'O'; //current confirmed colour
+    uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
     uint8_t lowbatt = 0; //used to track the status of low battery warnings
@@ -295,6 +295,10 @@ void prvXSCTask( void * parameters )
         }
         //check for messages from COMMS
         length = 0;
+        for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+        {
+            buffer[i] = 0;
+        }
         length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
@@ -539,7 +543,7 @@ void prvXSCTask( void * parameters )
                             case 'y': //confirm yellow 
                                 switch(lockout)
                                 {
-                                    case 'Y': //green lockout, mark as confirmed if Requester 1
+                                    case 'Y': //yellow lockout, mark as confirmed if Requester 1
                                         if(Requester == 1)
                                             ControllerTable[tablePos].status = 'Y';
                                         break;
