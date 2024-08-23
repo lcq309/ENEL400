@@ -229,7 +229,6 @@ void prvWPLTask( void * parameters )
                             uint8_t NetJoin[1] = {0xff};
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
                     }
                 }

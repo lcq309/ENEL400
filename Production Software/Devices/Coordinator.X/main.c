@@ -241,7 +241,7 @@ void prvWiredInitTask( void * parameters )
     xSemaphoreGive(xUSART0_MUTEX);
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
-    vTaskDelay(100); //wait for 100ms to ensure that the  
+    vTaskDelay(100); //wait for 100ms
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
@@ -725,6 +725,9 @@ void prvMENUOUTTask( void * parameters )
     //message length should be taken directly from the stream receive.
     //wait for initialization
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
+    //after initialization, send a wakeup message to the menu
+    uint8_t wakeup[4] = {0x7e, 0x02, 'P', 'M'};
+    xMessageBufferSend(xMENU_out_Buffer, wakeup, 4, portMAX_DELAY);
     for(;;)
     {
         //wait until a message arrives in the buffer

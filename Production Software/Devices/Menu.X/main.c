@@ -58,6 +58,9 @@ uint8_t GLOBAL_DeviceType = 'M'; //Menu controller device
 
 #define MaxNets 40
 
+//global variable
+uint8_t errorNum = 0; //track the number of errors
+
 //Error table
 struct ErrorTracker ErrorTable[50];
 
@@ -113,9 +116,6 @@ void prvWiredInitTask( void * parameters )
      */
     uint8_t PingResponse[4] = {0x7e, 0x02, 'R', GLOBAL_DeviceID};
     
-    //start flashing indicators
-    uint8_t FlashAll[3] = {'1', '4', 'F'}; //flash all segments
-    
     //wait and listen for the correct ping
     uint8_t byte_buffer[1];
     uint8_t buffer[2];
@@ -143,19 +143,8 @@ void prvWiredInitTask( void * parameters )
         //check for ping
         if(buffer[0] == 'P')
         {
-            if(buffer[1] == GLOBAL_DeviceID) //if pinging me, respond with ping response
+            if(buffer[1] == 'M') //if pinging me, wakeup
             {
-                //stop loop
-                received = 1;
-                //load output buffer
-                xStreamBufferSend(xCOMM_out_Stream, PingResponse, 4, portMAX_DELAY);
-                //start transmission by setting TXCIE, and DREIE
-                USART0.CTRLA |= USART_TXCIE_bm;
-                USART0.CTRLA |= USART_DREIE_bm;
-                //wait for semaphore
-                xSemaphoreTake(xTXC, portMAX_DELAY);
-                //stop flashing lights
-                FlashAll[2] = 'O'; // O for Off
                 //set initialization flag
                 xEventGroupSetBits(xEventInit, 0x1);
                 //go to sleep until restart
@@ -269,7 +258,7 @@ void prvMENUTask( void * parameters )
                         case 'C': //clear error
                             ErrorTable[((displayWindow - 1) * 5) + (buffer[2] - 1)].active = 0; //this equation is meant to determine which error in the array it is
                             ErrorTable[((displayWindow - 1) * 5) + (buffer[2] - 1)].state = 0; //the button was cleared
-                            updateIND = 'C'; //rearrange the errors around the one that was just cleared.
+                            updateIND = 'C'; //rearrange the errors around the one that was just cleared and decrement the count.
                             //the indication update code needs to loop and check all errors and clear up the gap
                             break;
                     }
@@ -302,7 +291,8 @@ void prvMENUTask( void * parameters )
         {
             buffer[i] = 0;
         }
-        length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
+        if(updateIND == 0) //skip the message 
+            length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
             uint8_t router = 0; //byte used for routing from different sources
@@ -372,6 +362,26 @@ void prvMENUTask( void * parameters )
                             numWireless++;
                         numControllers++;
                     }
+                    //add error code here
+                    //the only error here would be low battery
+                    switch(buffer[1])
+                    {
+                        case 'L': //low battery error
+                            if(buffer[2] == 'B')
+                            {
+                                //set up the first available error
+                                ErrorTable[NumErrors].message[0] = 'C'; //C for controller
+                                ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                ErrorTable[NumErrors].message[2] = 'L';
+                                ErrorTable[NumErrors].message[3] = 'B';
+                                updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                //send confirmation
+                                buffer[0] = 'e'; //confirm error
+                                buffer[1] = ControllerTable[tablePos].index;
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                            }
+                            break;
+                    }
                     break;
                     
                 case 's': //sector light
@@ -394,6 +404,7 @@ void prvMENUTask( void * parameters )
                             numWireless++;
                         numLights++;
                     }
+                    
                     break;
                     
                 case 'P': //pit controller
