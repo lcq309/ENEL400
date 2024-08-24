@@ -43,7 +43,7 @@ void DSIOSetup()
     USART1_init();
     USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | \
             USART_PMODE_DISABLED_gc; //disable parity for Nextion
-    
+    USART1.CTRLA |= USART_TXCIE_bm;
     //setup Queues
     
     xPB_Queue = xQueueCreate(2, 2 * sizeof(uint8_t)); //up to 2 touchscreen messages held
@@ -136,7 +136,7 @@ void dsIOOutTask (void * parameters)
     for(;;)
     {
         //first, check for commands from other tasks (hold for 50ms)
-        size = xMessageBufferReceive(xIND_Buffer, received, 50, 50);
+        size = xMessageBufferReceive(xIND_Buffer, received, 50, portMAX_DELAY);
         if(size != 0)
         {
             //load the command into the output buffer, then load the end delimiter

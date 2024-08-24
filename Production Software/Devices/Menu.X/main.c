@@ -160,7 +160,6 @@ void prvWiredInitTask( void * parameters )
                     xStreamBufferSend(xCOMM_out_Stream, PingResponse, 4, portMAX_DELAY);
                     USART0.CTRLA |= USART_TXCIE_bm;
                     USART0.CTRLA |= USART_DREIE_bm;
-                    USART1.CTRLA |= USART_TXCIE_bm;
                     //set initialization flag
                     xEventGroupSetBits(xEventInit, 0x1);
                     //go to sleep until restart
@@ -669,7 +668,7 @@ void prvMENUTask( void * parameters )
                     //first, update the window number in the buffer
                     numval(buffer, 2, displayWindow);
                     //send the buffer to the output buffer
-                    xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                    xMessageBufferSend(xIND_Buffer, buffer, 9, 5);
                     //display should now be drawn with all errors and the window number updated.
                     break;
 
@@ -889,7 +888,7 @@ void numval(uint8_t *output, uint8_t numbox, uint8_t number)
             break;
             
         case 2:
-            numUpdate[2] = '2';
+            numUpdate[1] = '2';
             break;
     }
     for(uint8_t i = 0; i < 7; i++) //copy command into output buffer
@@ -899,8 +898,6 @@ void numval(uint8_t *output, uint8_t numbox, uint8_t number)
     //convert the integer to ascii characters (only works up to 99)
     output[7] = (number / 10) + 0x30;
     output[8] = (number % 10) + 0x30; //should result in an ascii 0 through 9.
-    //add end quotation mark
-    output[9] = '"';
 }
 void ButtEn(uint8_t *output, uint8_t numButt)
 {
