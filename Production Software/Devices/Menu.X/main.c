@@ -81,6 +81,11 @@ void vRetransmitTimerFunc( TimerHandle_t xTimer );
 
 uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never transmit
 
+//Nextion helper functions
+void text(uint8_t *output, uint8_t textbox, uint8_t *text, uint8_t textlength);
+void numval(uint8_t *output, uint8_t numbox, uint8_t number);
+void ButtEn(uint8_t *output, uint8_t numButt);
+
 int main(int argc, char** argv) {
     
     //setup tasks
@@ -257,7 +262,6 @@ void prvMENUTask( void * parameters )
                             
                         case 'C': //clear error
                             ErrorTable[((displayWindow - 1) * 5) + (buffer[2] - 1)].active = 0; //this equation is meant to determine which error in the array it is
-                            ErrorTable[((displayWindow - 1) * 5) + (buffer[2] - 1)].state = 0; //the button was cleared
                             updateIND = 'C'; //rearrange the errors around the one that was just cleared and decrement the count.
                             //the indication update code needs to loop and check all errors and clear up the gap
                             break;
@@ -366,20 +370,21 @@ void prvMENUTask( void * parameters )
                     //the only error here would be low battery
                     switch(buffer[1])
                     {
-                        case 'L': //low battery error
-                            if(buffer[2] == 'B')
-                            {
-                                //set up the first available error
-                                ErrorTable[NumErrors].message[0] = 'C'; //C for controller
-                                ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
-                                ErrorTable[NumErrors].message[2] = 'L';
-                                ErrorTable[NumErrors].message[3] = 'B';
-                                updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
-                                //send confirmation
-                                buffer[0] = 'e'; //confirm error
-                                buffer[1] = ControllerTable[tablePos].index;
-                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
-                            }
+                        case 'E': //error
+                            if(buffer[2] == 'L') //low battery
+                                if(buffer[3] == 'B')
+                                {
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'C'; //C for controller
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'L';
+                                    ErrorTable[NumErrors].message[3] = 'B';
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = ControllerTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                }
                             break;
                     }
                     break;
@@ -398,13 +403,87 @@ void prvMENUTask( void * parameters )
                     {
                         LightTable[numLights].index = buffer[0];
                         tablePos = numLights;
-                        if(GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Type == '3')
+                        if(GLOBAL_DEVICE_TABLE[LightTable[numLights].index].Type == '3')
                             numWired++;
                         else
                             numWireless++;
                         numLights++;
                     }
-                    
+                    //this error could be low battery or circuit failure
+                    switch(buffer[1])
+                    {
+                        case 'E': //error
+                            switch(buffer[2])
+                            {
+                                case 'L': //low battery
+                                    if(buffer[3] == 'B')
+                                    {
+                                        //set up the first available error
+                                        ErrorTable[NumErrors].message[0] = 'L'; //L for light
+                                        ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                        ErrorTable[NumErrors].message[2] = 'L'; //Low
+                                        ErrorTable[NumErrors].message[3] = 'B'; //Battery
+                                        updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                        //send confirmation
+                                        buffer[0] = 'e'; //confirm error
+                                        buffer[1] = LightTable[tablePos].index;
+                                        xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    }
+                                    break;
+                                    
+                                case 'R': //red light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'L'; //L for light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'R'; //Red
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                                    
+                                case 'Y': //yellow light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'L'; //L for light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'Y'; //Yellow
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                                    
+                                case 'G': //green light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'L'; //L for light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'G'; //Green
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                                    
+                                case 'B': //blue light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'L'; //L for light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'B'; //Blue
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                            }
+                    }
                     break;
                     
                 case 'P': //pit controller
@@ -425,6 +504,7 @@ void prvMENUTask( void * parameters )
                         numControllers++;
                     }
                     break;
+                    //no errors for this one, this is just in case one is implemented in the future
                     
                 case 'p': //pit light
                     for(uint8_t i = 0; i < numLights; i++)
@@ -442,6 +522,65 @@ void prvMENUTask( void * parameters )
                         tablePos = numLights;
                         numWired++;
                         numLights++;
+                    }
+                    //this one might have a circuit failure error
+                    switch(buffer[1])
+                    {
+                        case 'E': //error
+                            switch(buffer[2])
+                            {
+                                case 'R': //red light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'P'; //P for pit light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'R'; //Red
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                                    
+                                case 'Y': //yellow light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'P'; //P for pit light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'Y'; //Yellow
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                                    
+                                case 'G': //green light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'P'; //P for pit light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'G'; //Green
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                                    
+                                case 'B': //blue light failure
+                                    //set up the first available error
+                                    ErrorTable[NumErrors].message[0] = 'P'; //P for pit light
+                                    ErrorTable[NumErrors].message[1] = GLOBAL_DEVICE_TABLE[ControllerTable[numControllers].index].Channel + 0x30; //channel number/letter
+                                    ErrorTable[NumErrors].message[2] = 'B'; //Blue
+                                    ErrorTable[NumErrors].message[3] = 'L'; //Light
+                                    updateIND = 'E'; //reshuffle for new error, this will increment error count when processed and move the last error to the front of the list
+                                    //send confirmation
+                                    buffer[0] = 'e'; //confirm error
+                                    buffer[1] = LightTable[tablePos].index;
+                                    xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                    break;
+                            }
                     }
                     break;
                     
@@ -463,6 +602,7 @@ void prvMENUTask( void * parameters )
                         numControllers++;
                     }
                     break;
+                    //no errors for the lap controller
                     
                 case 'l': //lap display
                     for(uint8_t i = 0; i < numLights; i++)
@@ -482,6 +622,7 @@ void prvMENUTask( void * parameters )
                         numLights++;
                     }
                     break;
+                    //no errors for the lap display
                     
                 case 'E': //emergency stop
                     for(uint8_t i = 0; i < numSpecials; i++)
@@ -501,6 +642,7 @@ void prvMENUTask( void * parameters )
                         numSpecials++;
                     }
                     break;
+                    //this may be where the system stop message is received if implemented
                     
                 case 'M': //menu
                     for(uint8_t i = 0; i < numMenus; i++)
@@ -520,6 +662,7 @@ void prvMENUTask( void * parameters )
                         numMenus++;
                     }
                     break;
+                    //so far, there isn't much reason for menus to communicate
             }
         }
         uint8_t check_variable = 1;
@@ -527,6 +670,11 @@ void prvMENUTask( void * parameters )
     switch(updateIND)
     {
         case 'W': //window update
+            //first, update the window number in the buffer
+            numval(buffer, 2, displayWindow);
+            //send the buffer to the output buffer
+            xMessageBufferSend(xIND_Buffer, buffer, 20, 5);
+            //then determine what error should be displayed first
             
             break;
             
@@ -537,6 +685,7 @@ void prvMENUTask( void * parameters )
         case 'E': //error added
             
             break;
+    }
             
             //then the common updates such as device numbers and system stop
             
@@ -544,10 +693,94 @@ void prvMENUTask( void * parameters )
             
             //system stop
             
-    }
         //loop and restart
 } 
 
+//helper functions for Nextion commands
+void text(uint8_t *output, uint8_t textbox, uint8_t *text, uint8_t textlength)
+{
+    uint8_t ErrorBox[8] = {'e',0,'.','t','x','t','=','"'}; //textbox to send text change messages
+    uint8_t SysBox[9] = {'s','y','s','.','t','x','t','=','"'}; //textbox to send stop button messages
+    if(textbox == 'S') //system stop textbox
+    {
+        for(uint8_t i = 0; i < 9; i++) //copy command into output buffer
+        {
+            output[i] = SysBox[i];
+        }
+        for(uint8_t i = 0; i < textlength; i++)
+        {
+            output[i + 9] = text[i];
+        }
+        output[textlength + 9] = '"'; //add end quotation mark
+    }
+    else
+    {
+        switch(textbox)
+        {
+            case 1:
+                ErrorBox[1] = '1';
+                break;
+            case 2:
+                ErrorBox[1] = '2';
+                break;
+            case 3:
+                ErrorBox[1] = '3';
+                break;
+            case 4:
+                ErrorBox[1] = '4';
+                break;
+            case 5:
+                ErrorBox[1] = '5';
+                break;
+        }
+        for(uint8_t i = 0; i < 8; i++) //copy command into output buffer
+        {
+            output[i] = ErrorBox[i];
+        }
+        for(uint8_t i = 0; i < textlength; i++)
+        {
+            output[i + 8] = text[i];
+        }
+        output[textlength + 8] = '"'; //add end quotation mark
+    }
+}
+
+void numval(uint8_t *output, uint8_t numbox, uint8_t number)
+{
+    uint8_t numUpdate[7] = {'n',0,'.','v','a','l','='}; //commands to update numbers
+    switch(numbox)
+    {
+        case 0:
+            numUpdate[1] = '0';
+            break;
+            
+        case 1:
+            numUpdate[1] = '1';
+            break;
+            
+        case 2:
+            numUpdate[2] = '2';
+            break;
+    }
+    for(uint8_t i = 0; i < 7; i++) //copy command into output buffer
+    {
+        output[i] = numUpdate[i];
+    }
+    //convert the integer to ascii characters (only works up to 99)
+    output[7] = (number / 10) + 0x30;
+    output[8] = (number % 10) + 0x30; //should result in an ascii 0 through 9.
+    //add end quotation mark
+    output[9] = '"';
+}
+void ButtEn(uint8_t *output, uint8_t numButt)
+{
+    uint8_t Vis[8] = {'v','i','s',' ', 'b', 0, ',', '1'}; //command to update visibility for buttons
+    Vis[5] = numButt + 0x30;
+    for(uint8_t i = 0; i < 8; i++) //copy over command
+    {
+        output[i] = Vis[i];
+    }
+}
 void vRetransmitTimerFunc( TimerHandle_t xTimer )
 {
     GLOBAL_RetransmissionTimerSet = 1;

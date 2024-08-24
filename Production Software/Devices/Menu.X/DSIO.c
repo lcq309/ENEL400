@@ -6,7 +6,6 @@
  * Created on April 23, 2024
  */
 
-#define I2C_ADDR 0x70 << 1
 #include "DSIO.h"
     //Semaphores
     
