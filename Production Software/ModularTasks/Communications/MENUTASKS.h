@@ -1,5 +1,5 @@
 /* 
- * File:   RS485TASKS.h
+ * File:   MENUTASKS.h
  * Author: Michael King
  * Header file that defines the RS485 IN/OUT tasks for devices on the wired network
  * as well as a small function to set them up, to be called before the scheduler starts or during initialization.
@@ -18,8 +18,8 @@
 #include "timers.h"
 #include "USART.h"
 
-#ifndef RS485TASKS_H
-#define	RS485TASKS_H
+#ifndef MENUTASKS_H
+#define	MENUTASKS_H
 
 #ifdef	__cplusplus
 extern "C" {
@@ -51,12 +51,7 @@ extern "C" {
     extern uint8_t GLOBAL_Channel;
     extern uint8_t GLOBAL_DeviceType;
     
-    //MUTEXes
-    
-    extern SemaphoreHandle_t xUSART0_MUTEX;
-    
     //Semaphores
-    extern SemaphoreHandle_t xPermission; //task notification replacement
     extern SemaphoreHandle_t xTXC;
     extern SemaphoreHandle_t xNotify;
     
@@ -90,13 +85,9 @@ extern "C" {
     //task setup function
     void COMMSetup(void);
     
-    //transceiver in/out set function ('R' for receive, 'T' for transmit)
-    //defined in device specific I/O.h
-    extern void RS485TR(uint8_t dir);
-    
 #ifdef	__cplusplus
 }
 #endif
 
-#endif	/* RS485TASKS_H */
+#endif	/* MENUTASKS_H */
 

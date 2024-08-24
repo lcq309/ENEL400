@@ -13,6 +13,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "event_groups.h"
+#include "queue.h"
 #include "timers.h"
 #include "I2C.h"
 #include "stream_buffer.h"
@@ -27,7 +28,7 @@ extern "C" {
 
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define mainNEXT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define mainNEXT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
     
     //Semaphores
     

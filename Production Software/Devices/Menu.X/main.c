@@ -9,6 +9,8 @@
  * 
  */
 
+#define configASSERT ( x )     if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <DSIO.h>
@@ -23,6 +25,7 @@
 #include "stream_buffer.h"
 #include "message_buffer.h"
 #include "ShiftReg.h"
+#include "queue.h"
 
 #define ErrLength 10
 #define ErrTableLength 50
@@ -53,9 +56,9 @@ uint8_t GLOBAL_Channel = 0;
 uint8_t GLOBAL_DeviceType = 'M'; //Menu controller device
 
 #define mainWIREDINIT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define mainCOMMOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define mainCOMMIN_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-#define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
+#define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainMENU_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
@@ -93,7 +96,7 @@ int main(int argc, char** argv)
 {
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
-    xTaskCreate(prvMENUTask, "WLC", 700, NULL, mainMENU_TASK_PRIORITY, NULL);
+    xTaskCreate(prvMENUTask, "MENU", 900, NULL, mainMENU_TASK_PRIORITY, NULL);
     
     //setup timer
     
@@ -209,44 +212,18 @@ void prvMENUTask( void * parameters )
      * 
      * since this is the lowest priority task, it shouldn't need to block for anything on the input side.
      */
-    while(1)
-    {
-        xQueueReceive(xDeviceIN_Queue, buffer, portMAX_DELAY);
-        if(buffer[0] == 'P')
-            if(buffer[1] == 'P')
-                if(buffer[2] == 'S')
-                    break;
-    }
     //now wait for initialization
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY); //wait for init
     //now that the wired network has initialized, we can start the display
     //start the display by sending page 1
     uint8_t start[6] = {'p','a','g','e',' ','1'};
-    xMessageBufferSend(xIND_Buffer, start, 6, 0); //send the start command
-    while(1) //wait for the display to confirm it has reached the next page
-    {
-        xQueueReceive(xDeviceIN_Queue, buffer, portMAX_DELAY);
-        if(buffer[0] == 'P')
-            if(buffer[1] == 'P')
-                if(buffer[2] == 'H')
-                    break;
-    }
-    //we need to send the correct window number now, which should be 1
-    numUpdate[1] = '2'; //2 is the window number
-    for(int8_t i = 0; i < 7; i++) //load buffer with command
-    {
-        buffer[i] = numUpdate[i];
-    }
-    //load buffer with the page number
-    buffer[7] = '1';
-    //send the command
-    xMessageBufferSend(xIND_Buffer, buffer, 8, 0);
     //display should now be initialized properly.
     for(;;)
     {
         xSemaphoreTake(xNotify, 200); //wait for a message to come in from anywhere
         //internal source commands processing
-        while(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
+        length = 0;
+        if(xQueueReceive(xDeviceIN_Queue, buffer, 0) == pdTRUE)
         {
             //check message source
             switch(buffer[0])
@@ -298,14 +275,16 @@ void prvMENUTask( void * parameters )
             }
             
         }
-        //check for messages from COMMS
-        length = 0;
-        for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+        else
         {
-            buffer[i] = 0;
+            
+            for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+            {
+                buffer[i] = 0;
+            }
+            if(updateIND != 0) //skip the message 
+                length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         }
-        if(updateIND == 0) //skip the message 
-            length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         if(length != 0) //if there is a message in the buffer
         {
             uint8_t router = 0; //byte used for routing from different sources
@@ -682,155 +661,155 @@ void prvMENUTask( void * parameters )
             }
         }
         uint8_t check_variable = 1;
-    }
-    if(updateIND != 0)
-    {
-        switch(updateIND)
+        if(updateIND != 0)
         {
-            case 'W': //window update
-                //first, update the window number in the buffer
-                numval(buffer, 2, displayWindow);
-                //send the buffer to the output buffer
-                xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-                //display should now be drawn with all errors and the window number updated.
-                break;
+            switch(updateIND)
+            {
+                case 'W': //window update
+                    //first, update the window number in the buffer
+                    numval(buffer, 2, displayWindow);
+                    //send the buffer to the output buffer
+                    xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                    //display should now be drawn with all errors and the window number updated.
+                    break;
 
-            case 'C': //error cleared
-                //check and see which one was cleared (should be first non-active in table)
-                ;
-                uint8_t Shufflemode = 0;
-                for(uint8_t i = 0; i < ErrTableLength; i++)
-                {
-                    if(Shufflemode = 0)
+                case 'C': //error cleared
+                    //check and see which one was cleared (should be first non-active in table)
+                    ;
+                    uint8_t Shufflemode = 0;
+                    for(uint8_t i = 0; i < ErrTableLength; i++)
                     {
-                        if(ErrorTable[i].active != 1) //this is the error that was cleared
+                        if(Shufflemode = 0)
                         {
-                            //now check if there are any errors after it
-                            if(ErrorTable[i + 1].active != 1) //if nothing comes after, then just break the loop
-                                i = ErrTableLength;
-                            else //change the loop to shuffle the remaining errors
+                            if(ErrorTable[i].active != 1) //this is the error that was cleared
                             {
-                                Shufflemode = 1;
-                                for(uint8_t y = 0; y < ErrLength; y++)
+                                //now check if there are any errors after it
+                                if(ErrorTable[i + 1].active != 1) //if nothing comes after, then just break the loop
+                                    i = ErrTableLength;
+                                else //change the loop to shuffle the remaining errors
                                 {
-                                    ErrorTable[i].message[y] = ErrorTable[i + 1].message[y]; //move first over
-                                    ErrorTable[i].active = 1; //this error is now active
+                                    Shufflemode = 1;
+                                    for(uint8_t y = 0; y < ErrLength; y++)
+                                    {
+                                        ErrorTable[i].message[y] = ErrorTable[i + 1].message[y]; //move first over
+                                        ErrorTable[i].active = 1; //this error is now active
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        if(ErrorTable[i].active != 1) //the last error is last in the list
+                        else
                         {
-                            ErrorTable[i - 1].active = 0; //remove the last error in the list
-                        }
-                        else //shuffle error down by one
-                        {
-                            for(uint8_t y = 0; y < ErrLength; y++)
-                                {
-                                    ErrorTable[i].message[y] = ErrorTable[i + 1].message[y]; //shuffle error message
-                                }
-                        }
-                    }
-                }
-                NumErrors--;
-                break;
-
-            case 'E': //error added
-                ;
-                uint8_t temp[ErrLength];
-                for(uint8_t i = 0; i < ErrLength; i++)
-                    temp[i] = 0;
-                //move the last error to a temporary storage buffer
-                for(uint8_t i = 0; i < ErrLength; i++)
-                {
-                    temp[i] = ErrorTable[NumErrors].message[i];
-                }
-                //now compare all errors to the new one and see if it exists
-                uint8_t matchErr = 0;
-                for(uint8_t i = 0; i < ErrTableLength; i++)
-                {
-                    if(ErrorTable[i].active != 0) //if there is an error here
-                    {
-                        //compare
-                        for(uint8_t y = 0; y < ErrLength; y++)
-                        {
-                           if(ErrorTable[i].message[y] != temp[y]) //if not matching, end loop and continue
-                           {
-                               y = ErrLength;
-                               matchErr = 0;
-                           }
-                           else //if matching, keep checking
-                           {
-                               matchErr = 1;
-                           }
-                        }
-                        if(matchErr == 1) //if the error is already present
-                        {
-                            i = ErrTableLength;
+                            if(ErrorTable[i].active != 1) //the last error is last in the list
+                            {
+                                ErrorTable[i - 1].active = 0; //remove the last error in the list
+                            }
+                            else //shuffle error down by one
+                            {
+                                for(uint8_t y = 0; y < ErrLength; y++)
+                                    {
+                                        ErrorTable[i].message[y] = ErrorTable[i + 1].message[y]; //shuffle error message
+                                    }
+                            }
                         }
                     }
-                    else //end execution, we reached an available spot.
-                        i = ErrTableLength;
-                }
-                if(matchErr == 1) //already exists, break execution and ignore
-                {
+                    NumErrors--;
                     break;
-                }
-                else //it doesn't already exist, shuffle errors and add at the start
-                {
-                    ErrorTable[NumErrors].active = 1; //set the last error active
-                    //shuffle first, start at the back and work towards the front
-                    for(int8_t i = NumErrors; i > 0; i--)
-                    {
-                        for(uint8_t y = 0; y < ErrLength; y++)
-                        {
-                            ErrorTable[i].message[y] = ErrorTable[i-1].message[y];
-                        }
-                    }
-                    //at this point, all errors should be moved up by one
-                    //add the new error at the start
+
+                case 'E': //error added
+                    ;
+                    uint8_t temp[ErrLength];
+                    for(uint8_t i = 0; i < ErrLength; i++)
+                        temp[i] = 0;
+                    //move the last error to a temporary storage buffer
                     for(uint8_t i = 0; i < ErrLength; i++)
                     {
-                        ErrorTable[0].message[i] = temp[i];
+                        temp[i] = ErrorTable[NumErrors].message[i];
                     }
-                    NumErrors++; //increment error count
-                }
-                break;
-        }
-
-        //then determine what error should be displayed first to redraw the display
-        uint8_t firstError = ((displayWindow - 1) * 5);
-        uint8_t localErr = 1; //which position should it be displayed in?
-        for(uint8_t i = firstError; i < (displayWindow * 5); i++)
-        {
-            if(ErrorTable[i].active == 1) //if this error is present
-            {
-                //add the error to the display at the correct point
-                text(buffer, localErr, ErrorTable[i].message);
-                xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-                //activate the button
-                ButtEn(buffer, localErr);
-                xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-                localErr++;
+                    //now compare all errors to the new one and see if it exists
+                    uint8_t matchErr = 0;
+                    for(uint8_t i = 0; i < ErrTableLength; i++)
+                    {
+                        if(ErrorTable[i].active != 0) //if there is an error here
+                        {
+                            //compare
+                            for(uint8_t y = 0; y < ErrLength; y++)
+                            {
+                               if(ErrorTable[i].message[y] != temp[y]) //if not matching, end loop and continue
+                               {
+                                   y = ErrLength;
+                                   matchErr = 0;
+                               }
+                               else //if matching, keep checking
+                               {
+                                   matchErr = 1;
+                               }
+                            }
+                            if(matchErr == 1) //if the error is already present
+                            {
+                                i = ErrTableLength;
+                            }
+                        }
+                        else //end execution, we reached an available spot.
+                            i = ErrTableLength;
+                    }
+                    if(matchErr == 1) //already exists, break execution and ignore
+                    {
+                        break;
+                    }
+                    else //it doesn't already exist, shuffle errors and add at the start
+                    {
+                        ErrorTable[NumErrors].active = 1; //set the last error active
+                        //shuffle first, start at the back and work towards the front
+                        for(int8_t i = NumErrors; i > 0; i--)
+                        {
+                            for(uint8_t y = 0; y < ErrLength; y++)
+                            {
+                                ErrorTable[i].message[y] = ErrorTable[i-1].message[y];
+                            }
+                        }
+                        //at this point, all errors should be moved up by one
+                        //add the new error at the start
+                        for(uint8_t i = 0; i < ErrLength; i++)
+                        {
+                            ErrorTable[0].message[i] = temp[i];
+                        }
+                        NumErrors++; //increment error count
+                    }
+                    break;
             }
-            else //no more errors to show, break the loop
-                break;
-        }
-        //then the common updates such as device numbers and system stop
 
-        //device numbers overwrite
-        //wireless first
-        numval(buffer, 0, numWireless);
-        xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-        //wired second
-        numval(buffer, 1, numWired);
-        xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-        //system stop
-        updateIND = 0;
-    }
+            //then determine what error should be displayed first to redraw the display
+            uint8_t firstError = ((displayWindow - 1) * 5);
+            uint8_t localErr = 1; //which position should it be displayed in?
+            for(uint8_t i = firstError; i < (displayWindow * 5); i++)
+            {
+                if(ErrorTable[i].active == 1) //if this error is present
+                {
+                    //add the error to the display at the correct point
+                    text(buffer, localErr, ErrorTable[i].message);
+                    xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                    //activate the button
+                    ButtEn(buffer, localErr);
+                    xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                    localErr++;
+                }
+                else //no more errors to show, break the loop
+                    break;
+            }
+            //then the common updates such as device numbers and system stop
+
+            //device numbers overwrite
+            //wireless first
+            numval(buffer, 0, numWireless);
+            xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+            //wired second
+            numval(buffer, 1, numWired);
+            xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+            //system stop
+            updateIND = 0;
+        }
         //loop and restart
+    }
 } 
 
 //helper functions for Nextion commands

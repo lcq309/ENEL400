@@ -53,7 +53,7 @@ void DSIOSetup()
     
     xIND_Buffer = xMessageBufferCreate(50);
     xNEXTION_out_Buffer = xStreamBufferCreate(40,1); //40 bytes, triggers when a byte is added
-    xNEXTION_in_Buffer = xStreamBufferCreate(20,1);
+    xNEXTION_in_Buffer = xStreamBufferCreate(40,1);
     
     //setup tasks
     
@@ -77,33 +77,34 @@ void NextionInTask (void * parameters)
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
+        uint8_t received = 0;
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
         //wait for something to appear on the bus
-        if(xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 200) == 0)
+        if(xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, portMAX_DELAY) != 0)
         {
-            byte_buffer[0] = 0x0;
-        }
-        //check for start delimiter
-        if(byte_buffer[0] == 0x7e)
-        {
-            length = 2;
+            if(byte_buffer[0] == 0x7e)
+            {
+                length = 2;
+            }
+            else
+                length = 0; //just ignore this message, something went wrong
+            
+            for(uint8_t i = 0; i < length; i++)
+            {
+                //assemble the message byte by byte until the length is reached
+                if(xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 10) != 0)
+                    message_buffer[i] = byte_buffer[0];
+                //if nothing is received, cancel message receipt. Something went wrong
+                else
+                    length = 0;
+                //this if/else statement constitutes collision recovery code.
+                //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
+            }
+            xQueueSendToFront(xPB_Queue, message_buffer, portMAX_DELAY);
         }
         else
-            length = 0; //just ignore this message, something went wrong
-        
-        //now we know the message length(if there is a message)
-        for(uint8_t i = 0; i < length; i++)
-        {
-            //assemble the message byte by byte until the length is reached
-            if(xStreamBufferReceive(xNEXTION_in_Buffer, byte_buffer, 1, 10) != 0)
-                message_buffer[i] = byte_buffer[0];
-            //if nothing is received, cancel message receipt. Something went wrong
-            else
-                length = 0;
-            //this if/else statement constitutes collision recovery code.
-            //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
-        }
-        //pass the message on to the input task
-        xQueueSend(xPB_Queue, message_buffer, portMAX_DELAY);
+            byte_buffer[0] = 0x0;
     }
 }
 
