@@ -293,7 +293,7 @@ void modCOMMInTask (void * parameters)
             case 'O': //outbound message
             {
                 //check channel, special channel, and menu
-                if((buffer[2] == GLOBAL_Channel) || (buffer[2] == 0xff) || (buffer[2] == 0x0) || (GLOBAL_Channel == 0xff))
+                if(1)
                 {
                     matched = 'O';
                     //check wired address against device table

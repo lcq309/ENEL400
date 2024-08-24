@@ -282,7 +282,7 @@ void prvMENUTask( void * parameters )
             {
                 buffer[i] = 0;
             }
-            if(updateIND != 0) //skip the message 
+            if(updateIND == 0) //skip the message 
                 length = xMessageBufferReceive(xDevice_Buffer, buffer, MAX_MESSAGE_SIZE, 0);
         }
         if(length != 0) //if there is a message in the buffer
