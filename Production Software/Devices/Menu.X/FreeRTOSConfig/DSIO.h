@@ -27,6 +27,7 @@ extern "C" {
 
 #define mainPBIN_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define mainINDOUT_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define mainNEXT_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
     
     //Semaphores
     
@@ -58,6 +59,7 @@ extern "C" {
     //Task Definition
     void dsIOInTask ( void * parameters );
     void dsIOOutTask ( void * parameters );
+    void NextionInTask ( void * parameters );
     
     //task setup function
     void DSIOSetup(void);

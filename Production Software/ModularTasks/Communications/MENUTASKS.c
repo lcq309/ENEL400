@@ -15,7 +15,7 @@
     
     //Timer Counters
     
-    volatile uint16_t TimerCounter = 0;
+    uint16_t TimerCounter = 0;
     
     //Semaphores
     SemaphoreHandle_t xTXC; //transmission complete flag
@@ -461,7 +461,7 @@ ISR(USART0_RXC_vect)
      */
     uint8_t buf[1];
     buf[0] = USART0.RXDATAL;
-    xMessageBufferSendFromISR(xCOMM_in_Stream, buf, 1, NULL);
+    xStreamBufferSendFromISR(xCOMM_in_Stream, buf, 1, NULL);
 }
 ISR(USART0_DRE_vect)
 {

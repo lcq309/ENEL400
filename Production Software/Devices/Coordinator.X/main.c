@@ -727,7 +727,22 @@ void prvMENUOUTTask( void * parameters )
     xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
     //after initialization, send a wakeup message to the menu
     uint8_t wakeup[4] = {0x7e, 0x02, 'P', 'M'};
-    xMessageBufferSend(xMENU_out_Buffer, wakeup, 4, portMAX_DELAY);
+    uint8_t menuawake = 0;
+    uint8_t byte_buffer[1];
+    while(menuawake != 1)
+    {
+        xStreamBufferSend(xMENU_out_Stream, wakeup, 4, portMAX_DELAY);
+        //enable DRE interrupt to start transmission
+        USART1.CTRLA |= USART_DREIE_bm;
+        //wait for TXcomplete semaphore
+        xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
+        xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 200);
+        if(byte_buffer == 0x7E) //the menu is awake
+        {
+            menuawake = 1;
+        }
+    }
+    xEventGroupSetBits(xEventInit, 0x2);
     for(;;)
     {
         //wait until a message arrives in the buffer
@@ -758,7 +773,7 @@ void prvMENUINTask( void * parameters )
     uint8_t byte_buffer[1];
     uint8_t length = 0; //message length from header
     //wait for initialization
-    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
+    xEventGroupWaitBits(xEventInit, 0x2, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
         //wait for something to appear on the bus

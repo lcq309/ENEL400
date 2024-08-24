@@ -68,15 +68,15 @@ Discarded input sections
  .data          0x0000000000000000        0x0 build/default/production/_ext/83377035/ShiftReg.o
  .bss           0x0000000000000000        0x0 build/default/production/_ext/83377035/ShiftReg.o
  .text.ShiftOut
-                0x0000000000000000       0x6c build/default/production/_ext/83377035/ShiftReg.o
- .text.CLROut   0x0000000000000000       0x18 build/default/production/_ext/83377035/ShiftReg.o
- .text.LTCHOut  0x0000000000000000       0x18 build/default/production/_ext/83377035/ShiftReg.o
+                0x0000000000000000       0x80 build/default/production/_ext/83377035/ShiftReg.o
+ .text.CLROut   0x0000000000000000       0x20 build/default/production/_ext/83377035/ShiftReg.o
+ .text.LTCHOut  0x0000000000000000       0x20 build/default/production/_ext/83377035/ShiftReg.o
  .text.InitShiftOut
                 0x0000000000000000        0xe build/default/production/_ext/83377035/ShiftReg.o
  .text.ShiftTranslate
-                0x0000000000000000      0x10a build/default/production/_ext/83377035/ShiftReg.o
+                0x0000000000000000      0x10e build/default/production/_ext/83377035/ShiftReg.o
  .progmem.gcc_sw_table.ShiftTranslate
-                0x0000000000000000       0x96 build/default/production/_ext/83377035/ShiftReg.o
+                0x0000000000000000       0xb6 build/default/production/_ext/83377035/ShiftReg.o
  .text          0x0000000000000000        0x0 build/default/production/_ext/1347852338/port.o
  .data          0x0000000000000000        0x0 build/default/production/_ext/1347852338/port.o
  .bss           0x0000000000000000        0x0 build/default/production/_ext/1347852338/port.o
@@ -856,104 +856,104 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000    0x10dd5
+.debug_info     0x0000000000000000    0x10d6c
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000     0x2504 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_info    0x0000000000002504      0x851 build/default/production/_ext/83377035/USART.o
- .debug_info    0x0000000000002d55      0x838 build/default/production/_ext/83377035/ShiftReg.o
- .debug_info    0x000000000000358d      0x672 build/default/production/_ext/1347852338/port.o
- .debug_info    0x0000000000003bff      0xcaf build/default/production/_ext/1644529106/event_groups.o
- .debug_info    0x00000000000048ae      0x3ff build/default/production/_ext/1644529106/heap_1.o
- .debug_info    0x0000000000004cad      0x579 build/default/production/_ext/1644529106/list.o
- .debug_info    0x0000000000005226     0x1f7a build/default/production/_ext/1644529106/queue.o
- .debug_info    0x00000000000071a0     0x189d build/default/production/_ext/1644529106/stream_buffer.o
- .debug_info    0x0000000000008a3d     0x26c7 build/default/production/_ext/1644529106/tasks.o
- .debug_info    0x000000000000b104     0x15c3 build/default/production/_ext/1644529106/timers.o
- .debug_info    0x000000000000c6c7     0x1866 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_info    0x000000000000df2d     0x1d3a build/default/production/main.o
- .debug_info    0x000000000000fc67     0x116e build/default/production/DSIO.o
+ .debug_info    0x0000000000002d55      0x7cf build/default/production/_ext/83377035/ShiftReg.o
+ .debug_info    0x0000000000003524      0x672 build/default/production/_ext/1347852338/port.o
+ .debug_info    0x0000000000003b96      0xcaf build/default/production/_ext/1644529106/event_groups.o
+ .debug_info    0x0000000000004845      0x3ff build/default/production/_ext/1644529106/heap_1.o
+ .debug_info    0x0000000000004c44      0x579 build/default/production/_ext/1644529106/list.o
+ .debug_info    0x00000000000051bd     0x1f7a build/default/production/_ext/1644529106/queue.o
+ .debug_info    0x0000000000007137     0x189d build/default/production/_ext/1644529106/stream_buffer.o
+ .debug_info    0x00000000000089d4     0x26c7 build/default/production/_ext/1644529106/tasks.o
+ .debug_info    0x000000000000b09b     0x15c3 build/default/production/_ext/1644529106/timers.o
+ .debug_info    0x000000000000c65e     0x1866 build/default/production/_ext/2083278984/RS485TASKS.o
+ .debug_info    0x000000000000dec4     0x1d3a build/default/production/main.o
+ .debug_info    0x000000000000fbfe     0x116e build/default/production/DSIO.o
 
-.debug_abbrev   0x0000000000000000     0x3da5
+.debug_abbrev   0x0000000000000000     0x3dd9
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000     0x230e C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_abbrev  0x000000000000230e       0xfb build/default/production/_ext/83377035/USART.o
- .debug_abbrev  0x0000000000002409      0x16f build/default/production/_ext/83377035/ShiftReg.o
- .debug_abbrev  0x0000000000002578      0x17f build/default/production/_ext/1347852338/port.o
- .debug_abbrev  0x00000000000026f7      0x21f build/default/production/_ext/1644529106/event_groups.o
- .debug_abbrev  0x0000000000002916      0x111 build/default/production/_ext/1644529106/heap_1.o
- .debug_abbrev  0x0000000000002a27      0x116 build/default/production/_ext/1644529106/list.o
- .debug_abbrev  0x0000000000002b3d      0x2d8 build/default/production/_ext/1644529106/queue.o
- .debug_abbrev  0x0000000000002e15      0x253 build/default/production/_ext/1644529106/stream_buffer.o
- .debug_abbrev  0x0000000000003068      0x35f build/default/production/_ext/1644529106/tasks.o
- .debug_abbrev  0x00000000000033c7      0x32f build/default/production/_ext/1644529106/timers.o
- .debug_abbrev  0x00000000000036f6      0x24f build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_abbrev  0x0000000000003945      0x276 build/default/production/main.o
- .debug_abbrev  0x0000000000003bbb      0x1ea build/default/production/DSIO.o
+ .debug_abbrev  0x0000000000002409      0x1a3 build/default/production/_ext/83377035/ShiftReg.o
+ .debug_abbrev  0x00000000000025ac      0x17f build/default/production/_ext/1347852338/port.o
+ .debug_abbrev  0x000000000000272b      0x21f build/default/production/_ext/1644529106/event_groups.o
+ .debug_abbrev  0x000000000000294a      0x111 build/default/production/_ext/1644529106/heap_1.o
+ .debug_abbrev  0x0000000000002a5b      0x116 build/default/production/_ext/1644529106/list.o
+ .debug_abbrev  0x0000000000002b71      0x2d8 build/default/production/_ext/1644529106/queue.o
+ .debug_abbrev  0x0000000000002e49      0x253 build/default/production/_ext/1644529106/stream_buffer.o
+ .debug_abbrev  0x000000000000309c      0x35f build/default/production/_ext/1644529106/tasks.o
+ .debug_abbrev  0x00000000000033fb      0x32f build/default/production/_ext/1644529106/timers.o
+ .debug_abbrev  0x000000000000372a      0x24f build/default/production/_ext/2083278984/RS485TASKS.o
+ .debug_abbrev  0x0000000000003979      0x276 build/default/production/main.o
+ .debug_abbrev  0x0000000000003bef      0x1ea build/default/production/DSIO.o
 
-.debug_line     0x0000000000000000     0x5bf5
+.debug_line     0x0000000000000000     0x5be4
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000      0x190 C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_line    0x0000000000000190      0x187 build/default/production/_ext/83377035/USART.o
- .debug_line    0x0000000000000317      0x5b0 build/default/production/_ext/83377035/ShiftReg.o
- .debug_line    0x00000000000008c7      0x259 build/default/production/_ext/1347852338/port.o
- .debug_line    0x0000000000000b20      0x3c8 build/default/production/_ext/1644529106/event_groups.o
- .debug_line    0x0000000000000ee8      0x144 build/default/production/_ext/1644529106/heap_1.o
- .debug_line    0x000000000000102c      0x1f0 build/default/production/_ext/1644529106/list.o
- .debug_line    0x000000000000121c      0xcd0 build/default/production/_ext/1644529106/queue.o
- .debug_line    0x0000000000001eec      0x741 build/default/production/_ext/1644529106/stream_buffer.o
- .debug_line    0x000000000000262d     0x1191 build/default/production/_ext/1644529106/tasks.o
- .debug_line    0x00000000000037be      0x5a4 build/default/production/_ext/1644529106/timers.o
- .debug_line    0x0000000000003d62      0x802 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_line    0x0000000000004564      0xfd7 build/default/production/main.o
- .debug_line    0x000000000000553b      0x6ba build/default/production/DSIO.o
+ .debug_line    0x0000000000000317      0x59f build/default/production/_ext/83377035/ShiftReg.o
+ .debug_line    0x00000000000008b6      0x259 build/default/production/_ext/1347852338/port.o
+ .debug_line    0x0000000000000b0f      0x3c8 build/default/production/_ext/1644529106/event_groups.o
+ .debug_line    0x0000000000000ed7      0x144 build/default/production/_ext/1644529106/heap_1.o
+ .debug_line    0x000000000000101b      0x1f0 build/default/production/_ext/1644529106/list.o
+ .debug_line    0x000000000000120b      0xcd0 build/default/production/_ext/1644529106/queue.o
+ .debug_line    0x0000000000001edb      0x741 build/default/production/_ext/1644529106/stream_buffer.o
+ .debug_line    0x000000000000261c     0x1191 build/default/production/_ext/1644529106/tasks.o
+ .debug_line    0x00000000000037ad      0x5a4 build/default/production/_ext/1644529106/timers.o
+ .debug_line    0x0000000000003d51      0x802 build/default/production/_ext/2083278984/RS485TASKS.o
+ .debug_line    0x0000000000004553      0xfd7 build/default/production/main.o
+ .debug_line    0x000000000000552a      0x6ba build/default/production/DSIO.o
 
-.debug_frame    0x0000000000000000     0x1820
+.debug_frame    0x0000000000000000     0x1868
  *(.debug_frame)
  .debug_frame   0x0000000000000000       0x44 build/default/production/_ext/83377035/USART.o
- .debug_frame   0x0000000000000044       0xa0 build/default/production/_ext/83377035/ShiftReg.o
- .debug_frame   0x00000000000000e4       0x84 build/default/production/_ext/1347852338/port.o
- .debug_frame   0x0000000000000168      0x17c build/default/production/_ext/1644529106/event_groups.o
- .debug_frame   0x00000000000002e4       0x60 build/default/production/_ext/1644529106/heap_1.o
- .debug_frame   0x0000000000000344       0x88 build/default/production/_ext/1644529106/list.o
- .debug_frame   0x00000000000003cc      0x42c build/default/production/_ext/1644529106/queue.o
- .debug_frame   0x00000000000007f8      0x438 build/default/production/_ext/1644529106/stream_buffer.o
- .debug_frame   0x0000000000000c30      0x570 build/default/production/_ext/1644529106/tasks.o
- .debug_frame   0x00000000000011a0      0x224 build/default/production/_ext/1644529106/timers.o
- .debug_frame   0x00000000000013c4      0x200 build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_frame   0x00000000000015c4       0xbc build/default/production/main.o
- .debug_frame   0x0000000000001680      0x1a0 build/default/production/DSIO.o
+ .debug_frame   0x0000000000000044       0xe8 build/default/production/_ext/83377035/ShiftReg.o
+ .debug_frame   0x000000000000012c       0x84 build/default/production/_ext/1347852338/port.o
+ .debug_frame   0x00000000000001b0      0x17c build/default/production/_ext/1644529106/event_groups.o
+ .debug_frame   0x000000000000032c       0x60 build/default/production/_ext/1644529106/heap_1.o
+ .debug_frame   0x000000000000038c       0x88 build/default/production/_ext/1644529106/list.o
+ .debug_frame   0x0000000000000414      0x42c build/default/production/_ext/1644529106/queue.o
+ .debug_frame   0x0000000000000840      0x438 build/default/production/_ext/1644529106/stream_buffer.o
+ .debug_frame   0x0000000000000c78      0x570 build/default/production/_ext/1644529106/tasks.o
+ .debug_frame   0x00000000000011e8      0x224 build/default/production/_ext/1644529106/timers.o
+ .debug_frame   0x000000000000140c      0x200 build/default/production/_ext/2083278984/RS485TASKS.o
+ .debug_frame   0x000000000000160c       0xbc build/default/production/main.o
+ .debug_frame   0x00000000000016c8      0x1a0 build/default/production/DSIO.o
 
-.debug_str      0x0000000000000000     0x1e71
+.debug_str      0x0000000000000000     0x1e7c
  *(.debug_str)
  .debug_str     0x0000000000000000      0xfdc C:/Users/miste/.mchp_packs/Microchip/AVR-Dx_DFP/2.4.286/xc8/avr/lib/avrxmega4/memx-const/crtavr128da28.o
  .debug_str     0x0000000000000fdc        0xb build/default/production/_ext/83377035/USART.o
- .debug_str     0x0000000000000fe7        0x0 build/default/production/_ext/83377035/ShiftReg.o
- .debug_str     0x0000000000000fe7       0x26 build/default/production/_ext/1347852338/port.o
- .debug_str     0x000000000000100d      0x192 build/default/production/_ext/1644529106/event_groups.o
- .debug_str     0x000000000000119f       0x1f build/default/production/_ext/1644529106/heap_1.o
- .debug_str     0x00000000000011be       0x2b build/default/production/_ext/1644529106/list.o
- .debug_str     0x00000000000011e9      0x2d2 build/default/production/_ext/1644529106/queue.o
- .debug_str     0x00000000000014bb      0x242 build/default/production/_ext/1644529106/stream_buffer.o
- .debug_str     0x00000000000016fd      0x26a build/default/production/_ext/1644529106/tasks.o
- .debug_str     0x0000000000001967      0x1fc build/default/production/_ext/1644529106/timers.o
- .debug_str     0x0000000000001b63      0x15d build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_str     0x0000000000001cc0      0x10e build/default/production/main.o
- .debug_str     0x0000000000001dce       0xa3 build/default/production/DSIO.o
+ .debug_str     0x0000000000000fe7        0xb build/default/production/_ext/83377035/ShiftReg.o
+ .debug_str     0x0000000000000ff2       0x26 build/default/production/_ext/1347852338/port.o
+ .debug_str     0x0000000000001018      0x192 build/default/production/_ext/1644529106/event_groups.o
+ .debug_str     0x00000000000011aa       0x1f build/default/production/_ext/1644529106/heap_1.o
+ .debug_str     0x00000000000011c9       0x2b build/default/production/_ext/1644529106/list.o
+ .debug_str     0x00000000000011f4      0x2d2 build/default/production/_ext/1644529106/queue.o
+ .debug_str     0x00000000000014c6      0x242 build/default/production/_ext/1644529106/stream_buffer.o
+ .debug_str     0x0000000000001708      0x26a build/default/production/_ext/1644529106/tasks.o
+ .debug_str     0x0000000000001972      0x1fc build/default/production/_ext/1644529106/timers.o
+ .debug_str     0x0000000000001b6e      0x15d build/default/production/_ext/2083278984/RS485TASKS.o
+ .debug_str     0x0000000000001ccb      0x10e build/default/production/main.o
+ .debug_str     0x0000000000001dd9       0xa3 build/default/production/DSIO.o
 
-.debug_loc      0x0000000000000000     0x8446
+.debug_loc      0x0000000000000000     0x831c
  *(.debug_loc)
- .debug_loc     0x0000000000000000      0xc0d build/default/production/_ext/83377035/ShiftReg.o
- .debug_loc     0x0000000000000c0d       0xc8 build/default/production/_ext/1347852338/port.o
- .debug_loc     0x0000000000000cd5      0x91c build/default/production/_ext/1644529106/event_groups.o
- .debug_loc     0x00000000000015f1       0xe0 build/default/production/_ext/1644529106/heap_1.o
- .debug_loc     0x00000000000016d1       0xb8 build/default/production/_ext/1644529106/list.o
- .debug_loc     0x0000000000001789     0x18ac build/default/production/_ext/1644529106/queue.o
- .debug_loc     0x0000000000003035     0x15ad build/default/production/_ext/1644529106/stream_buffer.o
- .debug_loc     0x00000000000045e2     0x1abd build/default/production/_ext/1644529106/tasks.o
- .debug_loc     0x000000000000609f      0xa9b build/default/production/_ext/1644529106/timers.o
- .debug_loc     0x0000000000006b3a      0x5cd build/default/production/_ext/2083278984/RS485TASKS.o
- .debug_loc     0x0000000000007107     0x1293 build/default/production/main.o
- .debug_loc     0x000000000000839a       0xac build/default/production/DSIO.o
+ .debug_loc     0x0000000000000000      0xae3 build/default/production/_ext/83377035/ShiftReg.o
+ .debug_loc     0x0000000000000ae3       0xc8 build/default/production/_ext/1347852338/port.o
+ .debug_loc     0x0000000000000bab      0x91c build/default/production/_ext/1644529106/event_groups.o
+ .debug_loc     0x00000000000014c7       0xe0 build/default/production/_ext/1644529106/heap_1.o
+ .debug_loc     0x00000000000015a7       0xb8 build/default/production/_ext/1644529106/list.o
+ .debug_loc     0x000000000000165f     0x18ac build/default/production/_ext/1644529106/queue.o
+ .debug_loc     0x0000000000002f0b     0x15ad build/default/production/_ext/1644529106/stream_buffer.o
+ .debug_loc     0x00000000000044b8     0x1abd build/default/production/_ext/1644529106/tasks.o
+ .debug_loc     0x0000000000005f75      0xa9b build/default/production/_ext/1644529106/timers.o
+ .debug_loc     0x0000000000006a10      0x5cd build/default/production/_ext/2083278984/RS485TASKS.o
+ .debug_loc     0x0000000000006fdd     0x1293 build/default/production/main.o
+ .debug_loc     0x0000000000008270       0xac build/default/production/DSIO.o
 
 .debug_macinfo
  *(.debug_macinfo)

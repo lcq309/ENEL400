@@ -89,8 +89,8 @@ void text(uint8_t *output, uint8_t textbox, uint8_t *text);
 void numval(uint8_t *output, uint8_t numbox, uint8_t number);
 void ButtEn(uint8_t *output, uint8_t numButt);
 
-int main(int argc, char** argv) {
-    
+int main(int argc, char** argv) 
+{
     //setup tasks
     xTaskCreate(prvWiredInitTask, "INIT", 300, NULL, mainWIREDINIT_TASK_PRIORITY, NULL);
     xTaskCreate(prvMENUTask, "WLC", 700, NULL, mainMENU_TASK_PRIORITY, NULL);
@@ -122,7 +122,7 @@ void prvWiredInitTask( void * parameters )
      * 8. release the USART mutex
      * 9. suspend permanently
      */
-    uint8_t PingResponse[4] = {0x7e, 0x02, 'R', GLOBAL_DeviceID};
+    uint8_t PingResponse[4] = {0x7e, 0x02, 'R', 'M'};
     
     //wait and listen for the correct ping
     uint8_t byte_buffer[1];
@@ -132,31 +132,37 @@ void prvWiredInitTask( void * parameters )
     while(received != 1)
     {
         //wait for start delimiter
-        xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
-        if(byte_buffer[0] == 0x7E)
+        if(xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY) != 0)
         {
-            uint8_t pos = 0;
-            //next byte is length, grab length for message construction loop
-            xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
-            length = byte_buffer[0]; // load loop iterator
-            //loop and assemble message until length = 0;
-            while(length > 0)
+            if(byte_buffer[0] == 0x7E)
             {
-                length--;
+                uint8_t pos = 0;
+                //next byte is length, grab length for message construction loop
                 xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
-                buffer[pos] = byte_buffer[0];
-                pos++;
+                length = byte_buffer[0]; // load loop iterator
+                //loop and assemble message until length = 0;
+                while(length > 0)
+                {
+                    length--;
+                    xStreamBufferReceive(xCOMM_in_Stream, byte_buffer, 1, portMAX_DELAY);
+                    buffer[pos] = byte_buffer[0];
+                    pos++;
+                }
             }
-        }
-        //check for ping
-        if(buffer[0] == 'P')
-        {
-            if(buffer[1] == 'M') //if pinging me, wakeup
+            //check for ping
+            if(buffer[0] == 'P')
             {
-                //set initialization flag
-                xEventGroupSetBits(xEventInit, 0x1);
-                //go to sleep until restart
-                vTaskSuspend(NULL);
+                if(buffer[1] == 'M') //if pinging me, wakeup and respond
+                {
+                    xStreamBufferSend(xCOMM_out_Stream, PingResponse, 4, portMAX_DELAY);
+                    USART0.CTRLA |= USART_TXCIE_bm;
+                    USART0.CTRLA |= USART_DREIE_bm;
+                    USART1.CTRLA |= USART_TXCIE_bm;
+                    //set initialization flag
+                    xEventGroupSetBits(xEventInit, 0x1);
+                    //go to sleep until restart
+                    vTaskSuspend(NULL);
+                }
             }
         }
     }

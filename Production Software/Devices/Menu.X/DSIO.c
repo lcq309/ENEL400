@@ -59,6 +59,7 @@ void DSIOSetup()
     
     xTaskCreate(dsIOInTask, "PBIN", 250, NULL, mainPBIN_TASK_PRIORITY, NULL);
     xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(NextionInTask, "NEXT", 250, NULL, mainNEXT_TASK_PRIORITY, NULL);
     
     //setup timers
     xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
