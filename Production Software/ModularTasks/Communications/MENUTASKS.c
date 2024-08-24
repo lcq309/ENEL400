@@ -228,10 +228,12 @@ void modCOMMInTask (void * parameters)
         uint8_t netmatch = 0; //track if a device is on the same wireless address as another to avoid redundant messages.
         switch(buffer[0])
         {
+            case 'P': //ping, just respond with ping response
+                break;
             case 'I': //inbound message
             {
-                //check channel, special channel, and menu
-                if((buffer[2] == GLOBAL_Channel) || (buffer[2] == 0xff) || (buffer[2] == 0x0) || (GLOBAL_Channel == 0xff))
+                //allow all messages
+                if(1)
                 {
                     matched = 'I';
                     //header structure: {start, length, type, wired address, ch, device type, wireless address}

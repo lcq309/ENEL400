@@ -185,9 +185,9 @@ void prvWiredInitTask( void * parameters )
     uint8_t length = 0;
     uint8_t buffer[2];
     
-    //wait half a second to ensure all wired devices are active
+    //wait a second to ensure all wired devices are active
     
-    vTaskDelay(500);
+    vTaskDelay(1000);
     
     //enable transmit complete interrupt
     USART0.CTRLA |= USART_TXCIE_bm;
@@ -242,6 +242,37 @@ void prvWiredInitTask( void * parameters )
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
     vTaskDelay(1000); //wait for 1000ms
+    //initialize the menu micro
+    Ping[3] = 'M';
+    xStreamBufferSend(xMENU_out_Stream, Ping, 4, portMAX_DELAY);
+    //enable DRE interrupt to start transmission
+    USART1.CTRLA |= USART_DREIE_bm;
+    //wait for TXcomplete semaphore
+    xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
+    xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 10);
+    if(byte_buffer[0] == 0x7E)
+    {
+        uint8_t pos = 0;
+        //next byte is length, grab length for message construction loop
+        xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, portMAX_DELAY);
+        length = byte_buffer[0]; // load loop iterator
+        //loop and assemble message until length = 0;
+        while(length > 0)
+        {
+            length--;
+            xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            buffer[pos] = byte_buffer[0];
+            pos++;
+        }
+    }
+        //now check ping response for correct number
+        if(buffer[0] == 'R')
+        {
+            if(buffer[1] == 'M') //if correct response, good to go
+            {
+                xEventGroupSetBits(xEventInit, 0x2);
+            }
+        }
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
@@ -374,14 +405,11 @@ void prv485INTask( void * parameters )
                             xSemaphoreGive(xXBEE_MUTEX);
                         }
                     }
-                    else if(message_buffer[2] == 0) //send to menu controller (if attached)
+                    //send all to menu controller
+                    if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
                     {
-                        //this will need to grab the MUTEX for the menu buffer and send the message
-                        if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
-                        {
-                            xMessageBufferSend(xMENU_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0);
-                            xSemaphoreGive(xMENU_MUTEX);
-                        }
+                        xMessageBufferSend(xMENU_out_Buffer, message_buffer, length, 0);
+                        xSemaphoreGive(xMENU_MUTEX);
                     }
                     xSemaphoreGive(xUSART0_MUTEX);
                     break;
@@ -724,25 +752,7 @@ void prvMENUOUTTask( void * parameters )
     //this is fairly simple, just output the message buffer when the bus is available.
     //message length should be taken directly from the stream receive.
     //wait for initialization
-    xEventGroupWaitBits(xEventInit, 0x1, pdFALSE, pdFALSE, portMAX_DELAY);
-    //after initialization, send a wakeup message to the menu
-    uint8_t wakeup[4] = {0x7e, 0x02, 'P', 'M'};
-    uint8_t menuawake = 0;
-    uint8_t byte_buffer[1];
-    while(menuawake != 1)
-    {
-        xStreamBufferSend(xMENU_out_Stream, wakeup, 4, portMAX_DELAY);
-        //enable DRE interrupt to start transmission
-        USART1.CTRLA |= USART_DREIE_bm;
-        //wait for TXcomplete semaphore
-        xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
-        xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 200);
-        if(byte_buffer == 0x7E) //the menu is awake
-        {
-            menuawake = 1;
-        }
-    }
-    xEventGroupSetBits(xEventInit, 0x2);
+    xEventGroupWaitBits(xEventInit, 0x2, pdFALSE, pdFALSE, portMAX_DELAY);
     for(;;)
     {
         //wait until a message arrives in the buffer
