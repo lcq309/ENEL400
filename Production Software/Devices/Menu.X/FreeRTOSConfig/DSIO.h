@@ -35,14 +35,6 @@ extern "C" {
     extern SemaphoreHandle_t xNotify; //defined in the communications module
     extern SemaphoreHandle_t xNEXTION_Sem;
     
-    //timer globals
-    
-    extern uint8_t xINDTimerSet;
-    
-    //timer handles
-    
-    extern TimerHandle_t xINDTimer;
-    
     //queue handles
 
     extern QueueHandle_t xPB_Queue;
@@ -65,9 +57,6 @@ extern "C" {
     //task setup function
     void DSIOSetup(void);
     
-    //timer callback functions
-    void vINDTimerFunc( TimerHandle_t xTimer );
-    void vPBTimerFunc( TimerHandle_t xTimer );
     
 #ifdef	__cplusplus
 }

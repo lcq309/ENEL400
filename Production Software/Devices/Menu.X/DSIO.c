@@ -55,17 +55,16 @@ void DSIOSetup()
     xNEXTION_out_Buffer = xStreamBufferCreate(40,1); //40 bytes, triggers when a byte is added
     xNEXTION_in_Buffer = xStreamBufferCreate(40,1);
     
+    //setup semaphore
+    
+    xNEXTION_Sem = xSemaphoreCreateBinary();
+    
     //setup tasks
     
     xTaskCreate(dsIOInTask, "PBIN", 250, NULL, mainPBIN_TASK_PRIORITY, NULL);
-    xTaskCreate(dsIOOutTask, "INDOUT", 250, NULL, mainINDOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(dsIOOutTask, "INDOUT", 400, NULL, mainINDOUT_TASK_PRIORITY, NULL);
     xTaskCreate(NextionInTask, "NEXT", 250, NULL, mainNEXT_TASK_PRIORITY, NULL);
     
-    //setup timers
-    xINDTimer = xTimerCreate("INDT", 250, pdTRUE, 0, vINDTimerFunc);
-    
-    //start the indicator timer
-    xTimerStart(xINDTimer, 0);
 }
 
 void NextionInTask (void * parameters)
@@ -145,19 +144,9 @@ void dsIOOutTask (void * parameters)
             //start the transmission
             USART1.CTRLA |= USART_DREIE_bm;
             //wait for end of transmission
-            xSemaphoreTake(xNEXTION_Sem, portMAX_DELAY);
+            xSemaphoreTake(xNEXTION_Sem, 20);
         }
-        
     }
-                vTaskSuspend(NULL);
-    
-}
-
-//timer callback functions
-
-void vINDTimerFunc( TimerHandle_t xTimer )
-{
-    xINDTimerSet = 1;
 }
 
 //interrupts go here
@@ -181,7 +170,7 @@ ISR(USART1_DRE_vect)
     if(xStreamBufferReceiveFromISR(xNEXTION_out_Buffer, buf, 1, NULL) == 0) //if end of message
         USART1.CTRLA &= ~USART_DREIE_bm; //disable interrupt
     else
-        USART1.TXDATAL = buf[0];
+         USART1.TXDATAL = buf[0];
 }
 ISR(USART1_TXC_vect)
 {

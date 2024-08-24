@@ -28,7 +28,7 @@
 #include "queue.h"
 
 #define ErrLength 10
-#define ErrTableLength 50
+#define ErrTableLength 25
 
 /*
  * Define device specific tasks
@@ -775,35 +775,40 @@ void prvMENUTask( void * parameters )
                         NumErrors++; //increment error count
                     }
                     break;
-            }
-
-            //then determine what error should be displayed first to redraw the display
-            uint8_t firstError = ((displayWindow - 1) * 5);
-            uint8_t localErr = 1; //which position should it be displayed in?
-            for(uint8_t i = firstError; i < (displayWindow * 5); i++)
-            {
-                if(ErrorTable[i].active == 1) //if this error is present
-                {
-                    //add the error to the display at the correct point
-                    text(buffer, localErr, ErrorTable[i].message);
-                    xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-                    //activate the button
-                    ButtEn(buffer, localErr);
-                    xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
-                    localErr++;
-                }
-                else //no more errors to show, break the loop
+                default:
                     break;
+            }
+            
+            //then determine what error should be displayed first to redraw the display
+            if(NumErrors > 0)
+            {
+                uint8_t firstError = ((displayWindow - 1) * 5);
+                uint8_t localErr = 1; //which position should it be displayed in?
+                for(uint8_t i = firstError; i < (displayWindow * 5); i++)
+                {
+                    if(ErrorTable[i].active == 1) //if this error is present
+                    {
+                        //add the error to the display at the correct point
+                        text(buffer, localErr, ErrorTable[i].message);
+                        xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                        //activate the button
+                        ButtEn(buffer, localErr);
+                        xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                        localErr++;
+                    }
+                    else //no more errors to show, break the loop
+                        break;
+                }
             }
             //then the common updates such as device numbers and system stop
 
             //device numbers overwrite
             //wireless first
             numval(buffer, 0, numWireless);
-            xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+            xMessageBufferSend(xIND_Buffer, buffer, 9, 5);
             //wired second
             numval(buffer, 1, numWired);
-            xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+            xMessageBufferSend(xIND_Buffer, buffer, 9, 5);
             //system stop
             updateIND = 0;
         }

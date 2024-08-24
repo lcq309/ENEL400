@@ -241,7 +241,7 @@ void prvWiredInitTask( void * parameters )
     xSemaphoreGive(xUSART0_MUTEX);
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
-    vTaskDelay(100); //wait for 100ms
+    vTaskDelay(1000); //wait for 1000ms
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
