@@ -24,6 +24,9 @@
 #include "message_buffer.h"
 #include "ShiftReg.h"
 
+#define ErrLength 10
+#define ErrTableLength 50
+
 /*
  * Define device specific tasks
  * - Device Specific
@@ -39,9 +42,9 @@ struct DeviceTracker
 
 struct ErrorTracker
 {
-    uint8_t active; //show the state of this error
+    uint8_t active; //show the state of this error box
     uint8_t state; //show the state of the clear button
-    uint8_t message[4]; //hold the error message to be displayed
+    uint8_t message[ErrLength]; //hold the error message to be displayed
 };
 
 //define global variables
@@ -62,7 +65,7 @@ uint8_t GLOBAL_DeviceType = 'M'; //Menu controller device
 uint8_t errorNum = 0; //track the number of errors
 
 //Error table
-struct ErrorTracker ErrorTable[50];
+struct ErrorTracker ErrorTable[ErrTableLength];
 
 //task pointers
 
@@ -82,7 +85,7 @@ void vRetransmitTimerFunc( TimerHandle_t xTimer );
 uint8_t GLOBAL_RetransmissionTimerSet = 1; //without setting this, it will never transmit
 
 //Nextion helper functions
-void text(uint8_t *output, uint8_t textbox, uint8_t *text, uint8_t textlength);
+void text(uint8_t *output, uint8_t textbox, uint8_t *text);
 void numval(uint8_t *output, uint8_t numbox, uint8_t number);
 void ButtEn(uint8_t *output, uint8_t numButt);
 
@@ -365,6 +368,7 @@ void prvMENUTask( void * parameters )
                         else
                             numWireless++;
                         numControllers++;
+                        updateIND = 1;
                     }
                     //add error code here
                     //the only error here would be low battery
@@ -408,6 +412,7 @@ void prvMENUTask( void * parameters )
                         else
                             numWireless++;
                         numLights++;
+                        updateIND = 1;
                     }
                     //this error could be low battery or circuit failure
                     switch(buffer[1])
@@ -502,6 +507,7 @@ void prvMENUTask( void * parameters )
                         tablePos = numControllers;
                         numWired++;
                         numControllers++;
+                        updateIND = 1;
                     }
                     break;
                     //no errors for this one, this is just in case one is implemented in the future
@@ -522,6 +528,7 @@ void prvMENUTask( void * parameters )
                         tablePos = numLights;
                         numWired++;
                         numLights++;
+                        updateIND = 1;
                     }
                     //this one might have a circuit failure error
                     switch(buffer[1])
@@ -600,6 +607,7 @@ void prvMENUTask( void * parameters )
                         tablePos = numControllers;
                         numWired++;
                         numControllers++;
+                        updateIND = 1;
                     }
                     break;
                     //no errors for the lap controller
@@ -640,6 +648,7 @@ void prvMENUTask( void * parameters )
                         tablePos = numSpecials;
                         numWired++;
                         numSpecials++;
+                        updateIND = 1;
                     }
                     break;
                     //this may be where the system stop message is received if implemented
@@ -660,6 +669,7 @@ void prvMENUTask( void * parameters )
                         tablePos = numMenus;
                         numWired++;
                         numMenus++;
+                        updateIND = 1;
                     }
                     break;
                     //so far, there isn't much reason for menus to communicate
@@ -667,37 +677,158 @@ void prvMENUTask( void * parameters )
         }
         uint8_t check_variable = 1;
     }
-    switch(updateIND)
+    if(updateIND != 0)
     {
-        case 'W': //window update
-            //first, update the window number in the buffer
-            numval(buffer, 2, displayWindow);
-            //send the buffer to the output buffer
-            xMessageBufferSend(xIND_Buffer, buffer, 20, 5);
-            //then determine what error should be displayed first
-            
-            break;
-            
-        case 'C': //error cleared
-            
-            break;
-            
-        case 'E': //error added
-            
-            break;
+        switch(updateIND)
+        {
+            case 'W': //window update
+                //first, update the window number in the buffer
+                numval(buffer, 2, displayWindow);
+                //send the buffer to the output buffer
+                xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                //display should now be drawn with all errors and the window number updated.
+                break;
+
+            case 'C': //error cleared
+                //check and see which one was cleared (should be first non-active in table)
+                ;
+                uint8_t Shufflemode = 0;
+                for(uint8_t i = 0; i < ErrTableLength; i++)
+                {
+                    if(Shufflemode = 0)
+                    {
+                        if(ErrorTable[i].active != 1) //this is the error that was cleared
+                        {
+                            //now check if there are any errors after it
+                            if(ErrorTable[i + 1].active != 1) //if nothing comes after, then just break the loop
+                                i = ErrTableLength;
+                            else //change the loop to shuffle the remaining errors
+                            {
+                                Shufflemode = 1;
+                                for(uint8_t y = 0; y < ErrLength; y++)
+                                {
+                                    ErrorTable[i].message[y] = ErrorTable[i + 1].message[y]; //move first over
+                                    ErrorTable[i].active = 1; //this error is now active
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(ErrorTable[i].active != 1) //the last error is last in the list
+                        {
+                            ErrorTable[i - 1].active = 0; //remove the last error in the list
+                        }
+                        else //shuffle error down by one
+                        {
+                            for(uint8_t y = 0; y < ErrLength; y++)
+                                {
+                                    ErrorTable[i].message[y] = ErrorTable[i + 1].message[y]; //shuffle error message
+                                }
+                        }
+                    }
+                }
+                NumErrors--;
+                break;
+
+            case 'E': //error added
+                ;
+                uint8_t temp[ErrLength];
+                for(uint8_t i = 0; i < ErrLength; i++)
+                    temp[i] = 0;
+                //move the last error to a temporary storage buffer
+                for(uint8_t i = 0; i < ErrLength; i++)
+                {
+                    temp[i] = ErrorTable[NumErrors].message[i];
+                }
+                //now compare all errors to the new one and see if it exists
+                uint8_t matchErr = 0;
+                for(uint8_t i = 0; i < ErrTableLength; i++)
+                {
+                    if(ErrorTable[i].active != 0) //if there is an error here
+                    {
+                        //compare
+                        for(uint8_t y = 0; y < ErrLength; y++)
+                        {
+                           if(ErrorTable[i].message[y] != temp[y]) //if not matching, end loop and continue
+                           {
+                               y = ErrLength;
+                               matchErr = 0;
+                           }
+                           else //if matching, keep checking
+                           {
+                               matchErr = 1;
+                           }
+                        }
+                        if(matchErr == 1) //if the error is already present
+                        {
+                            i = ErrTableLength;
+                        }
+                    }
+                    else //end execution, we reached an available spot.
+                        i = ErrTableLength;
+                }
+                if(matchErr == 1) //already exists, break execution and ignore
+                {
+                    break;
+                }
+                else //it doesn't already exist, shuffle errors and add at the start
+                {
+                    ErrorTable[NumErrors].active = 1; //set the last error active
+                    //shuffle first, start at the back and work towards the front
+                    for(int8_t i = NumErrors; i > 0; i--)
+                    {
+                        for(uint8_t y = 0; y < ErrLength; y++)
+                        {
+                            ErrorTable[i].message[y] = ErrorTable[i-1].message[y];
+                        }
+                    }
+                    //at this point, all errors should be moved up by one
+                    //add the new error at the start
+                    for(uint8_t i = 0; i < ErrLength; i++)
+                    {
+                        ErrorTable[0].message[i] = temp[i];
+                    }
+                    NumErrors++; //increment error count
+                }
+                break;
+        }
+
+        //then determine what error should be displayed first to redraw the display
+        uint8_t firstError = ((displayWindow - 1) * 5);
+        uint8_t localErr = 1; //which position should it be displayed in?
+        for(uint8_t i = firstError; i < (displayWindow * 5); i++)
+        {
+            if(ErrorTable[i].active == 1) //if this error is present
+            {
+                //add the error to the display at the correct point
+                text(buffer, localErr, ErrorTable[i].message);
+                xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                //activate the button
+                ButtEn(buffer, localErr);
+                xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+                localErr++;
+            }
+            else //no more errors to show, break the loop
+                break;
+        }
+        //then the common updates such as device numbers and system stop
+
+        //device numbers overwrite
+        //wireless first
+        numval(buffer, 0, numWireless);
+        xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+        //wired second
+        numval(buffer, 1, numWired);
+        xMessageBufferSend(xIND_Buffer, buffer, 25, 5);
+        //system stop
+        updateIND = 0;
     }
-            
-            //then the common updates such as device numbers and system stop
-            
-            //device numbers overwrite
-            
-            //system stop
-            
         //loop and restart
 } 
 
 //helper functions for Nextion commands
-void text(uint8_t *output, uint8_t textbox, uint8_t *text, uint8_t textlength)
+void text(uint8_t *output, uint8_t textbox, uint8_t *text)
 {
     uint8_t ErrorBox[8] = {'e',0,'.','t','x','t','=','"'}; //textbox to send text change messages
     uint8_t SysBox[9] = {'s','y','s','.','t','x','t','=','"'}; //textbox to send stop button messages
@@ -707,11 +838,18 @@ void text(uint8_t *output, uint8_t textbox, uint8_t *text, uint8_t textlength)
         {
             output[i] = SysBox[i];
         }
-        for(uint8_t i = 0; i < textlength; i++)
+        for(uint8_t i = 0; i < 10; i++)
         {
-            output[i + 9] = text[i];
+            if(text[i] != 0) //assuming the string is null terminated, anything but 0 should be added
+            {
+                output[i + 9] = text[i];
+            }
+            else //the string has ended, add the end quotation mark and break the loop
+            {
+                output[i + 9] = '"';
+                break;
+            }
         }
-        output[textlength + 9] = '"'; //add end quotation mark
     }
     else
     {
@@ -737,11 +875,18 @@ void text(uint8_t *output, uint8_t textbox, uint8_t *text, uint8_t textlength)
         {
             output[i] = ErrorBox[i];
         }
-        for(uint8_t i = 0; i < textlength; i++)
+        for(uint8_t i = 0; i < 10; i++)
         {
-            output[i + 8] = text[i];
+            if(text[i] != 0) //assuming the string is null terminated, anything but 0 should be added
+            {
+                output[i + 8] = text[i];
+            }
+            else //the string has ended, add the end quotation mark and break the loop
+            {
+                output[i + 8] = '"';
+                break;
+            }
         }
-        output[textlength + 8] = '"'; //add end quotation mark
     }
 }
 
