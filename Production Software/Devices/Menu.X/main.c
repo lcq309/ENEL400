@@ -9,7 +9,6 @@
  * 
  */
 
-#define configASSERT ( x )     if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
 
 #include <stdio.h>
 #include <stdlib.h>

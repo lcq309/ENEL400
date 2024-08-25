@@ -734,8 +734,13 @@ void prvXBEEINTask( void * parameters )
                             xSemaphoreGive(x485_MUTEX);
                         }
                     }
-                }
+                    if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xMENU_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                        xSemaphoreGive(xMENU_MUTEX);
+                    }
                 break;
+            }
         }
         
     }
