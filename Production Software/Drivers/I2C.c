@@ -32,195 +32,69 @@ uint16_t I2C_translate(uint8_t character)
     
     switch (character)
     {
-        case '0':
-            result = 0x003F;
-            break;
-        case '1':
-            result = 0x1006;
-            break;
-        case '2':
-            result = 0x055B;
-            break;
-        case '3':
-            result = 0x053F;
-            break;
-        case '4':
-            result = 0x0566;
-            break;
-        case '5':
-            result = 0x056D;
-            break;
-        case '6':
-            result = 0x057D;
-            break;
-        case '7':
-            result = 0x5001;
-            break;
-        case '8':
-            result = 0x057F;
-            break;
-        case '9':
-            result = 0x0567;
-            break;
-        case 'A':
-            result = 0x0577;
-            break;
-        case 'B':
-            result = 0x4C0F;
-            break;
-        case 'C':
-            result = 0x0039;
-            break;
-        case 'D':
-            result = 0x480F;
-            break;
-        case 'E':
-            result = 0x0579;
-            break;
-        case 'F':
-            result = 0x0571;
-            break;
-        case 'G':
-            result = 0x047D;
-            break;
-        case 'H':
-            result = 0x0576;
-            break;
-        case 'I':
-            result = 0x4809;
-            break;
-        case 'J':
-            result = 0x001E;
-            break;
-        case 'K':
-            result = 0x31C0;
-            break;
-        case 'L':
-            result = 0x0038;
-            break;
-        case 'M':
-            result = 0x12D6;
-            break;
-        case 'N':
-            result = 0x22D6;
-            break;
-        case 'O':
-            result = 0x003F;
-            break;
-        case 'P':
-            result = 0x0573;
-            break;
-        case 'Q':
-            result = 0x20FF;
-            break;
-        case 'R':
-            result = 0x25B3;
-            break;
-        case 'S':
-            result = 0x063D;
-            break;
-        case 'T':
-            result = 0x4801;
-            break;
-        case 'U':
-            result = 0x003E;
-            break;
-        case 'V':
-            result = 0x9230;
-            break;
-        case 'W':
-            result = 0xA2D6;
-            break;
-        case 'X':
-            result = 0xB200;
-            break;
-        case 'Y':
-            result = 0x5200;
-            break;
-        case 'Z':
-            result = 0x9209;
-            break;
-        case 'a':
-            result = 0x057F;
-            break;
-        case 'b':
-            result = 0x21F0;
-            break;
-        case 'c':
-            result = 0x0560;
-            break;
-        case 'd':
-            result = 0x843E;
-            break;
-        case 'e':
-            result = 0x0079;
-            break;
-        case 'f':
-            result = 0x0071;
-            break;
-        case 'g':
-            result = 0x063F;
-            break;
-        case 'h':
-            result = 0x0574;
-            break;
-        case 'i':
-            result = 0x4000;
-            break;
-        case 'j':
-            result = 0x000E;
-            break;
-        case 'k':
-            result = 0x7C00;
-            break;
-        case 'l':
-            result = 0x4800;
-            break;
-        case 'm':
-            result = 0x4554;
-            break;
-        case 'n':
-            result = 0x2140;
-            break;
-        case 'o':
-            result = 0x057C;
-            break;
-        case 'p':
-            result = 0x11C1;
-            break;
-        case 'q':
-            result = 0x25C3;
-            break;
-        case 'r':
-            result = 0x0050;
-            break;
-        case 's':
-            result = 0x063D;
-            break;
-        case 't':
-            result = 0x0078;
-            break;
-        case 'u':
-            result = 0x001C;
-            break;
-        case 'v':
-            result = 0x8010;
-            break;
-        case 'w':
-            result = 0xA014;
-            break;
-        case 'x':
-            result = 0xB200;
-            break;
-        case 'y':
-            result = 0x0C0E;
-            break;
-        case 'z':
-            result = 0x9209;
-            break;
-        default:
-            result = 0xffff;
-            break;
+        case '0': return 0xC3F;
+        case '1': return 0x406;
+        case '2': return 0xDB;
+        case '3': return 0x8F;
+        case '4': return 0xE6;
+        case '5': return 0xED;
+        case '6': return 0xFD;
+        case '7': return 0x1401;
+        case '8': return 0xFF;
+        case '9': return 0xE7;
+        case 'A': return 0xF7;
+        case 'B': return 0x128F;
+        case 'C': return 0x39;
+        case 'D': return 0x120F;
+        case 'E': return 0xF9;
+        case 'F': return 0xF1;
+        case 'G': return 0xBD;
+        case 'H': return 0xF6;
+        case 'I': return 0x1209;
+        case 'J': return 0x1E;
+        case 'K': return 0x2470;
+        case 'L': return 0x38;
+        case 'M': return 0x536;
+        case 'N': return 0x2136;
+        case 'O': return 0x3F;
+        case 'P': return 0xF3;
+        case 'Q': return 0x203F;
+        case 'R': return 0x20F3;
+        case 'S': return 0x18D;
+        case 'T': return 0x1201;
+        case 'U': return 0x3E;
+        case 'V': return 0xC30;
+        case 'W': return 0x2836;
+        case 'X': return 0x2D00;
+        case 'Y': return 0x1500;
+        case 'Z': return 0xC09;
+        case 'a': return 0xDF;
+        case 'b': return 0x2078;
+        case 'c': return 0xD8;
+        case 'd': return 0x88E;
+        case 'e': return 0x79;
+        case 'f': return 0x71;
+        case 'g': return 0x18F;
+        case 'h': return 0xF4;
+        case 'i': return 0x1000;
+        case 'j': return 0xE;
+        case 'k': return 0x3600;
+        case 'l': return 0x1200;
+        case 'm': return 0x10D4;
+        case 'n': return 0x2050;
+        case 'o': return 0xDC;
+        case 'p': return 0x471;
+        case 'q': return 0x20E3;
+        case 'r': return 0x50;
+        case 's': return 0x18D;
+        case 't': return 0x78;
+        case 'u': return 0x1C;
+        case 'v': return 0x810;
+        case 'w': return 0x2814;
+        case 'x': return 0x2D00;
+        case 'y': return 0x28E;
+        case 'z': return 0xC09;
+        default:  return 0xffff;
     }
     
     return result;
