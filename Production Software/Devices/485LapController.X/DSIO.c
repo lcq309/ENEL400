@@ -205,14 +205,16 @@ void dsIOOutTask (void * parameters)
         {
             case 1: //on
                 //first and last digit is always left blank
+                output[1] = 0x00;
+                output[2] = 0x00;
                 digit = I2C_translate(DigitOne);
-                output[1] = digit & 0xff;
-                //output[4] = output[3];
-                output[2] = (digit >> 8) & 0xff;
-                digit = I2C_translate(DigitTwo);
                 output[3] = digit & 0xff;
-                //output[6] = output[5];
+                //output[4] = output[3];
                 output[4] = (digit >> 8) & 0xff;
+                digit = I2C_translate(DigitTwo);
+                output[5] = digit & 0xff;
+                //output[6] = output[5];
+                output[6] = (digit >> 8) & 0xff;
                 xStreamBufferSend(xI2C_out_Buffer, output, 9, 10);
                 //with the message loaded, load the address buffer with the address for the display
                 TWI0.MADDR = I2C_ADDR;

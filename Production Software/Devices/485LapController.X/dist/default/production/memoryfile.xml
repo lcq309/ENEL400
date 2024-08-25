@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/debug/XBSecLight.X.debug.elf">                 
+  <executable name="dist/default/production/485LapController.X.production.elf">                 
     <memory name="program">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>24475</used>                     
-      <free>106597</free>                     
+      <used>23226</used>                     
+      <free>107846</free>                     
     </memory>                              
     <memory name="data">                 
       <units>bytes</units>                 
       <length>16384</length>                 
-      <used>11389</used>                     
-      <free>4995</free>                     
+      <used>11395</used>                     
+      <free>4989</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

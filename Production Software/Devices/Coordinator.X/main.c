@@ -64,6 +64,10 @@ void prvRoundRobinTask( void * parameters );
 void prvXBEEOUTTask( void * parameters );
 void prvXBEEINTask( void * parameters );
 
+//menu tasks
+void prvMENUOUTTask( void * parameters );
+void prvMENUINTask( void * parameters );
+
 //stream handles
 //wired
 static StreamBufferHandle_t xRS485_in_Stream = NULL;
@@ -74,14 +78,22 @@ static MessageBufferHandle_t xRoundRobin_Buffer = NULL;
 static StreamBufferHandle_t xXBEE_in_Stream = NULL;
 static StreamBufferHandle_t xXBEE_out_Stream = NULL;
 static MessageBufferHandle_t xXBEE_out_Buffer = NULL;
+//menu
+static StreamBufferHandle_t xMENU_in_Stream = NULL;
+static StreamBufferHandle_t xMENU_out_Stream = NULL;
+static StreamBufferHandle_t xMENU_out_Buffer = NULL;
 
 //Mutexes
 static SemaphoreHandle_t xUSART0_MUTEX = NULL;
 static SemaphoreHandle_t xRoundRobin_MUTEX = NULL;
+static SemaphoreHandle_t x485_MUTEX = NULL;
+static SemaphoreHandle_t xXBEE_MUTEX = NULL;
+static SemaphoreHandle_t xMENU_MUTEX = NULL;
 
 //Semaphores
 static SemaphoreHandle_t xRS485TX_SEM = NULL;
 static SemaphoreHandle_t xXBEETX_SEM = NULL;
+static SemaphoreHandle_t xMENUTX_SEM = NULL;
 
 //Device Table
 static uint8_t GLOBAL_DEVICE_TABLE[LIST_LENGTH];
@@ -102,6 +114,9 @@ int main(int argc, char** argv) {
     
     xTaskCreate(prvXBEEOUTTask, "XBO", 600, NULL, mainOUT_TASK_PRIORITY, NULL);
     xTaskCreate(prvXBEEINTask, "XBI", 600, NULL, mainIN_TASK_PRIORITY, NULL);
+    
+    xTaskCreate(prvMENUOUTTask, "MO", 600, NULL, mainOUT_TASK_PRIORITY, NULL);
+    xTaskCreate(prvMENUINTask, "MI", 600, NULL, mainIN_TASK_PRIORITY, NULL);
     //setup modules (no modules for the coordinator)
     
     //setup event group
@@ -111,6 +126,7 @@ int main(int argc, char** argv) {
     //setup USART
     
     USART0_init();
+    USART1_init();
     USART2_init();
     
     //USART 485 control pin
@@ -129,15 +145,23 @@ int main(int argc, char** argv) {
     xXBEE_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1);
     xXBEE_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE * 2);
     
+    xMENU_in_Stream = xStreamBufferCreate(20, 1); //size of 20 bytes, 1 byte trigger
+    xMENU_out_Stream = xStreamBufferCreate(MAX_MESSAGE_SIZE, 1);
+    xMENU_out_Buffer = xMessageBufferCreate(MAX_MESSAGE_SIZE * 2);
+    
     //setup mutex(es)
     
     xUSART0_MUTEX = xSemaphoreCreateMutex();
     xRoundRobin_MUTEX = xSemaphoreCreateMutex();
+    x485_MUTEX = xSemaphoreCreateMutex();
+    xXBEE_MUTEX = xSemaphoreCreateMutex();
+    xMENU_MUTEX = xSemaphoreCreateMutex();
     
     //setup semaphore
     
     xRS485TX_SEM = xSemaphoreCreateBinary();
     xXBEETX_SEM = xSemaphoreCreateBinary();
+    xMENUTX_SEM = xSemaphoreCreateBinary();
     
     //done with pre-scheduler initialization, start scheduler
     
@@ -167,6 +191,7 @@ void prvWiredInitTask( void * parameters )
     
     //enable transmit complete interrupt
     USART0.CTRLA |= USART_TXCIE_bm;
+    USART1.CTRLA |= USART_TXCIE_bm;
     USART2.CTRLA |= USART_TXCIE_bm;
     
     //take the mutex
@@ -217,6 +242,37 @@ void prvWiredInitTask( void * parameters )
     //The device table and all connected devices should now be initialized.
     //release the init group and suspend the task.
     vTaskDelay(1000); //wait for 1000ms
+    //initialize the menu micro
+    Ping[3] = 'M';
+    xStreamBufferSend(xMENU_out_Stream, Ping, 4, portMAX_DELAY);
+    //enable DRE interrupt to start transmission
+    USART1.CTRLA |= USART_DREIE_bm;
+    //wait for TXcomplete semaphore
+    xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
+    xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 10);
+    if(byte_buffer[0] == 0x7E)
+    {
+        uint8_t pos = 0;
+        //next byte is length, grab length for message construction loop
+        xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, portMAX_DELAY);
+        length = byte_buffer[0]; // load loop iterator
+        //loop and assemble message until length = 0;
+        while(length > 0)
+        {
+            length--;
+            xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, portMAX_DELAY);
+            buffer[pos] = byte_buffer[0];
+            pos++;
+        }
+    }
+        //now check ping response for correct number
+        if(buffer[0] == 'R')
+        {
+            if(buffer[1] == 'M') //if correct response, good to go
+            {
+                xEventGroupSetBits(xEventInit, 0x2);
+            }
+        }
     xEventGroupSetBits(xEventInit, 0x1);
     vTaskSuspend(NULL);
 }
@@ -343,9 +399,19 @@ void prv485INTask( void * parameters )
                     {
                         //this will need to grab the MUTEX for the wireless buffer and send the message
                         //block for no more than 50 cycles
-                        xMessageBufferSend(xXBEE_out_Buffer, message_buffer, length, 0); //do not block, if the buffer is full then just discard the message
-                        
+                        if(xSemaphoreTake(xXBEE_MUTEX, 50) == pdTRUE)
+                        {
+                            xMessageBufferSend(xXBEE_out_Buffer, message_buffer, length, 0); //do not block, if the buffer is full then just discard the message
+                            xSemaphoreGive(xXBEE_MUTEX);
+                        }
                     }
+                    //send all to menu controller
+                    if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xMENU_out_Buffer, message_buffer, length, 0);
+                        xSemaphoreGive(xMENU_MUTEX);
+                    }
+                    xSemaphoreGive(xUSART0_MUTEX);
                     break;
             }
         }
@@ -590,66 +656,194 @@ void prvXBEEINTask( void * parameters )
         switch(buffer[0])
         {
             case 0x90: //receive packet
-            //re-arrange header to match wired format (type 'I')
-            /* Message Structure Wired and Wireless
-             *  Wireless (from XBEE to this task):
-             *  Byte 0 = start delimiter (not included in count) [size doesn't change]
-             *  Byte 1 = MSB of length (probably always 0) [size doesn't change]
-             *  Byte 2 = LSB of length (we will change this to match the size) [size doesn't change]
-             *  Byte 3 = Message type (discarded for wired) [size - 1]
-             *  Byte 5 = Start of wireless address (move to output) [size doesn't change]
-             *  -
-             *  Byte 12 = End of wireless address (move to output) [size doesn't change]
-             *  Byte 13 = start of 16 bit address (always unknown) [size - 1]
-             *  Byte 14 = end of 16 bit address (always unknown) [size - 1]
-             *  Byte 17 = Wired address (move to output) [size doesn't change]
-             *  Byte 18 = Channel (move to output) [size doesn't change]
-             *  Byte 19 = Device Type (move to output) [size doesn't change]
-             *  Byte 20+ = Message
-             * 
-             *  Wired (to 485 or menu):
-             *  Byte 0 = Message type (should be 'I') [size + 1]
-             *  Byte 1 = Wired Address (we need to move this from header) [size doesn't change]
-             *  Byte 2 = Channel (we need to move this from header) [size doesn't change]
-             *  Byte 3 = Device Type (we need to move this from header) [size doesn't change]
-             *  Byte 4 = first byte of wireless address (we need to move this from header) [size doesn't change]
-             *  -
-             *  Byte 11 = last byte of wireless address (this all needs to move from header) [size doesn't change]
-             *  Byte 12+ = message (taken from input) [size doesn't change]
-             * 
-             * overall size change is - 4 for header differences
-             */
-            //check against checksum
-            {
-                //change size
-                size = size - 2;
-                //reassemble the message in the output buffer
-                for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
-                outbuffer[i] = 0;
-                outbuffer[0] = 'I'; //always inbound
-                outbuffer[1] = buffer[12]; //wired address
-                outbuffer[2] = buffer[13]; //channel number
-                outbuffer[3] = buffer[14]; //device type
-                outbuffer[4] = buffer[1]; //start of wireless address
-                outbuffer[5] = buffer[2];
-                outbuffer[6] = buffer[3];
-                outbuffer[7] = buffer[4];
-                outbuffer[8] = buffer[5];
-                outbuffer[9] = buffer[6];
-                outbuffer[10] = buffer[7];
-                outbuffer[11] = buffer[8]; //end of wireless address]
-                for(uint8_t i = 12; i < size + 2; i++) //move message to the correct spot
+                //re-arrange header to match wired format (type 'I')
+                /* Message Structure Wired and Wireless
+                 *  Wireless (from XBEE to this task):
+                 *  Byte 0 = start delimiter (not included in count) [size doesn't change]
+                 *  Byte 1 = MSB of length (probably always 0) [size doesn't change]
+                 *  Byte 2 = LSB of length (we will change this to match the size) [size doesn't change]
+                 *  Byte 3 = Message type (discarded for wired) [size - 1]
+                 *  Byte 5 = Start of wireless address (move to output) [size doesn't change]
+                 *  -
+                 *  Byte 12 = End of wireless address (move to output) [size doesn't change]
+                 *  Byte 13 = start of 16 bit address (always unknown) [size - 1]
+                 *  Byte 14 = end of 16 bit address (always unknown) [size - 1]
+                 *  Byte 17 = Wired address (move to output) [size doesn't change]
+                 *  Byte 18 = Channel (move to output) [size doesn't change]
+                 *  Byte 19 = Device Type (move to output) [size doesn't change]
+                 *  Byte 20+ = Message
+                 * 
+                 *  Wired (to 485 or menu):
+                 *  Byte 0 = Message type (should be 'I') [size + 1]
+                 *  Byte 1 = Wired Address (we need to move this from header) [size doesn't change]
+                 *  Byte 2 = Channel (we need to move this from header) [size doesn't change]
+                 *  Byte 3 = Device Type (we need to move this from header) [size doesn't change]
+                 *  Byte 4 = first byte of wireless address (we need to move this from header) [size doesn't change]
+                 *  -
+                 *  Byte 11 = last byte of wireless address (this all needs to move from header) [size doesn't change]
+                 *  Byte 12+ = message (taken from input) [size doesn't change]
+                 * 
+                 * overall size change is - 4 for header differences
+                 */
+                //check against checksum
                 {
-                    outbuffer[i] = buffer[i + 3];
-                }
-                //now the outbuffer should be loaded with the correct message, move to routing
-                xMessageBufferSend(xRS485_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                    //change size
+                    size = size - 2;
+                    //reassemble the message in the output buffer
+                    for(uint8_t i = 0; i < MAX_MESSAGE_SIZE; i++)
+                    outbuffer[i] = 0;
+                    outbuffer[0] = 'I'; //always inbound
+                    outbuffer[1] = buffer[12]; //wired address
+                    outbuffer[2] = buffer[13]; //channel number
+                    outbuffer[3] = buffer[14]; //device type
+                    outbuffer[4] = buffer[1]; //start of wireless address
+                    outbuffer[5] = buffer[2];
+                    outbuffer[6] = buffer[3];
+                    outbuffer[7] = buffer[4];
+                    outbuffer[8] = buffer[5];
+                    outbuffer[9] = buffer[6];
+                    outbuffer[10] = buffer[7];
+                    outbuffer[11] = buffer[8]; //end of wireless address]
+                    for(uint8_t i = 12; i < size + 2; i++) //move message to the correct spot
+                    {
+                        outbuffer[i] = buffer[i + 3];
+                    }
+                    //now the outbuffer should be loaded with the correct message, move to routing
+                    if(outbuffer[2] == 0) //channel zero always goes to menu
+                    {
+                        //this will need to grab the MUTEX for the menu buffer and send the message
+                        if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
+                        {
+                            xMessageBufferSend(xMENU_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                            xSemaphoreGive(xMENU_MUTEX);
+                        }
+                        if(outbuffer[3] == 'M') //if the device type is menu, then also transmit on wired network
+                        {
+                            if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
+                            {
+                                xMessageBufferSend(xRS485_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                                xSemaphoreGive(x485_MUTEX);
+                            }
+                        }
+                    }
+                    else //all other cases transmit over the wired network
+                    {
+                        if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
+                        {
+                            xMessageBufferSend(xRS485_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                            xSemaphoreGive(x485_MUTEX);
+                        }
+                    }
+                    if(xSemaphoreTake(xMENU_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xMENU_out_Buffer, outbuffer, MAX_MESSAGE_SIZE, 0);
+                        xSemaphoreGive(xMENU_MUTEX);
+                    }
+                break;
             }
-            break;
         }
+        
     }
 }
 
+//menu tasks
+
+void prvMENUOUTTask( void * parameters )
+{
+    //pass messages from either wireless or wired network on to menu
+    uint8_t output_buffer[MAX_MESSAGE_SIZE]; //output buffer
+    uint8_t output_leader[2] = {0x7e, 0}; //output leader
+    uint8_t length = 0;  //message length
+    //this is fairly simple, just output the message buffer when the bus is available.
+    //message length should be taken directly from the stream receive.
+    //wait for initialization
+    xEventGroupWaitBits(xEventInit, 0x2, pdFALSE, pdFALSE, portMAX_DELAY);
+    for(;;)
+    {
+        //wait until a message arrives in the buffer
+        length = xMessageBufferReceive(xMENU_out_Buffer, output_buffer, MAX_MESSAGE_SIZE, portMAX_DELAY);
+        output_leader[1] = length;
+        xStreamBufferSend(xMENU_out_Stream, output_leader, 2, 0);
+        //pass message to the output buffer
+        xStreamBufferSend(xMENU_out_Stream, output_buffer, length, 0);
+        //enable DRE interrupt to start transmission
+        USART1.CTRLA |= USART_DREIE_bm;
+        //wait for TXcomplete semaphore
+        xSemaphoreTake(xMENUTX_SEM, portMAX_DELAY);
+        //end of loop, start over by waiting for a new message in the buffer
+    }
+}
+
+void prvMENUINTask( void * parameters )
+{
+    /* listen for messages from menu
+     * - there may be multiple messages in a stream, process them appropriately based on destination
+     * = for messages targeted outbound, send them to the wireless task
+     * = for messages targeted inbound, send them to the 485 task
+     * 
+     * 1. wait until message start is received, start collecting and building messages
+     * 2. route messages to appropriate destination task
+     */
+    uint8_t message_buffer[MAX_MESSAGE_SIZE];
+    uint8_t byte_buffer[1];
+    uint8_t length = 0; //message length from header
+    //wait for initialization
+    xEventGroupWaitBits(xEventInit, 0x2, pdFALSE, pdFALSE, portMAX_DELAY);
+    for(;;)
+    {
+        //wait for something to appear on the bus
+        if(xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 200) == 0)
+        {
+            byte_buffer[0] = 0x0;
+        }
+        //check for start delimiter
+        if(byte_buffer[0] == 0x7e)
+        {
+            //next byte should be length
+            xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 50); //at worst, this will collect garbage, but it shouldn't lock up
+            length = byte_buffer[0];
+        }
+        else
+            length = 0; //just ignore this message, something went wrong
+        
+        //now we know the message length(if there is a message)
+        for(uint8_t i = 0; i < length; i++)
+        {
+            //assemble the message byte by byte until the length is reached
+            if(xStreamBufferReceive(xMENU_in_Stream, byte_buffer, 1, 10) != 0)
+                message_buffer[i] = byte_buffer[0];
+            //if nothing is received, cancel message receipt. Something went wrong
+            else
+                length = 0;
+            //this if/else statement constitutes collision recovery code.
+            //if a collision occurs and breaks the loop, the timeout will save us from getting trapped here.
+        }
+        //now the full message should be within the message buffer, perform routing
+        if(length != 0)
+        {
+            uint8_t wirelesscheck = 0;
+            switch(message_buffer[0])
+            {
+                case 'O': //outbound message, route to XBEE task
+                    if(xSemaphoreTake(xXBEE_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xXBEE_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
+                        xSemaphoreGive(xXBEE_MUTEX);
+                    }
+                    break;
+                    
+                case 'I': //inbound message, route to 485 task
+                    if(xSemaphoreTake(x485_MUTEX, 50) == pdTRUE)
+                    {
+                        xMessageBufferSend(xRS485_out_Buffer, message_buffer, MAX_MESSAGE_SIZE, 0); //do not block, if the buffer is full then just discard the message
+                        xSemaphoreGive(x485_MUTEX);
+                    }
+                    break;
+            }
+        }
+        
+    }
+}
 //helper functions:
 
 //RS485 in/out
@@ -701,6 +895,37 @@ ISR(USART0_TXC_vect)
     RS485TR('R');
     USART0.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
     xSemaphoreGiveFromISR(xRS485TX_SEM, NULL);
+}
+
+ISR(USART1_RXC_vect)
+{
+    //move the data receive register into the stream for the input task, this clears the interrupt automatically
+    uint8_t buf[1];
+    buf[0] = USART1.RXDATAL;
+    xMessageBufferSendFromISR(xMENU_in_Stream, buf, 1, NULL);
+}
+ISR(USART1_DRE_vect)
+{
+    /* Data Register empty Interrupt
+     * 1. pull from output stream buffer and put in TX register until clear
+     * 2. disable interrupt after end of message
+     */
+    uint8_t buf[1];
+    if(xStreamBufferReceiveFromISR(xMENU_out_Stream, buf, 1, NULL) == 0) //if end of message
+    {
+        USART1.CTRLA &= ~USART_DREIE_bm; //disable interrupt
+    }
+    else
+        USART1.TXDATAL = buf[0];
+}
+ISR(USART1_TXC_vect)
+{
+    /* Transmission complete interrupts
+     * 1. set semaphore
+     * 2. clear interrupt flag
+     */
+    USART1.STATUS |= USART_TXCIF_bm; //clear flag by writing a 1 to it
+    xSemaphoreGiveFromISR(xMENUTX_SEM, NULL);
 }
 
 ISR(USART2_RXC_vect)

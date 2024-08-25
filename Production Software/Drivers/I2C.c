@@ -32,6 +32,7 @@ uint16_t I2C_translate(uint8_t character)
     
     switch (character)
     {
+        case ' ': return 0x00;
         case '0': return 0xC3F;
         case '1': return 0x406;
         case '2': return 0xDB;
