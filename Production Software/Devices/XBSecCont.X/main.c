@@ -147,6 +147,7 @@ void prvXSCTask( void * parameters )
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
     uint8_t lowbatt = 0; //used to track the status of low battery warnings
+    uint8_t lightbatt = 0; //used to track battery status for lights
     
     /* High level overview
      * 1. check for any commands from pushbutton or other internal source.
@@ -279,7 +280,6 @@ void prvXSCTask( void * parameters )
                             //send the network join message
                             ; //this needs to be here to avoid an error on NetJoin.
                             uint8_t NetJoin[1] = {0xff};
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
@@ -713,6 +713,14 @@ void prvXSCTask( void * parameters )
                                 updateIND = 1;
                                 break;
 
+                            case 'L': //low battery
+                                lightbatt = 1; //start warning about light battery
+                                updateIND = 1;
+                                buffer[0] = 'b'; //confirm battery
+                                buffer[1] = LightTable[tablePos].index;
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                break;
+                                
                             default: //anything else should just be state confirmations
                                 LightTable[tablePos].status = (buffer[1] - 32); //subtract 32 to get uppercase letter
                                 break;
@@ -1140,6 +1148,31 @@ void prvXSCTask( void * parameters )
                     xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
                 }
             }
+            else if(colour_err == 'L') //low battery
+            {
+                colour_err = colour_cur;
+                if(colour_cur == 'O')
+                {
+                    //blink all indicators, if a light hasn't turned off
+                    //set single light flash to show all devices have confirmed change but are still releasing lights
+                    buffer[0] = 0xfe; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = 0xfe;
+                    buffer[1] = 'B'; //blink
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
+                else
+                {
+                    //set single light flash to show all devices have confirmed change but are still releasing lights
+                    buffer[0] = 0xfe; //all indicators
+                    buffer[1] = 'O'; //off
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                    buffer[0] = colour_cur;
+                    buffer[1] = 'B'; //blink
+                    xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
+            }
             else if(colour_cur == colour_req)
             {
                 //set solid
@@ -1149,6 +1182,12 @@ void prvXSCTask( void * parameters )
                 buffer[0] = colour_cur;
                 buffer[1] = 'S'; //solid
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                if(lightbatt == 1)
+                {
+                buffer[0] = colour_cur;
+                buffer[1] = 'B'; //slow blink
+                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
             }
                 //error case should blink lights slowly.
             updateIND = 0;

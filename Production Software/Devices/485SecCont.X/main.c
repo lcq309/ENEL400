@@ -200,6 +200,7 @@ void prvWSCTask( void * parameters )
     uint8_t colour_err = 0; //error tracking colour
     uint8_t Requester = 0; //is this device currently requesting a colour change
     uint8_t ForceCheck = 0; //used to force the device to check on the first go through.
+    uint8_t lightbatt = 0;
     
     /* High level overview
      * 1. check for any commands from pushbutton or other internal source.
@@ -755,7 +756,15 @@ void prvWSCTask( void * parameters )
                                 colour_err = buffer[2];
                                 updateIND = 1;
                                 break;
-
+                                
+                            case 'L': //low battery
+                                lightbatt = 1; //start warning about light battery
+                                updateIND = 1;
+                                buffer[0] = 'b'; //confirm battery
+                                buffer[1] = LightTable[tablePos].index;
+                                xMessageBufferSend(xCOMM_out_Buffer, buffer, 2, 5);
+                                break;
+                                
                             default: //anything else should just be state confirmations
                                 LightTable[tablePos].status = (buffer[1] - 32); //subtract 32 to get uppercase letter
                                 break;
@@ -1140,6 +1149,12 @@ void prvWSCTask( void * parameters )
                 buffer[0] = colour_cur;
                 buffer[1] = 'S'; //solid
                 xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                if(lightbatt == 1)
+                {
+                buffer[0] = colour_cur;
+                buffer[1] = 'B'; //slow blink
+                xQueueSendToBack(xIND_Queue, buffer, portMAX_DELAY);
+                }
             }
                 //error case should blink lights slowly.
             updateIND = 0;

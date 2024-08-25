@@ -192,7 +192,6 @@ void prvXSLTask( void * parameters )
                             uint8_t NetJoin[1] = {0xff};
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
-                            xMessageBufferSend(xCOMM_out_Buffer, NetJoin, 1, 0);
                             break;
                     }
                 }
@@ -442,6 +441,10 @@ void prvXSLTask( void * parameters )
                             }
                             break;
                             
+                        case 'b': //confirm battery
+                                ControllerTable[tablePos].status = (ControllerTable[tablePos].status | 0x1);
+                            break;   
+                            
                         default: //can put an error message here, for incorrect command.
                             break;
                     }
@@ -615,12 +618,12 @@ void prvXSLTask( void * parameters )
             //ignore the netnumber stuff, there will only ever be one menu per net.
             for(uint8_t i = 0; i < numMenus; i++)
             {
-                if((MenuTable[i].status & 0x1) != 0x1)
+                if((ControllerTable[i].status & 0x1) != 0x1)
                 {
                     //send another lowbatt message
                     buffer[0] = 'L'; //low
-                    buffer[1] = 'B'; //battery
-                    buffer[2] = MenuTable[i].index; //load with retransmission request
+                    buffer[1] = 'B'; //Lbattery
+                    buffer[2] = ControllerTable[i].index; //load with retransmission request
                     check_variable = 0;
                     xMessageBufferSend(xCOMM_out_Buffer, buffer, 3, 5);
                 }
